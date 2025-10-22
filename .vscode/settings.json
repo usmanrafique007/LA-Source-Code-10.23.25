@@ -1,0 +1,9 @@
+{
+    "[javascriptreact]": {
+        "editor.formatOnSave": true
+    },
+    "[typescriptreact]": {
+        "editor.formatOnSave": true
+    },
+    "java.configuration.updateBuildConfiguration": "interactive"
+}
