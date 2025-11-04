@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState, useRef, useEffect} from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Platform,
   TouchableWithoutFeedback,
@@ -12,7 +12,7 @@ import {
 import LottieView from 'lottie-react-native';
 import CheckBox from '@react-native-community/checkbox';
 
-import {requestPurchase} from 'react-native-iap';
+import { requestPurchase } from 'react-native-iap';
 import {
   responsiveScreenHeight,
   responsiveScreenWidth,
@@ -21,7 +21,7 @@ import {
 import Carousel from 'react-native-snap-carousel';
 import Sound from 'react-native-sound';
 
-import {trackSettings} from '../../../constants/available-settings';
+import { trackSettings } from '../../../constants/available-settings';
 
 import styled from 'styled-components/native';
 import {
@@ -30,30 +30,30 @@ import {
   SettingHead,
   Row,
 } from '../../../styles/commonStyledComponents';
-import {scaleWidth} from '../../../styles/scales';
-import {theme} from '../../../styles/theme';
-import Loader from './Loader';
-import {useAlarmAudios} from '../hooks/useAlarmAudios';
-import {usePurchaseHandling} from '../../../components/Globals/PurchaseContext';
+import { scaleWidth } from '../../../styles/scales';
+import { theme } from '../../../styles/theme';
+import { useAlarmAudios } from '../hooks/useAlarmAudios';
+import { usePurchaseHandling } from '../../../components/Globals/PurchaseContext';
+import ShimmerCard from './ShimmerCard';
 
 Sound.setCategory('Playback');
 let soundPlayer = new Sound(
   trackSettings[0]?.product_identifier?.slice(3, trackSettings[0]?.length + 3) +
-    '.mp3',
+  '.mp3',
 );
 
 export default function InAppAudios() {
   const [hasAlarmAudiosPurchased, setHasAlarmAudiosPurchased] = useState(false);
   const [soundPlaying, setSoundPlaying] = useState(false);
   const [category, setCategory] = useState('Music');
-  const {audios, loader, setLoader} = useAlarmAudios(
+  const { audios, loader, setLoader } = useAlarmAudios(
     hasAlarmAudiosPurchased,
     category,
   );
   const alarmPreviewTimeout = useRef();
   const [animationLoader, setAnimationLoader] = useState(false);
   const [isPurchasePending, setIsPurchasePending] = useState(false);
-  const {audioPurchaseComplete} = usePurchaseHandling();
+  const { audioPurchaseComplete } = usePurchaseHandling();
 
   useEffect(() => {
     if (audioPurchaseComplete) {
@@ -72,7 +72,7 @@ export default function InAppAudios() {
     ];
 
     return (
-      <View style={{marginLeft: 10}}>
+      <View style={{ marginLeft: 10 }}>
         <SectionButton
           style={{
             backgroundColor:
@@ -101,12 +101,17 @@ export default function InAppAudios() {
     }
     setIsPurchasePending(true);
     console.log('Purchase request initiated');
-    if (Platform.OS === 'ios') {
-      console.log('Requesting purchase (iOS)');
-      await requestPurchase({sku: item});
-    } else {
-      console.log('Requesting purchase (Android)');
-      await requestPurchase({skus: [item]});
+    try {
+      if (Platform.OS === 'ios') {
+        console.log('Requesting purchase (iOS)');
+        await requestPurchase({ sku: item });
+      } else {
+        console.log('Requesting purchase (Android)');
+        await requestPurchase({ skus: [item] });
+      }
+    } catch (error) {
+      console.log('purchase error ---> ', error);
+      setAnimationLoader(false);
     }
     setIsPurchasePending(false);
   };
@@ -144,7 +149,7 @@ export default function InAppAudios() {
     }
   };
 
-  const renderedAudios = ({item, index}) => {
+  const renderedAudios = ({ item, index }) => {
     if (item.product_identifier !== 'preset_alarm') {
       return (
         <TouchableWithoutFeedback>
@@ -158,13 +163,13 @@ export default function InAppAudios() {
                 height: responsiveScreenHeight(45),
                 flexDirection: 'column',
               }}>
-              <Spacer style={{paddingBottom: responsiveScreenHeight(2)}} />
+              <Spacer style={{ paddingBottom: responsiveScreenHeight(2) }} />
               <BundleImage
                 source={require('../../../../assets/musical-note.png')}
               />
-              <Spacer style={{paddingBottom: responsiveScreenHeight(3)}} />
-              <Row style={{width: '100%'}}>
-                <BundleNameTitle style={{width: '78%'}}>
+              <Spacer style={{ paddingBottom: responsiveScreenHeight(3) }} />
+              <Row style={{ width: '100%' }}>
+                <BundleNameTitle style={{ width: '78%' }}>
                   {item.title}
                 </BundleNameTitle>
                 <StyledTouchableOpacity
@@ -188,7 +193,7 @@ export default function InAppAudios() {
                 }}>
                 {item.description}
               </BundleQuote>
-              <Spacer style={{paddingBottom: responsiveScreenHeight(2.5)}} />
+              <Spacer style={{ paddingBottom: responsiveScreenHeight(2.5) }} />
               <Row
                 style={{
                   alignItems: 'flex-end',
@@ -212,12 +217,12 @@ export default function InAppAudios() {
                   <>
                     {item.is_purchased ? (
                       <CheckBox
-                        style={{height: responsiveScreenHeight(4)}}
+                        style={{ height: responsiveScreenHeight(4) }}
                         value={true}
                         onFillColor={'#f3d449'}
                         onTintColor={'#f3d449'}
                         onCheckColor={'#1d0f57'}
-                        tintColors={{true: '#f3d449'}}
+                        tintColors={{ true: '#f3d449' }}
                         disabled={true}
                       />
                     ) : (
@@ -243,11 +248,11 @@ export default function InAppAudios() {
       <SectionNameContainer>
         <SectionName>Alarm Sounds</SectionName>
       </SectionNameContainer>
-      <Spacer style={{paddingBottom: responsiveScreenHeight(1)}} />
+      <Spacer style={{ paddingBottom: responsiveScreenHeight(1) }} />
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={{marginLeft: 8}}>
+        style={{ marginLeft: 8 }}>
         {renderCategory(0)}
         {renderCategory(1)}
         {renderCategory(2)}
@@ -257,9 +262,9 @@ export default function InAppAudios() {
         {renderCategory(6)}
         {renderCategory(7)}
       </ScrollView>
-      <Spacer style={{paddingBottom: responsiveScreenHeight(1)}} />
+      <Spacer style={{ paddingBottom: responsiveScreenHeight(1) }} />
       {loader ? (
-        <Loader />
+        <ShimmerCard />
       ) : audios.length > 0 ? (
         <Carousel
           data={audios}
@@ -282,7 +287,7 @@ export default function InAppAudios() {
         </SectionNameContainer>
       )}
 
-      <Spacer style={{paddingBottom: responsiveScreenHeight(5)}} />
+      <Spacer style={{ paddingBottom: responsiveScreenHeight(5) }} />
     </>
   );
 }

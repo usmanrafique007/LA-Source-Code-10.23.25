@@ -11,7 +11,6 @@ NetInfo.configure({
   shouldFetchWiFiSSID: true,
 });
 
-Geolocation.requestAuthorization();
 
 export const NetworkInfoProvider = ({children}) => {
   const [connectionInfo, setConnectionInfo] = useState(null);
@@ -20,6 +19,8 @@ export const NetworkInfoProvider = ({children}) => {
 
   // Fetch stored Wifi
   useEffect(() => {
+Geolocation.requestAuthorization();
+
     async function getWifiName() {
       const storedWifiName = await getAsyncStorageData(
         StorageProperty.WIFI_NAME,

@@ -1,7 +1,7 @@
 import React from 'react';
-import {Modal} from 'react-native';
+import { Modal } from 'react-native';
 
-import {removeDevice} from '@volst/react-native-tuya';
+import {removeDevice} from '@owowagency/react-native-tuya';
 
 import styled from 'styled-components/native';
 import {
@@ -13,9 +13,9 @@ import {
   ModalHeader,
   ModalText,
 } from '../../../styles/commonStyledComponents';
-import {theme} from '../../../styles/theme';
+import { theme } from '../../../styles/theme';
 
-import {Toast} from '../../../components/Globals/Toast';
+import { Toast } from '../../../components/Globals/Toast';
 import {
   responsiveScreenHeight,
   responsiveScreenWidth,
@@ -29,10 +29,10 @@ const RemoveBulbForm = ({
 }) => {
   async function deleteDevice() {
     try {
-      await removeDevice({devId: deviceId});
+      await removeDevice({ devId: deviceId });
       setTimeout(() => {
         setShowRemoveForm(false);
-        navigation.navigate('Bulbs', {from: 'bulb'});
+        navigation.navigate('Bulbs', { from: 'bulb' });
       }, 500);
     } catch (error) {
       Toast('Error', error, 'danger', 'danger');
@@ -48,7 +48,7 @@ const RemoveBulbForm = ({
             width: responsiveScreenWidth(85),
           }}
           colors={[theme.colors.bluePurple, theme.colors.lightIndigo]}
-          start={{x: 0.7, y: 0}}>
+          start={{ x: 0.7, y: 0 }}>
           <ModalHeader
             style={{
               marginBottom: 10,
@@ -57,7 +57,7 @@ const RemoveBulbForm = ({
             }}>
             Remove Device?
           </ModalHeader>
-          <ModalText style={{marginLeft: 5, textAlign: 'center'}}>
+          <ModalText style={{ marginLeft: 5, textAlign: 'center' }}>
             Bulb will be disabled after the device is removed.
           </ModalText>
           <Spacer />

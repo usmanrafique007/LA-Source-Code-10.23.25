@@ -13,7 +13,6 @@ import {
 import Answer from './Answer';
 
 import {theme} from '../../../styles/theme';
-import RNUxcam from 'react-native-ux-cam';
 
 export function Answers({
   slide,
@@ -31,7 +30,6 @@ export function Answers({
   setNextButtonShow,
   setDoneButtonShow,
 }) {
-  RNUxcam.tagScreenName('Survey Screen');
   const handleAnswerTyped = (answer) => {
     if (slide == 1) {
       setAnswer1(answer);

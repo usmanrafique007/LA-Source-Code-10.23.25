@@ -1,9 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import {
-    getHomeDetail,
-    registerDevListener,
-    unRegisterAllDevListeners
-  } from '@volst/react-native-tuya';
+
 import {useHomeId} from '../../hooks/useHomeId';
 import StorageProperty from '../../constants/storage-property';
 import {getAsyncStorageData,} from '../../constants/utils';

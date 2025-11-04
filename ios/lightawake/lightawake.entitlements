@@ -14,8 +14,14 @@
 	<array>
 		<string>merchant.lightawake.2021reimagined</string>
 	</array>
+	<key>com.apple.developer.networking.multicast</key>
+	<true/>
 	<key>com.apple.developer.networking.wifi-info</key>
 	<true/>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.com.lightawake.live</string>
+	</array>
 	<key>inter-app-audio</key>
 	<true/>
 	<key>keychain-access-groups</key>

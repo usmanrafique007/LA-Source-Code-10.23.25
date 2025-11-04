@@ -10,7 +10,6 @@ import {scaleWidth} from '../../styles/scales';
 import {getAsyncStorageData} from '../../constants/utils';
 import StorageProperty from '../../constants/storage-property';
 import AxiosRequestHandler, { connectionPath, method } from '../../network/AxiosRequestHandler';
-import RNUxcam from 'react-native-ux-cam';
 
 
 const Link = ({href, children}) => {
@@ -27,8 +26,7 @@ const Link = ({href, children}) => {
 };
 
 const About = ({navigation}) => {
-  RNUxcam.tagScreenName('About Screen');
-  const [hasAnsweredSurvey, setHasAnsweredSurvey] = useState(false);
+  const [hasAnsweredSurvey, setHasAnsweredSurvey] = useState(true);
 
   useEffect(() => {
     async function checkIfUserHasAnsweredSurvey() {

@@ -212,7 +212,7 @@ const ButtonContainer = styled.View`
 
 const BodyContainer = styled.View`
   width: 100%;
-  height: ${responsiveScreenHeight(65)};
+  // height: ${responsiveScreenHeight(65)};
   align-items: center;
 `;
 
@@ -268,7 +268,7 @@ const ModalBody = styled(LinearGradient)`
   border-radius: 20px;
   z-index: 100;
   max-width: 90%;
-  height: ${responsiveScreenHeight(70)};
+  // height: ${responsiveScreenHeight(70)};
   width: 90%;
 `;
 

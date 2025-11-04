@@ -26,6 +26,7 @@ import {
   Clock,
   PeriodContainer,
   PeriodText,
+  AlarmStackContainer,
 } from '../../styles/commonStyledComponents';
 import {scaleWidth, scaleHeight} from '../../styles/scales';
 import {theme} from '../../styles/theme';
@@ -35,11 +36,9 @@ import AxiosRequestHandler, {
 } from '../../network/AxiosRequestHandler';
 import useDateTime from './hooks/useDateTime';
 import InformUserModal from '../../components/Modals/InformUserModal';
-import RNUxcam from 'react-native-ux-cam';
 
 const Alarms = ({navigation, route}) => {
 
-  RNUxcam.tagScreenName('Alarm Screen');
 
   const {date, getFormattedDate} = useDateTime();
 
@@ -296,9 +295,9 @@ const Alarms = ({navigation, route}) => {
         <ScreenTitle>ALARMS</ScreenTitle>
       </BulbScreenHead>
       <ScreenContent style={{paddingTop: 0}}>
-        <BackgroundImage style={{height: '100%'}}>
-          <StackContainer>
-            {hasAlarmUpgraded || isLoggedIn ? renderedAlarms : freeAlarm}
+        {/* <BackgroundImage style={{height: '100%'}}> */}
+          <AlarmStackContainer>
+            {hasAlarmUpgraded || isLoggedIn ?renderedAlarms  : freeAlarm}
             {alarmCount != 10 && (
               <StackChildWrapper>
                 <TouchableOpacity onPress={handleLastButtonPress}>
@@ -338,8 +337,8 @@ const Alarms = ({navigation, route}) => {
                 navigation={navigation}
               />
             )}
-          </StackContainer>
-        </BackgroundImage>
+          </AlarmStackContainer>
+        {/* </BackgroundImage> */}
       </ScreenContent>
     </ScreenContainer>
   );

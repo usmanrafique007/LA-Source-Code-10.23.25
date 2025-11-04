@@ -95,7 +95,7 @@ const ButtonContainer = styled.View`
 const BulbColorPickerContainer = styled.View`
   width: 100%;
   padding: 4.5% 4.9%;
-  height: ${responsiveScreenHeight(65)};
+  // height: ${responsiveScreenHeight(65)};
   align-items: center;
 `;
 
@@ -157,7 +157,7 @@ const ModalBody = styled(LinearGradient)`
   border-radius: 20px;
   z-index: 100;
   max-width: 90%;
-  height: ${responsiveScreenHeight(55)};
+  // height: ${responsiveScreenHeight(55)};
   width: 85%;
 `;
 

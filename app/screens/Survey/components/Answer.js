@@ -4,7 +4,6 @@ import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import {responsiveScreenHeight} from 'react-native-responsive-dimensions';
 import styled from 'styled-components/native';
 import {SettingTitle} from '../../../styles/commonStyledComponents';
-import RNUxcam from 'react-native-ux-cam';
 
 export default function Answer({
   slide,
@@ -22,7 +21,6 @@ export default function Answer({
   setNextButtonShow,
   setDoneButtonShow,
 }) {
-  RNUxcam.tagScreenName('Survey Screen');
   const handleAnswerPicked = (answer, value) => {
     // workaround so user can choose a new answer again
     if (value) {

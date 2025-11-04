@@ -4,6 +4,7 @@ import {
   KeyboardAvoidingView,
   Modal,
   TouchableOpacity,
+  Keyboard,
 } from 'react-native';
 
 import AnimatedLoader from 'react-native-animated-loader';
@@ -35,11 +36,9 @@ import AxiosRequestHandler, {
   method,
 } from '../../network/AxiosRequestHandler';
 import {Toast} from '../../components/Globals/Toast';
-import RNUxcam from 'react-native-ux-cam';
 
 export default function EditUserProfileSettings({navigation, route}) {
 
-  RNUxcam.tagScreenName('Edit User Screen');
 
   const [hasUpdated, setHasUpdated] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -74,6 +73,7 @@ export default function EditUserProfileSettings({navigation, route}) {
   }, [hasUpdated]);
 
   const handleSaveProfileSettings = () => {
+    Keyboard.dismiss();
     if (firstName == '') {
       return Toast(
         'Error',
@@ -215,7 +215,7 @@ export default function EditUserProfileSettings({navigation, route}) {
               </NameContainer>
             </ScreenTitleContainer>
             <Spacer style={{marginBottom: responsiveScreenHeight(3)}} />
-            <StackContainer>
+            <StackContainer keyboardShouldPersistTaps='handled'>
               <StackChildWrapper>
                 <ScreenSubTitle>Email Address</ScreenSubTitle>
                 <InputText

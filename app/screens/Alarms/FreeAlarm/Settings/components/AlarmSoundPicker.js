@@ -2,7 +2,6 @@ import React, {useState, useEffect, useRef} from 'react';
 import {Image, TouchableOpacity, Text} from 'react-native';
 
 import Sound from 'react-native-sound';
-import TrackPlayer, {State, usePlaybackState} from 'react-native-track-player';
 
 import styled from 'styled-components/native';
 import {

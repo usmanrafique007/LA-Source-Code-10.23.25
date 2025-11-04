@@ -20,13 +20,13 @@ import {
   StackContainer,
   StackChildWrapper,
 } from '../../styles/commonStyledComponents';
-import RNUxcam from 'react-native-ux-cam';
 
 const Bulb = ({route, navigation}) => {
 
-  RNUxcam.tagScreenName('Bulb Screen');
 
   const {device} = route.params;
+
+  console.log("device bulb :: ", device);
 
   return (
     <ScreenContainer>

@@ -1,36 +1,37 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/react-in-jsx-scope */
-import {createContext, useState, useContext, useEffect} from 'react';
-import {Platform, PermissionsAndroid} from 'react-native';
+import { createContext, useState, useContext, useEffect } from 'react';
+import { Platform, PermissionsAndroid } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import AxiosRequestHandler, {
   connectionPath,
   LIGHTAWAKE_BASE_URL,
   method,
 } from '../../network/AxiosRequestHandler';
-import {Toast} from '../Globals/Toast';
-import {useIAP} from 'react-native-iap';
-
+import { Toast } from '../Globals/Toast';
+import { useIAP } from 'react-native-iap';
 const PurchaseContext = createContext();
 
-export const PurchaseProvider = ({children}) => {
-  const {currentPurchase, finishTransaction} = useIAP();
+export const PurchaseProvider = ({ children }) => {
+  const { currentPurchase, finishTransaction } = useIAP();
   const [audioPurchaseComplete, setAudioPurchaseComplete] = useState(false);
   const [alarmPurchaseComplete, setAlarmPurchaseComplete] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  async function redownloadPurchasedTrack(product) {
-    const {audio} = await getPurchasedAudio(product);
-    await checkPermission();
-    const {path, id} = await download(audio);
-    updateIapUrl(path, id);
+  async function redownloadPurchasedTrack(product,track) {
+    const { audio } = await getPurchasedAudio(product);
+    // console.log(audio, 'AUDIO');
+    // await checkPermission();
+    const { path, id } = await download(audio);
+
+    updateIapUrl(path, track?.id);
   }
 
   useEffect(() => {
     const checkCurrentPurchase = async (purchase) => {
       setAudioPurchaseComplete(false);
       setAlarmPurchaseComplete(false);
-      console.log('Purchase: ', purchase);
+      // console.log('Purchase: ', purchase);
 
       const receipt = purchase.transactionReceipt;
 
@@ -41,28 +42,26 @@ export const PurchaseProvider = ({children}) => {
             purchase,
             isConsumable,
           });
-          console.log('ackResult', ackResult);
+          // console.log('ackResult', ackResult);
           await handlePurchase(purchase);
         } catch (ackErr) {
-          console.warn('ackErr', ackErr);
+          // console.warn('ackErr', ackErr);
           setAudioPurchaseComplete(true);
           setAlarmPurchaseComplete(true);
         }
       }
     };
     if (currentPurchase) {
-      console.log('Calling checkCurrentPurchase:', currentPurchase);
       checkCurrentPurchase(currentPurchase);
     }
   }, [currentPurchase]);
 
   const handlePurchase = async (purchase) => {
-    console.log(purchase.productId);
     if (purchase && purchase.productId !== 'preset_alarm') {
-      console.log('Handle Purchase', purchase);
+      // console.log('Handle Purchase', purchase);
       const product = await createPurchase(purchase);
-      await checkPermission();
-      const {path, id} = await download(product);
+      // await checkPermission();
+      const { path, id } = await download(product);
       await updateIapUrl(path, id);
       return setAudioPurchaseComplete(true);
     } else if (purchase.productId === 'preset_alarm') {
@@ -74,7 +73,7 @@ export const PurchaseProvider = ({children}) => {
   };
 
   async function createPurchase(purchase) {
-    console.log('Create Purchase', purchase);
+    // console.log('Create Purchase', purchase);
     if (purchase && purchase.productId !== 'preset_alarm') {
       try {
         const data = {
@@ -89,7 +88,6 @@ export const PurchaseProvider = ({children}) => {
           url: `${connectionPath.iaps.purchaseProduct}`,
         };
 
-        console.log('Request Config', requestConfig);
         const response = await AxiosRequestHandler(requestConfig);
         const product = response.data.purchase;
         return product;
@@ -110,7 +108,6 @@ export const PurchaseProvider = ({children}) => {
           url: `${connectionPath.iaps.purchaseProduct}`,
         };
 
-        console.log('Alarm Request Config', requestConfig);
         const response = await AxiosRequestHandler(requestConfig);
 
         if (response) {
@@ -139,9 +136,9 @@ export const PurchaseProvider = ({children}) => {
       const response = await AxiosRequestHandler(requestConfig);
 
       if (response) {
-        const {data} = response;
-        const {audio} = data;
-        return {audio};
+        const { data } = response;
+        const { audio } = data;
+        return { audio };
       }
     } catch (error) {
       console.log(error);
@@ -151,7 +148,7 @@ export const PurchaseProvider = ({children}) => {
   const checkPermission = async () => {
     console.log('Checking Permission...');
     if (Platform.OS === 'ios') {
-      return {permission: true};
+      return { permission: true };
     }
 
     try {
@@ -165,7 +162,7 @@ export const PurchaseProvider = ({children}) => {
       );
 
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        return {permission: true};
+        return { permission: true };
       } else {
         // eslint-disable-next-line no-alert
         return alert('Storage Permission Not Granted.');
@@ -177,67 +174,73 @@ export const PurchaseProvider = ({children}) => {
   };
 
   async function download(product) {
+    console.log('DOWNLOADING PRODUCT.TRACK:', `${LIGHTAWAKE_BASE_URL}${product.track}`);
     if (isDownloading) {
       console.log('Downloading in progress...');
       return Toast('Error', 'Download in Progress...', 'danger', 'danger');
     }
-
     console.log('Purchase Downloading...');
     setIsDownloading(true);
-    let date = new Date();
-    const {config, fs} = ReactNativeBlobUtil;
-    let directory = Platform.select({
-      android: fs.dirs.SDCardApplicationDir,
-      ios: fs.dirs.DocumentDir,
-    });
 
-    let options = Platform.select({
-      android: {
-        fileCache: true,
-        addAndroidDownloads: {
-          useDownloadManager: true,
-          path:
-            directory +
-            '/' +
-            Math.floor(date.getTime() + date.getSeconds() / 2) +
-            '.mp3',
-          description: 'Track',
-        },
-      },
-      ios: {
-        fileCache: true,
-        path: `${directory}/${Math.floor(
-          date.getTime() + date.getSeconds() / 2,
-        )}.mp3`,
-      },
-    });
+    //   const granted = await PermissionsAndroid.request(
+    //     PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+    //     {
+    //       title: 'Storage Permission Required',
+    //       message: 'This app needs access to your storage to download files',
+    //     }
+    //   );
+    // console.log(granted,'Granted');
+    //   if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+    //     console.log('Storage permission not granted');
+    //     setIsDownloading(false);
+    //     return;
+    //   }
+    // let options = Platform.select({
+    //   android: {
+    //     fileCache: true,
+    //     addAndroidDownloads: {
+    //       useDownloadManager: true,
+    //       path:
+    //         directory +
+    //         '/' +
+    //         Math.floor(date.getTime() + date.getSeconds() / 2) +
+    //         '.mp3',
+    //       description: 'Track',
+    //     },
+    //   },
+    //   ios: {
+    //     fileCache: true,
+    //     path: `${directory}/${Math.floor(
+    //       date.getTime() + date.getSeconds() / 2,
+    //     )}.mp3`,
+    //   },
+    // }); +
+    // '/' +
+    // Math.floor(date.getTime() + date.getSeconds() / 2) +
+    // '.mp3'
+    let date = new Date();
+    let _path = Platform.OS == 'ios' ? ReactNativeBlobUtil.fs.dirs.DocumentDir + '/' + Math.floor(date.getTime() + date.getSeconds() / 2) + '.mp3' : ReactNativeBlobUtil.fs.dirs.DownloadDir + '/file_' + Math.floor(date.getTime() + date.getSeconds() / 2) + '.mp3';
+    console.log('Starting download to:', _path);
 
     try {
-      const response = await config(options)
+      const res = await ReactNativeBlobUtil.config({
+        path: _path,
+        fileCache: true,
+      })
         .fetch('GET', `${LIGHTAWAKE_BASE_URL}${product.track}`)
-        .progress({count: 0.1}, (received, total) => {
+        .progress({ count: 0.1 }, (received, total) => {
           console.log('Progress: ', received / total);
-        })
-        .catch((error) => {
-          console.log('DOWNLOAD ERROR: ' + error);
-          return {path: null, id: null};
         });
-
-      const {path} = response;
-      const {id} = product;
-      console.log('ID: ', {id});
+      const { path } = res;
+      const { id } = product;
 
       setIsDownloading(false);
-      return {path, id};
+      console.log(path(), '<====Path');
+      return { path, id };
     } catch (error) {
-      console.log(error);
+      console.log('DOWNLOAD ERROR:', error);
       setIsDownloading(false);
-      return Toast(
-        'Error',
-        'Oops, something went wrong. Try again.',
-        'danger',
-        'danger',
-      );
+      return Toast('Error', 'Oops, something went wrong. Try again.', 'danger', 'danger');
     }
   }
 
@@ -253,15 +256,14 @@ export const PurchaseProvider = ({children}) => {
         method: method.put,
         url: connectionPath.iaps.updateUrl,
       };
-
+      console.log(requestConfig, 'REQ');
       const response = await AxiosRequestHandler(requestConfig);
-
+      console.log(response, 'RESS');
       if (response) {
         Toast('Success', 'Download successful!', 'success', 'success');
-        return {downloaded: true};
+        return { downloaded: true };
       }
     } catch (error) {
-      console.log(error);
       Toast(
         'Error!',
         'Oops, something went wrong. Try again.',

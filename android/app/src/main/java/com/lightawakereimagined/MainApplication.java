@@ -12,12 +12,17 @@ import com.facebook.react.ReactPackage;
 // import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 // import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
-
+import android.content.BroadcastReceiver; 
+import android.content.Intent; 
+import android.content.IntentFilter;
+import android.os.Build;
+import javax.annotation.Nullable;
 
 import expo.modules.ApplicationLifecycleDispatcher;
 import expo.modules.ReactNativeHostWrapper;
 
 import com.airbnb.android.react.lottie.LottiePackage;
+
 import com.tuya.smart.rnsdk.core.TuyaCoreModule;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 
@@ -65,6 +70,15 @@ public class MainApplication extends Application implements ReactApplication {
     ApplicationLifecycleDispatcher.onApplicationCreate(this);
     return mReactNativeHost;
   }
+
+  @Override
+  public Intent registerReceiver(@Nullable BroadcastReceiver receiver, IntentFilter filter) {
+    if (Build.VERSION.SDK_INT >= 34 && getApplicationInfo().targetSdkVersion >= 34) {
+        return super.registerReceiver(receiver, filter, Context.RECEIVER_EXPORTED);
+        } else {
+        return super.registerReceiver(receiver, filter);
+        }
+}
 
   @Override
   public void onCreate() {

@@ -30,7 +30,6 @@ import {
   PeriodText,
   StackChildWrapper,
 } from '../../../../styles/commonStyledComponents';
-import RNUxcam from 'react-native-ux-cam';
 
 export default function FreeAlarmSettingsScreen({
   setDatePickerVisibility,
@@ -45,7 +44,7 @@ export default function FreeAlarmSettingsScreen({
   navigation,
   selectedDate,
 }) {
-  RNUxcam.tagScreenName('Alarm Screen');
+  
   return (
     <ScreenContainer>
       <ScreenHead>

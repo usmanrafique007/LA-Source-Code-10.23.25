@@ -2,12 +2,14 @@ package com.lightawakereimagined;
 
 // import android.os.Build;
 import android.os.Bundle;
+import android.view.KeyEvent;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
 // import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 // import com.facebook.react.defaults.DefaultReactActivityDelegate;
 import org.devio.rn.splashscreen.SplashScreen;
+// import com.github.kevinejohn.keyevent.KeyEventModule;
 
 import expo.modules.ReactActivityDelegateWrapper;
 
@@ -30,6 +32,28 @@ public class MainActivity extends ReactActivity {
   protected String getMainComponentName() {
     return "main";
   }
+  
+  // @Override
+  // public boolean onKeyDown(int keyCode, KeyEvent event) {
+  //     KeyEventModule.getInstance().onKeyDownEvent(keyCode, event);
+  //     super.onKeyDown(keyCode, event);
+  //     return false;
+  // }
+
+  // @Override
+  // public boolean onKeyUp(int keyCode, KeyEvent event) {
+  //     KeyEventModule.getInstance().onKeyUpEvent(keyCode, event);
+  //     super.onKeyUp(keyCode, event);
+  //     return false;
+  // }
+
+  // @Override
+  // public boolean onKeyMultiple(int keyCode, int repeatCount, KeyEvent event) {
+  //     KeyEventModule.getInstance().onKeyMultipleEvent(keyCode, repeatCount, event);
+  //     return super.onKeyMultiple(keyCode, repeatCount, event);
+  // }
+
+
 
   /**
    * Returns the instance of the {@link ReactActivityDelegate}. Here we use a util class {@link

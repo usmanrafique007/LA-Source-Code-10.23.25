@@ -22,20 +22,46 @@ import {
 } from '../../styles/commonStyledComponents';
 import {useWifi} from './hooks/useWifi';
 import {useTuyaServices} from '../../hooks/useTuyaServices';
-import RNUxcam from 'react-native-ux-cam';
+
+import VerifyOTP from './components/VerifyOTP';
+import StorageProperty from '../../constants/storage-property';
+import { getAsyncStorageData } from '../../constants/utils';
+
 
 const Pair = ({navigation}) => {
 
-  RNUxcam.tagScreenName('Pair Screen');
 
-  const {requestLocationAuthorizationIos, requestLocationAuthorizationAndroid} =
+  const {requestLocationAuthorizationIos,requestStoragePermission,  requestLocationAuthorizationAndroid, requestNotificationAuthorizationAndroid, requestReadExternalStorageAndroid} =
     useWifi();
   const {loginTuya} = useTuyaServices();
   const [noticeModalOpen, setNoticeModalOpen] = useState(false);
   const [isPairing, setIsPairing] = useState(false);
+  const [email, setEmail] = useState('');
+  const [isTuyaUser, setIsTuyaUser] = useState(true);
+
+  const getTuyaUser=async()=>{
+    const token = await getAsyncStorageData(StorageProperty.USER_TOKEN);
+    const {uid} = JSON.parse(token);
+    setEmail(uid)
+    loginTuya(uid).then(res=>{
+      if(res){
+        setIsTuyaUser(true)
+      }
+    })
+    .catch((e)=>{
+      setIsTuyaUser(false)
+    })
+
+  }
 
   useEffect(() => {
-    loginTuya();
+    try{
+      // loginTuya()
+      getTuyaUser()
+    }
+ catch(e){
+
+ }
   }, []);
 
   useEffect(() => {
@@ -45,6 +71,9 @@ const Pair = ({navigation}) => {
 
     if (Platform.OS === 'android') {
       requestLocationAuthorizationAndroid();
+      requestNotificationAuthorizationAndroid();
+      requestReadExternalStorageAndroid();
+      requestStoragePermission();
     }
 
     setNoticeModalOpen(true);
@@ -56,18 +85,20 @@ const Pair = ({navigation}) => {
       style={{flex: 1, backgroundColor: '#24146C'}}>
       <ScreenContainer>
         <ScreenHead>
-          <BackButton onPress={() => navigation.goBack()} />
+          {!isPairing&&<BackButton onPress={() => navigation.goBack()} />}
           <ScreenTitle />
         </ScreenHead>
         <Spacer />
         <ScreenContent style={{width: `85%`}}>
           <ScreenTitle>
-            {isPairing
+            {!isTuyaUser?"An OTP has been sent to your below email\n"+email: isPairing
               ? 'Adding device...'
               : 'Select 2.4GHz Wi-Fi Network and enter password.'}
           </ScreenTitle>
           <ScreenSubTitle>
-            {isPairing
+            {!isTuyaUser
+            ?"Please Enter OTP to verify your email":
+            isPairing
               ? 'Please allow the pairing to complete within 5 minutes.'
               : 'If your Wi-Fi is 5GHz, please set it to be 2.4GHz.'}
           </ScreenSubTitle>
@@ -77,11 +108,18 @@ const Pair = ({navigation}) => {
               width: '100%',
               paddingTop: responsiveScreenHeight(25),
             }}>
-            <Form
-              isPairing={isPairing}
-              setIsPairing={setIsPairing}
-              navigation={navigation}
-            />
+              {
+                !isTuyaUser?<VerifyOTP
+                isVerifying={isTuyaUser}
+                setIsVerifying={setIsTuyaUser}
+                />:
+                <Form
+                isPairing={isPairing}
+                setIsPairing={setIsPairing}
+                navigation={navigation}
+              />
+              }
+        
           </View>
         </ScreenContent>
         {noticeModalOpen && (

@@ -19,13 +19,14 @@ import AxiosRequestHandler, {
 import {storeAsyncStorageData} from '../../../../constants/utils';
 import StorageProperty from '../../../../constants/storage-property';
 import {Toast} from '../../../../components/Globals/Toast';
+import AxiosMailerLiteRequestHandler, { mailerliteEndpoint } from '../../../../network/AxiosMailerLiteHandler';
 
 export function GoogleSignIn({navigation}) {
   useEffect(() => {
     GoogleSignin.configure({
       offlineAccess: true,
       webClientId: WEB_CLIENT_ID,
-      androidClientId: ANDROID_CLIENT_ID,
+      // androidClientId: ANDROID_CLIENT_ID,
       scopes: ['profile', 'email'],
       forceCodeForRefreshToken: true,
     });
@@ -41,9 +42,17 @@ export function GoogleSignIn({navigation}) {
 
       login(idToken, givenName, familyName);
     } catch (error) {
+      console.log("Google Error", error);
       Toast('Error', error.message, 'danger', 'danger');
     }
   }
+
+    async function logoutGoogleUser() {
+      const isSignedIn = await GoogleSignin.isSignedIn();
+      if (isSignedIn && Platform.OS === 'android') {
+        await GoogleSignin.signOut();
+      }
+    }
 
   async function login(identity_token, first_name, last_name) {
     const deviceId = await DeviceInfo.getUniqueId()
@@ -70,6 +79,17 @@ export function GoogleSignIn({navigation}) {
           'access-token': response.headers['access-token'],
         };
 
+        const sendData = {
+          email: response.headers['uid'],
+        }
+        const mailerliteConfig = {
+          data: sendData,
+          method: method.post,
+          url: mailerliteEndpoint.auth.appUserSubscriber,
+        };
+  
+        const res = await AxiosMailerLiteRequestHandler(mailerliteConfig);
+
         storeAsyncStorageData(
           StorageProperty.USER_TOKEN,
           JSON.stringify(authToken),
@@ -82,6 +102,7 @@ export function GoogleSignIn({navigation}) {
         }, 2000);
       }
     } catch (error) {
+      logoutGoogleUser();
       if (error.response) {
         Toast('Error', error.response.data.message, 'danger', 'danger');
       }
@@ -92,7 +113,7 @@ export function GoogleSignIn({navigation}) {
     <SocialButtonsContainer>
       <SocialButtonChildrenWrapper>
         <GoogleSigninButton
-          style={{width: 192, height: 48}}
+          style={{width: 260, height: 48}}
           size={GoogleSigninButton.Size.Wide}
           color={GoogleSigninButton.Color.Light}
           onPress={onGoogleButtonPress}

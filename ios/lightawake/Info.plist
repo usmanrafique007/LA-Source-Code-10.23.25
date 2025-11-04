@@ -2,10 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>LightAwake does not request this permission or utilize this functionality, you can ignore this message and click OK.</string>
 	<key></key>
 	<string></string>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -21,7 +23,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.4.0</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -32,15 +34,27 @@
 				<string>fbAPP-ID</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string></string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>lightawake</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>FacebookAppID</key>
 	<string>558886382790627</string>
 	<key>FacebookClientToken</key>
 	<string>8159c668e3aa9eb9537c22ce9ba8e37d</string>
 	<key>FacebookDisplayName</key>
 	<string>LightAwake</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This identifier will be used to deliver personalized ads and experiences.</string>
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
@@ -58,14 +72,26 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>TEXT</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>LightAwake does not request this permission or utilize this functionality, you can
+			ignore this message and click OK.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>LightAwake required this permission for camera flashlight</string>
 	<key>NSHumanReadableCopyright</key>
 	<string></string>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>The purpose of LightAwake connecting to the local network is to enable pairing and control of devices connected to the local network.</string>
+	<string>The purpose of LightAwake connecting to the local network is to enable pairing and
+			control of devices connected to the local network.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Location permissions will be used for smart device automation, discovery of nearby devices,Wi-Fi lists, and more.</string>
+	<string>Location permissions will be used for smart device automation, discovery of nearby
+			devices,Wi-Fi lists, and more.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Location permissions will be used for smart device automation, discovery of nearby devices,Wi-Fi lists, and more.</string>
+	<string>Location permissions will be used for smart device automation, discovery of nearby
+			devices,Wi-Fi lists, and more.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>We track interactions to improve how smart bulb routines are suggested based on your app usage.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>nunito-regular.ttf</string>
@@ -81,7 +107,9 @@
 	</dict>
 	<key>UIBackgroundModes</key>
 	<array>
+		<string>audio</string>
 		<string>fetch</string>
+		<string>processing</string>
 		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
@@ -111,6 +139,8 @@
 	<key>UIUserInterfaceStyle</key>
 	<string>Light</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 </dict>
 </plist>

@@ -1,11 +1,11 @@
-import React, {useState} from 'react';
-import {Modal, Platform} from 'react-native';
+import React, { useState } from 'react';
+import { Modal, Platform } from 'react-native';
 
-import {responsiveHeight} from 'react-native-responsive-dimensions';
-import {renameDevice} from '@volst/react-native-tuya';
+import { responsiveHeight } from 'react-native-responsive-dimensions';
+import { renameDevice } from '@owowagency/react-native-tuya';
 import styled from 'styled-components/native';
-import {scaleHeight, scaleWidth} from '../../../styles/scales';
-import {theme} from '../../../styles/theme';
+import { scaleHeight, scaleWidth } from '../../../styles/scales';
+import { theme } from '../../../styles/theme';
 import {
   ButtonText,
   InputText,
@@ -19,15 +19,20 @@ import {
   ExitModalButton,
   ModalXIcon,
 } from '../../../styles/commonStyledComponents';
-import {Toast} from '../../../components/Globals/Toast';
+import { Toast } from '../../../components/Globals/Toast';
 
-const ChangeBulbNameForm = ({device, formShow, setFormShow, navigation}) => {
+const ChangeBulbNameForm = ({ device, formShow, setFormShow, navigation }) => {
   const [name, setName] = useState(device.name);
 
   async function setBulbName() {
+    let regex = new RegExp(/^[A-Za-z\s]+$/)
+
     if (name == '') {
       return Toast('Error', 'Name must not be empty.', 'danger', 'danger');
     }
+    // if (!regex.test(name)) {
+    //   return Toast('Error', 'Name must be valid.', 'danger', 'danger');
+    // }
 
     try {
       await renameDevice({
@@ -37,7 +42,7 @@ const ChangeBulbNameForm = ({device, formShow, setFormShow, navigation}) => {
         setFormShow(false);
 
         setTimeout(() => {
-          navigation.navigate('Bulbs', {status: 'configured'});
+          navigation.navigate('Bulbs', { status: 'configured' });
         }, 500);
       });
     } catch (error) {
@@ -45,13 +50,17 @@ const ChangeBulbNameForm = ({device, formShow, setFormShow, navigation}) => {
     }
   }
 
+  const onChangeName = (name) => {
+
+  }
+
   return (
     <Modal visible={formShow} transparent={true} animationType="fade">
       <Backdrop>
         <ModalBody
-          style={{width: `85%`}}
+          style={{ width: `85%` }}
           colors={[theme.colors.bluePurple, theme.colors.lightIndigo]}
-          start={{x: 0.7, y: 0}}>
+          start={{ x: 0.7, y: 0 }}>
           <CloseButtonContainer onPress={() => setFormShow(false)}>
             <ExitModalButton>
               <ModalXIcon
@@ -70,7 +79,7 @@ const ChangeBulbNameForm = ({device, formShow, setFormShow, navigation}) => {
               <ButtonText>Confirm</ButtonText>
             </SetButton>
             <SetCancelButton onPress={() => setFormShow(!formShow)}>
-              <ButtonText style={{color: 'white'}}>Cancel</ButtonText>
+              <ButtonText style={{ color: 'white' }}>Cancel</ButtonText>
             </SetCancelButton>
           </FormContainer>
         </ModalBody>
