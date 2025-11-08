@@ -1,0 +1,17 @@
+diff --git a/node_modules/react-native-track-player/android/build.gradle b/node_modules/react-native-track-player/android/build.gradle
+index ad99343..3a3db80 100644
+--- a/node_modules/react-native-track-player/android/build.gradle
++++ b/node_modules/react-native-track-player/android/build.gradle
+@@ -18,6 +18,12 @@ def getExtOrIntegerDefault(name) {
+ }
+ 
+ android {
++    buildFeatures {
++    buildConfig = true
++}
++
++namespace "com.guichaguri.trackplayer"
++
+     compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
+ 
+     defaultConfig {

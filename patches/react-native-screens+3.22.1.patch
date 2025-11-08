@@ -1,0 +1,22 @@
+diff --git a/node_modules/react-native-screens/android/build.gradle b/node_modules/react-native-screens/android/build.gradle
+index 056a698..8d9f659 100644
+--- a/node_modules/react-native-screens/android/build.gradle
++++ b/node_modules/react-native-screens/android/build.gradle
+@@ -44,6 +44,7 @@ def reactNativeArchitectures() {
+ }
+ 
+ android {
++    namespace "com.swmansion.rnscreens"
+     compileSdkVersion safeExtGet('compileSdkVersion', rnsDefaultCompileSdkVersion)
+     def agpVersion = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
+     if (agpVersion.tokenize('.')[0].toInteger() >= 7) {
+@@ -71,6 +72,9 @@ android {
+     }
+     lintOptions {
+         abortOnError false
++    }
++        buildFeatures {
++        buildConfig = true
+     }
+     compileOptions {
+         sourceCompatibility JavaVersion.VERSION_1_8

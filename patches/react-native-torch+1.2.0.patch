@@ -1,0 +1,16 @@
+diff --git a/node_modules/react-native-torch/android/build.gradle b/node_modules/react-native-torch/android/build.gradle
+index 2d42774..94bbe60 100644
+--- a/node_modules/react-native-torch/android/build.gradle
++++ b/node_modules/react-native-torch/android/build.gradle
+@@ -5,6 +5,11 @@ def safeExtGet(prop, fallback) {
+ }
+ 
+ android {
++    buildFeatures {
++    buildConfig = true
++}
++
++namespace "com.github.yaap.torch"
+     compileSdkVersion safeExtGet('compileSdkVersion', 28)
+     buildToolsVersion safeExtGet('buildToolsVersion', '28.0.3')
+ 

@@ -1,0 +1,21 @@
+diff --git a/node_modules/react-native-background-actions/android/build.gradle b/node_modules/react-native-background-actions/android/build.gradle
+index f7c92c8..71204b8 100644
+--- a/node_modules/react-native-background-actions/android/build.gradle
++++ b/node_modules/react-native-background-actions/android/build.gradle
+@@ -5,12 +5,16 @@ def safeExtGet(prop, fallback) {
+ }
+ 
+ android {
++    namespace 'com.reactnative.backgroundactions'
+     compileSdkVersion safeExtGet('compileSdkVersion', 31)
+ 
+     defaultConfig {
+         minSdkVersion safeExtGet('minSdkVersion', 16)
+         targetSdkVersion safeExtGet('targetSdkVersion', 31)
+     }
++    buildFeatures {
++        buildConfig = true
++    }
+ }
+ 
+ dependencies {

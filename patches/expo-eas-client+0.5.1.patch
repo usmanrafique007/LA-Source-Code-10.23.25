@@ -1,0 +1,17 @@
+diff --git a/node_modules/expo-eas-client/android/build.gradle b/node_modules/expo-eas-client/android/build.gradle
+index 5265db0..2807aad 100644
+--- a/node_modules/expo-eas-client/android/build.gradle
++++ b/node_modules/expo-eas-client/android/build.gradle
+@@ -35,10 +35,9 @@ buildscript {
+   }
+ }
+ 
+-// Creating sources with comments
+ task androidSourcesJar(type: Jar) {
+-  classifier = 'sources'
+-  from android.sourceSets.main.java.srcDirs
++    from android.sourceSets.main.java.srcDirs
++    archiveClassifier.set('sources')
+ }
+ 
+ afterEvaluate {

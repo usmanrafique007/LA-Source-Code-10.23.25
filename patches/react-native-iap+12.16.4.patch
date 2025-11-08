@@ -1,0 +1,23 @@
+diff --git a/node_modules/react-native-iap/android/build.gradle b/node_modules/react-native-iap/android/build.gradle
+index e4a79cc..7deeb02 100644
+--- a/node_modules/react-native-iap/android/build.gradle
++++ b/node_modules/react-native-iap/android/build.gradle
+@@ -33,6 +33,7 @@ def getExtOrIntegerDefault(name) {
+ }
+ 
+ android {
++  namespace 'com.reactnativeiap' 
+   compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
+ 
+   defaultConfig {
+@@ -48,6 +49,10 @@ android {
+     }
+   }
+ 
++    buildFeatures {
++        buildConfig = true
++    }
++
+   lintOptions {
+     abortOnError false
+     disable "GradleCompatible"

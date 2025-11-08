@@ -1,0 +1,16 @@
+diff --git a/node_modules/react-native-safe-area-context/android/build.gradle b/node_modules/react-native-safe-area-context/android/build.gradle
+index bfdc938..649577f 100644
+--- a/node_modules/react-native-safe-area-context/android/build.gradle
++++ b/node_modules/react-native-safe-area-context/android/build.gradle
+@@ -42,7 +42,10 @@ android {
+     if (rootProject.hasProperty("ndkVersion")) {
+         ndkVersion rootProject.ext.ndkVersion
+     }
+-
++    buildFeatures {
++        buildConfig = true
++    }
++    namespace "com.th3rdwave.safeareacontext"
+     defaultConfig {
+         minSdkVersion getExtOrDefault('minSdkVersion', 16)
+         targetSdkVersion getExtOrDefault('targetSdkVersion', 28)

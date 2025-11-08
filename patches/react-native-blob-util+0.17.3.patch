@@ -1,0 +1,22 @@
+diff --git a/node_modules/react-native-blob-util/android/build.gradle b/node_modules/react-native-blob-util/android/build.gradle
+index 4fd9e0b..7e70fb7 100644
+--- a/node_modules/react-native-blob-util/android/build.gradle
++++ b/node_modules/react-native-blob-util/android/build.gradle
+@@ -44,6 +44,7 @@ if (isNewArchitectureEnabled()) {
+ }
+ 
+ android {
++    namespace "com.ReactNativeBlobUtil"
+     compileSdkVersion safeExtGet('compileSdkVersion', 30)
+     buildToolsVersion safeExtGet('buildToolsVersion', '28.0.3')
+     defaultConfig {
+@@ -59,6 +60,9 @@ android {
+             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+         }
+     }
++    buildFeatures {
++        buildConfig = true
++    }
+     compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8

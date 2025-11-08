@@ -1,0 +1,35 @@
+diff --git a/node_modules/expo-json-utils/android/build.gradle b/node_modules/expo-json-utils/android/build.gradle
+index d92147a..19d8080 100644
+--- a/node_modules/expo-json-utils/android/build.gradle
++++ b/node_modules/expo-json-utils/android/build.gradle
+@@ -35,10 +35,9 @@ buildscript {
+   }
+ }
+ 
+-// Creating sources with comments
+ task androidSourcesJar(type: Jar) {
+-  classifier = 'sources'
+-  from android.sourceSets.main.java.srcDirs
++    from android.sourceSets.main.java.srcDirs
++    archiveClassifier.set('sources')
+ }
+ 
+ afterEvaluate {
+@@ -59,6 +58,7 @@ afterEvaluate {
+ }
+ 
+ android {
++  namespace 'expo.modules.jsonutils'
+   compileSdkVersion safeExtGet("compileSdkVersion", 33)
+ 
+   compileOptions {
+@@ -80,6 +80,9 @@ android {
+   lintOptions {
+     abortOnError false
+   }
++  publishing {
++        singleVariant("release") {}
++    }
+   testOptions {
+     unitTests.includeAndroidResources = true
+   }

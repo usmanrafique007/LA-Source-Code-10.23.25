@@ -1,0 +1,22 @@
+diff --git a/node_modules/@react-native-async-storage/async-storage/android/build.gradle b/node_modules/@react-native-async-storage/async-storage/android/build.gradle
+index ff1baa4..3b09cf8 100644
+--- a/node_modules/@react-native-async-storage/async-storage/android/build.gradle
++++ b/node_modules/@react-native-async-storage/async-storage/android/build.gradle
+@@ -78,6 +78,7 @@ if (useNextStorage) {
+ }
+ 
+ android {
++    namespace 'com.reactnative.asyncstorage'
+     compileSdkVersion safeExtGet('compileSdkVersion', 31)
+     defaultConfig {
+         minSdkVersion safeExtGet('minSdkVersion', 21)
+@@ -89,6 +90,9 @@ android {
+     lintOptions {
+         abortOnError false
+     }
++     buildFeatures {
++        buildConfig = true
++    }
+ 
+     if (useNextStorage) {
+         testOptions {

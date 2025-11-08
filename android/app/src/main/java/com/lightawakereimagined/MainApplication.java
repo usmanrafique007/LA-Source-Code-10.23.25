@@ -13,6 +13,8 @@ import com.facebook.react.ReactPackage;
 // import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
 import android.content.BroadcastReceiver; 
+import com.facebook.react.jscexecutor.HermesExecutorFactory;
+
 import android.content.Intent; 
 import android.content.IntentFilter;
 import android.os.Build;

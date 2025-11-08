@@ -1,18 +1,22 @@
-/**
- * Metro configuration for React Native
- * https://github.com/facebook/react-native
- *
- * @format
- */
+const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
 
-module.exports = {
+const defaultConfig = getDefaultConfig(__dirname);
+
+const config = mergeConfig(defaultConfig, {
   transformer: {
+    // Optional: customize transformer options
     getTransformOptions: async () => ({
       transform: {
-        experimentalImportSupport: false,
+        experimentalImportSupport: false, // usually false in modern RN
         inlineRequires: false,
       },
     }),
-    assetPlugins: ['expo-asset/tools/hashAssetFiles']
+    // Keep asset plugin if using expo-asset
+    assetPlugins: ['expo-asset/tools/hashAssetFiles'],
   },
-};
+  resolver: {
+    // Add any extra resolver config if needed
+  },
+});
+
+module.exports = config;

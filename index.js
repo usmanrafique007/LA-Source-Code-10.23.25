@@ -4,7 +4,6 @@
 
 import 'expo-asset';
 import {AppRegistry} from 'react-native';
-import {registerRootComponent} from 'expo';
 import TrackPlayer from 'react-native-track-player';
 import PushNotification from 'react-native-push-notification';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
@@ -35,5 +34,5 @@ PushNotification.configure({
   // },
 });
 
-registerRootComponent(App);
+// App is already registered with AppRegistry above
 TrackPlayer.registerPlaybackService(() => require('./service'));

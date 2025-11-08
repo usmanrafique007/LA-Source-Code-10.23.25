@@ -1,0 +1,15 @@
+diff --git a/node_modules/@react-native-community/checkbox/android/build.gradle b/node_modules/@react-native-community/checkbox/android/build.gradle
+index 743c7d1..9895c30 100644
+--- a/node_modules/@react-native-community/checkbox/android/build.gradle
++++ b/node_modules/@react-native-community/checkbox/android/build.gradle
+@@ -57,6 +57,10 @@ android {
+     lintOptions {
+         abortOnError false
+     }
++    buildFeatures {
++    buildConfig = true
++}
++
+ }
+ 
+ repositories {

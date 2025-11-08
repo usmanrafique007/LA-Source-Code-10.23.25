@@ -1,0 +1,22 @@
+diff --git a/node_modules/react-native-get-random-values/android/build.gradle b/node_modules/react-native-get-random-values/android/build.gradle
+index 9f8e491..c4724e8 100644
+--- a/node_modules/react-native-get-random-values/android/build.gradle
++++ b/node_modules/react-native-get-random-values/android/build.gradle
+@@ -22,6 +22,7 @@ def safeExtGet(prop, fallback) {
+ }
+ 
+ android {
++    namespace "com.reactnativegetrandomvalues"
+     compileSdkVersion safeExtGet('compileSdkVersion', 30)
+     buildToolsVersion safeExtGet('buildToolsVersion', '30.0.3')
+ 
+@@ -34,6 +35,9 @@ android {
+     lintOptions {
+         abortOnError false
+     }
++        buildFeatures {
++        buildConfig = true
++    }
+ }
+ 
+ repositories {

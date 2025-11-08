@@ -1,0 +1,23 @@
+diff --git a/node_modules/@react-native-community/slider/android/build.gradle b/node_modules/@react-native-community/slider/android/build.gradle
+index f5a1c98..b007b58 100644
+--- a/node_modules/@react-native-community/slider/android/build.gradle
++++ b/node_modules/@react-native-community/slider/android/build.gradle
+@@ -31,6 +31,7 @@ def getExtOrIntegerDefault(name) {
+ }
+ 
+ android {
++  namespace 'com.reactnative.slider'
+   compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
+   buildToolsVersion getExtOrDefault('buildToolsVersion')
+ 
+@@ -40,6 +41,10 @@ android {
+     buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
+   }
+ 
++    buildFeatures {
++        buildConfig = true
++    }
++
+   sourceSets {
+     main {
+       if (isNewArchitectureEnabled()) {

@@ -1,0 +1,17 @@
+diff --git a/node_modules/expo-error-recovery/android/build.gradle b/node_modules/expo-error-recovery/android/build.gradle
+index 7e5aaa3..1845129 100644
+--- a/node_modules/expo-error-recovery/android/build.gradle
++++ b/node_modules/expo-error-recovery/android/build.gradle
+@@ -35,10 +35,9 @@ buildscript {
+   }
+ }
+ 
+-// Creating sources with comments
+ task androidSourcesJar(type: Jar) {
+-  classifier = 'sources'
+-  from android.sourceSets.main.java.srcDirs
++    from android.sourceSets.main.java.srcDirs
++    archiveClassifier.set('sources')
+ }
+ 
+ afterEvaluate {
