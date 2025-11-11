@@ -19,7 +19,9 @@ export default function BulbsList({
   handleSettingsIconPress,
 }) {
   const BulbsList = Object.keys(devices ?? []).map((val) => (
+    
     <SettingContainer key={val}>
+      
       <SettingHead>
         <BulbsContainer>
           {Platform.OS === 'ios' ? (
@@ -34,7 +36,7 @@ export default function BulbsList({
               />
             </CheckBoxContainer>
           ) : (
-            <CheckBoxContainer>
+            <TouchableWithoutFeedback onPress={() => handleCheckboxPress(devices[val])}>
               <CheckBox
                 value={check(devices[val])}
                 onValueChange={() => handleCheckboxPress(devices[val])}
@@ -43,7 +45,7 @@ export default function BulbsList({
                   false: '#FFFFFF',
                 }}
               />
-            </CheckBoxContainer>
+            </TouchableWithoutFeedback>
           )}
           <ScreenTitleContainer>
             <SettingTitle

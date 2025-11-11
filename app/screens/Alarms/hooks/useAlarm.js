@@ -21,7 +21,7 @@ export const useAlarm = (id, hasUpdated, timeFormat) => {
         };
 
         const response = await AxiosRequestHandler(requestConfig);
-
+        
         if (response) {
           setAlarm(response.data);
         }

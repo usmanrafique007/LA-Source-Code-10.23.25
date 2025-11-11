@@ -18,7 +18,8 @@ if (System.getenv('EX_UPDATES_NATIVE_DEBUG') == "1") {
  * By default you don't need to apply any configuration, just uncomment the lines you need.
  */
 react {
-    entryFile = file(["node", "-e", "require('expo/scripts/resolveAppEntry')", projectRoot, "android", "absolute"].execute(null, rootDir).text.trim())
+    entryFile = file("$rootDir/../index.js")
+    // entryFile = file(["node", "-e", "require('expo/scripts/resolveAppEntry')", projectRoot, "android", "absolute"].execute(null, rootDir).text.trim())
     reactNativeDir = new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim()).getParentFile().getAbsoluteFile()
     hermesCommand = new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim()).getParentFile().getAbsolutePath() + "/sdks/hermesc/%OS-BIN%/hermesc"
     debuggableVariants = expoDebuggableVariants
@@ -118,12 +119,17 @@ android {
         applicationId 'com.lightawakereimagined'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 117
-        versionName "2.4.0"
+        versionCode 169
+        versionName "3.4.1"
         missingDimensionStrategy 'store', 'play'
         multiDexEnabled true
+    ndk {
+         abiFilters "armeabi-v7a", "arm64-v8a"
+      }
     }
-
+        buildFeatures {
+        buildConfig true   // Needed for some RN libraries
+    }
     splits {
         abi {
             reset()
@@ -177,6 +183,7 @@ android {
     }
 
     packagingOptions {
+        pickFirst 'lib/*/libc++_shared.so' 
         pickFirst '**/armeabi-v7a/libc++_shared.so'
         pickFirst '**/x86/libc++_shared.so'
         pickFirst '**/arm64-v8a/libc++_shared.so'
@@ -184,18 +191,27 @@ android {
         pickFirst '**/x86/libjsc.so'
         pickFirst '**/armeabi-v7a/libjsc.so'
     }
-//     flavorDimensions "appstore"
-//     productFlavors{
-//         googlePlay{
-//             dimension "appstore"
-//             missingDimensionStrategy "store", "play"
-//         }
-//         amazon{
-//             dimension "appstore"
-//             missingDimensionStrategy "store", "amazon"
-//         }
-//     }
-//     buildToolsVersion '33.0.1'
+
+    // flavorDimensions "appstore"
+    // productFlavors{
+    //     googlePlay{
+    //         dimension "appstore"
+    //         missingDimensionStrategy "store", "play"
+    //         matchingFallbacks = ['play']
+    //     }
+    //     amazon{
+    //         dimension "appstore"
+    //         missingDimensionStrategy "store", "amazon"
+    //         matchingFallbacks = ['amazon', 'play']
+    //     }
+    // }
+    flavorDimensions "appstore"
+productFlavors {
+    googlePlay { dimension "appstore" }
+    amazon { dimension "appstore"; matchingFallbacks = ['play', 'amazon'] }
+}
+
+    buildToolsVersion '35.0.0'
 }
 
 // Apply static values from `gradle.properties` to the `android.packagingOptions`
@@ -217,24 +233,22 @@ android {
 //         }
 //     }
 // }
-
+configurations.all {
+    exclude group: "com.thingclips.smart" ,module: 'thingsmart-modularCampAnno'
+}
 dependencies {
-    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation fileTree(dir: 'libs', include: ['*.aar'])
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
-
+    implementation platform('com.google.firebase:firebase-bom:32.2.0')
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.10")
     implementation 'com.google.firebase:firebase-analytics:17.3.0'
-    implementation platform('com.google.firebase:firebase-bom:31.0.0')
+    // implementation platform('com.google.firebase:firebase-bom:31.0.0')
     implementation 'com.google.firebase:firebase-functions'
     implementation 'com.google.firebase:firebase-messaging'
     implementation 'com.google.firebase:firebase-iid:21.1.0'
     implementation 'androidx.work:work-runtime-ktx:2.7.0'
-    implementation project(':lottie-react-native')
-    implementation project(':react-native-sound')
-    implementation project(':react-native-push-notification')
-    implementation project(':react-native-fbsdk-next')
-    implementation project(path: ':@react-native-community_geolocation')
+
 
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";
@@ -262,6 +276,7 @@ dependencies {
     }
 
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    implementation 'org.jetbrains:annotations:16.0.2'
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {

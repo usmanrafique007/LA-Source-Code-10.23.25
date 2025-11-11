@@ -98,6 +98,10 @@ export default function UpgradeAlarmSettingsContainer({navigation, route}) {
     setupTrackPlayer();
     getActivatedDevices();
   }, []);
+  useEffect(()=>{
+    getActivatedDevices();
+
+  },[isFocused])
 
   useEffect(() => {
     async function checkUserTacPopUpModalPreference() {
@@ -225,7 +229,6 @@ export default function UpgradeAlarmSettingsContainer({navigation, route}) {
 
   const handleStartAlarm = async () => {
     var uniq = getUniqueQueue();
-
     if (uniq) {
       await TrackPlayer.add(uniq);
     }
@@ -255,6 +258,8 @@ export default function UpgradeAlarmSettingsContainer({navigation, route}) {
   };
 
   function addTrackToQueue(track, type, action) {
+    let tempQue=[...queue]
+
     try {
       const {audio, iapable_type, track_url} = track,
         {product_identifier, title} = audio;
@@ -265,10 +270,18 @@ export default function UpgradeAlarmSettingsContainer({navigation, route}) {
         title: title,
         artist: type,
       };
-
+// sleep on index 0
+// alarm at index 1
       if (type === 'alarm') {
         if (action === 'push') {
-          setQueue((current) => [...current, song]);
+          if(tempQue?.length>1){
+            tempQue[0]=queue[0]
+            tempQue[1]=song
+          }
+          else{
+            tempQue[0]=song
+          }
+          setQueue(tempQue);
         }
 
         if (action === 'pop') {
@@ -283,7 +296,11 @@ export default function UpgradeAlarmSettingsContainer({navigation, route}) {
 
       if (type === 'sleep') {
         if (action === 'unshift') {
-          setQueue((current) => [song, ...current]);
+          tempQue[0]=song
+          if(queue[0]?.artist=='alarm'){
+            tempQue[1]=queue[0]
+          }
+          setQueue(tempQue);
         }
       }
     } catch (error) {
@@ -292,7 +309,8 @@ export default function UpgradeAlarmSettingsContainer({navigation, route}) {
   }
 
   function getUniqueQueue() {
-    if (queue.length > 1) {
+    console.log(queue,'Que');
+    if (queue.length > 0) {
       let uniqueTracks = [];
 
       const uniqueQueues = queue.filter((element) => {

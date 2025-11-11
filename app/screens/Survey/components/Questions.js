@@ -29,11 +29,9 @@ import AxiosRequestHandler, {
   method,
 } from '../../../network/AxiosRequestHandler';
 import {Answers} from './Answers';
-import RNUxcam from 'react-native-ux-cam';
 
 export function Questions({navigation}) {
 
-  RNUxcam.tagScreenName('Survey Screen');
 
   const slider = useRef();
   const [nextButtonShow, setNextButtonShow] = useState(false);
@@ -229,7 +227,12 @@ export function Questions({navigation}) {
         method: method.post,
         url: connectionPath.users.submitSurveyAnswers,
       };
-
+      let parse=JSON.parse(params?.survey)
+      if(!parse)
+        {
+          Toast('Error', 'Something went wrong!', 'danger', 'danger');
+          return
+        }
       console.log(surveyResult);
       
       const response = await AxiosRequestHandler(requestConfig);

@@ -20,7 +20,6 @@ export const useTrackSettings = (audio_type, dependencies) => {
         const response = await AxiosRequestHandler(requestConfig);
 
         if (response) {
-          console.log('Latest Response', response.data.audios);
           const {audios} = response.data;
           const purchasedSounds = audios.filter(
             (element) => element.audio.audio_type === audio_type,

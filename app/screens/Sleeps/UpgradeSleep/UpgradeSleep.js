@@ -1,79 +1,217 @@
-import React, {useState, useEffect} from 'react';
-import {Alert, TouchableWithoutFeedback} from 'react-native';
-import {useIsFocused} from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { Alert, TouchableWithoutFeedback, Linking, DeviceEventEmitter, BackHandler, Platform } from 'react-native';
+import { CommonActions, useIsFocused } from '@react-navigation/native';
 
 import * as Brightness from 'expo-brightness';
-import {useKeepAwake, deactivateKeepAwake} from 'expo-keep-awake';
+import { useKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
 
-import TrackPlayer, {RepeatMode} from 'react-native-track-player';
+import TrackPlayer, { RepeatMode, State } from 'react-native-track-player';
 
 import useTime from '../../../hooks/useTime';
-import {formatTo24hFormat, formatTo12hFormat} from '../../../constants/utils';
-import {getAsyncStorageData} from '../../../constants/utils';
+import { formatTo24hFormat, formatTo12hFormat } from '../../../constants/utils';
+import { getAsyncStorageData } from '../../../constants/utils';
 
-import {useTimeFormatContext} from '../../../contexts/time-format.context';
-import {useDeviceBrightnessContext} from '../../../contexts/device-brightness.context';
-import {useSleepSoundContext} from '../../../contexts/sleep-sound.context';
+import { useTimeFormatContext } from '../../../contexts/time-format.context';
+import { useDeviceBrightnessContext } from '../../../contexts/device-brightness.context';
+import { useSleepSoundContext } from '../../../contexts/sleep-sound.context';
 import StorageProperty from '../../../constants/storage-property';
 
 import styled from 'styled-components/native';
-import {scaleWidth} from '../../../styles/scales';
+import { scaleWidth } from '../../../styles/scales';
 import {
   IllustratedBackgroundImage,
   ClockBar,
 } from '../../../styles/commonStyledComponents';
-import {volumeSettings} from '../../../constants/available-settings';
-import {sleepSoundTimerSettings} from '../../../constants/available-settings';
+import { volumeSettings } from '../../../constants/available-settings';
+import { sleepSoundTimerSettings } from '../../../constants/available-settings';
 import useAppState from '../hooks/useAppState';
 import useNotify from '../hooks/useNotify';
-import RNUxcam from 'react-native-ux-cam';
+import { useAlarmSoundContext } from '../../../contexts/alarm-sound.context';
+import { pulseSettings } from '../../../constants/available-settings';
+import { useWakeUpContext } from '../../../contexts/wake-up.context';
+import { useTuyaServices } from '../../../hooks/useTuyaServices';
+import Sound from 'react-native-sound';
+import BackgroundService from 'react-native-background-actions';
 
-const Sleep = ({route, navigation}) => {
-  RNUxcam.tagScreenName('Sleep Screen');
+const Sleep = ({ route, navigation }) => {
   useKeepAwake();
-  const {timeFormat} = useTimeFormatContext();
-  const {timeToDisplay, period, nowDateInMiliseconds} = useTime(timeFormat);
-  const {readyToChangeBrightness, restoreDeviceBrightnessWhenAppIsReady} =
+  const { timeFormat } = useTimeFormatContext();
+  const { timeToDisplay, period, nowDateInMiliseconds } = useTime(timeFormat);
+  const { readyToChangeBrightness, restoreDeviceBrightnessWhenAppIsReady } =
     useDeviceBrightnessContext();
-  const {appStateVisible} = useAppState();
-  const {notify} = useNotify();
-  const {sleepSound, sleepSoundEnabled, sleepSoundTimer, sleepSoundVolume} =
+  const { appStateVisible } = useAppState();
+  const { notify, reminderAlert } = useNotify();
+  const { sleepSound, sleepSoundEnabled, sleepSoundTimer, sleepSoundVolume } =
     useSleepSoundContext();
   const [isScrensaverActive, setIsScreensaverActive] = useState(false);
   const [displayTurnOffMessage, setDisplayTurnOffMessage] = useState(false);
   const isFocused = useIsFocused();
+  const { turnBulbOff } = useTuyaServices();
+  const { alarmSound, alarmSoundEnabled, startSound } = useAlarmSoundContext();
 
-  const {adjustedAlarmDateInMiliseconds} = route.params;
-  const {alarm} = route.params;
-  const {sleepSoundHourLimit} = route.params;
+  // Torch Light States
+  const [torchIsFlashing, setTorchIsFlashing] = useState(false);
+  const { flashlightPulseRate, flashlightPulseRateEnabled } = useWakeUpContext();
+
+  const { adjustedAlarmDateInMiliseconds } = route.params;
+  const { alarm } = route.params;
+  // console.log("🚀 ~ Sleep ~ alarm:", alarm)
+  const { sleepSoundHourLimit } = route.params;
   const alarmDate = new Date(adjustedAlarmDateInMiliseconds);
   alarmDate.setSeconds(0);
   const alarmHours = alarmDate.getHours();
   const alarmMinutes = alarmDate.getMinutes();
-  const {timeToDisplay: alarmTimeToDisplay, period: alarmPeriod} =
+  const { timeToDisplay: alarmTimeToDisplay, period: alarmPeriod } =
     timeFormat === '24'
       ? formatTo24hFormat(alarmHours, alarmMinutes)
       : formatTo12hFormat(alarmHours, alarmMinutes);
 
+  // useEffect(() => {
+  //   turnBulbOff();
+  // }, []);
+
+  const options = {
+    taskName: 'Ligth Awake',
+    taskTitle: 'Ligth Awake',
+    taskDesc: 'Alarm set in background mode',
+    taskIcon: {
+      name: 'ic_launcher',
+      type: 'mipmap',
+    },
+    color: '#ff00ff',
+    linkingURI: 'scheme://host',
+    parameters: {
+      delay: 1000,
+    },
+  };
+
+  const sleep = (time) =>
+    new Promise((resolve) =>
+      setTimeout(() => {
+        resolve();
+      }, time),
+    );
+
+  const veryIntensiveTask = async (taskDataArguments) => {
+ 
+    const { delay } = taskDataArguments;
+    let fileName = ''
+    let filePath = ''
+    let soundPlayer
+    if (alarm.alarm.alarm_sound) {
+      fileName = alarm.alarm.alarm_sound
+      filePath = Sound.MAIN_BUNDLE
+    }
+    else {
+      const track = JSON.parse(
+        await getAsyncStorageData(StorageProperty.ALARM_TRACK),
+      );
+      const { track_url } = track
+      let splitFileName = track_url?.split('/')
+      fileName = splitFileName[splitFileName.length - 1]
+      filePath = Sound.DOCUMENT
+    }
+    if(Platform.OS=='ios'){
+      soundPlayer = new Sound(fileName, filePath, (error) => {
+        soundPlayer.setCategory('Playback')
+        if (error) console.log(error);
+        soundPlayer.setNumberOfLoops(-1);
+      });
+    }
+
+    let timeOut;
+    let isHandler = true;
+    let alarmDuration = alarmDate.getTime() - new Date().getTime();
+
+    const startPlaying = async (time) => {
+    if(Platform.OS=='ios'){
+
+      soundPlayer.play();
+      soundPlayer.setVolume(0);
+    }
+      if (isHandler && !timeOut) {
+        console.log('start playing...');
+        timeOut = setTimeout(async() => {
+          // soundPlayer.play();
+          // soundPlayer.setVolume(1);
+          await TrackPlayer.pause();
+
+          isHandler = false;
+          reminderAlert();
+        }, time);
+      }
+    };
+
+    const stopPlaying = () => {
+      if (soundPlayer.isPlaying()) {
+        console.log('stop playing...');
+    if(Platform.OS=='ios'){
+
+        soundPlayer.stop(() => {
+          soundPlayer.release(() => {
+          
+          });
+        });
+      }
+        isHandler = true;
+        clearTimeout(timeOut);
+      }
+    };
+
+    await new Promise(async (resolve) => {
+      while (true) {
+        if (BackgroundService.isRunning()) startPlaying(alarmDuration);
+        else stopPlaying();
+        await sleep(delay);
+      }
+    });
+  };
+
   useEffect(() => {
     restoreDeviceBrightnessWhenAppIsReady();
     if (appStateVisible == 'background') {
+      onBackgroundServices();
       notify();
+    } else {
+      BackgroundService.stop();
     }
   }, [appStateVisible]);
 
-  useEffect(() => {
-    const setMinimumBrightness = async () => {
-      // setting brightness after moving app to background on android
-      // doesn't work if we didn't get brightness earlier
-      await Brightness.getBrightnessAsync();
-      await Brightness.setBrightnessAsync(0);
-    };
-
-    if (readyToChangeBrightness && isFocused) {
-      setMinimumBrightness();
+  const onBackgroundServices = async () => {
+    if (BackgroundService.isRunning()) {
+      await BackgroundService.stop();
+      await BackgroundService.start(veryIntensiveTask, options);
+    } else {
+      await BackgroundService.start(veryIntensiveTask, options);
     }
-  }, [readyToChangeBrightness, isFocused]);
+  };
+
+  const handleBackAction = () => {
+    setDisplayTurnOffMessage(true);
+    return true;
+  };
+
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      handleBackAction,
+    );
+
+    return () => backHandler.remove();
+  }, []);
+
+  // useEffect(() => {
+  //   const setMinimumBrightness = async () => {
+  //     // setting brightness after moving app to background on android
+  //     // doesn't work if we didn't get brightness earlier
+  //     await Brightness.getBrightnessAsync();
+  //     await Brightness.setBrightnessAsync(0);
+  //   };
+
+  //   if (readyToChangeBrightness && isFocused) {
+  //     setMinimumBrightness();
+  //   }
+  // }, [readyToChangeBrightness, isFocused]);
 
   useEffect(() => {
     if (!isScrensaverActive) {
@@ -84,12 +222,30 @@ const Sleep = ({route, navigation}) => {
     }
   }, [isScrensaverActive]);
 
+
+  const checkPlayer = async () => {
+    const state = await TrackPlayer.getState();
+    if (state === State.Playing) {
+      console.log('The player is playing');
+    };
+
+    let trackIndex = await TrackPlayer.getCurrentTrack();
+    let trackObject = await TrackPlayer.getTrack(trackIndex);
+    if (trackObject?.artist == 'alarm') {
+      await TrackPlayer.skipToPrevious()
+    }
+    playTrack();
+
+    console.log(`Title: ${trackObject?.artist}`);
+  }
+
   useEffect(() => {
+
     if (alarm?.alarm?.sleep_sound_enabled) {
       try {
         TrackPlayer.getQueue().then((queue) => {
-          if (queue[0].artist === 'sleep') {
-            playTrack();
+          if (queue[0]?.artist === 'sleep') {
+            checkPlayer()
           }
         });
       } catch (error) {
@@ -97,25 +253,25 @@ const Sleep = ({route, navigation}) => {
       }
     }
   }, [alarm?.alarm?.sleep_sound, alarm?.alarm?.sleep_sound_enabled]);
-
   useEffect(() => {
     if (alarmDate.getTime() <= nowDateInMiliseconds) {
       async function getQueue() {
         const queue = await TrackPlayer.getQueue();
-
+        console.log(queue, 'QQ');
         if (queue.length === 0) {
-          navigation.replace('UpgradeAlarm', {alarm});
+          navigation.replace('UpgradeAlarm', { alarm });
+
         }
 
         if (queue.length > 1) {
           TrackPlayer.skipToNext().then(() => {
-            navigation.replace('UpgradeAlarm', {alarm});
+            navigation.replace('UpgradeAlarm', { alarm });
           });
         } else {
-          if (queue[0].artist === 'sleep') {
-            TrackPlayer.pause();
+          if (queue[0]?.artist === 'sleep') {
+            await TrackPlayer.pause();
           }
-          navigation.replace('UpgradeAlarm', {alarm});
+          navigation.replace('UpgradeAlarm', { alarm });
         }
       }
 
@@ -144,7 +300,7 @@ const Sleep = ({route, navigation}) => {
         } else {
           stopTrackPlayer();
           async function stopTrackPlayer() {
-            return await TrackPlayer.stop();
+            return await TrackPlayer.reset();
           }
         }
       }, 500);
@@ -168,11 +324,11 @@ const Sleep = ({route, navigation}) => {
         ? sleepSoundTimerSettings
         : sleepSoundHourLimit)[0].milliseconds;
 
-    console.log(
-      sleepSoundTimerSettings,
-      animatedSequenceTimeInMilliseconds,
-      sleepSoundHourLimit,
-    );
+    // console.log(
+    //   sleepSoundTimerSettings,
+    //   animatedSequenceTimeInMilliseconds,
+    //   sleepSoundHourLimit,
+    // );
     return animatedSequenceTimeInMilliseconds;
   };
 
@@ -195,9 +351,10 @@ const Sleep = ({route, navigation}) => {
   };
 
   const handleTurnOffPress = async () => {
-    TrackPlayer.pause();
+    // await TrackPlayer.pause();
     await TrackPlayer.reset();
     deactivateKeepAwake();
+    await BackgroundService.stop();
     navigation.goBack();
   };
 

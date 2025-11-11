@@ -1,0 +1,15 @@
+diff --git a/node_modules/@react-native-community/geolocation/android/build.gradle b/node_modules/@react-native-community/geolocation/android/build.gradle
+index aab4a31..ba8ecf9 100644
+--- a/node_modules/@react-native-community/geolocation/android/build.gradle
++++ b/node_modules/@react-native-community/geolocation/android/build.gradle
+@@ -49,6 +49,10 @@ android {
+   lintOptions {
+     disable 'GradleCompatible'
+   }
++  buildFeatures {
++    buildConfig = true
++}
++
+ 
+   compileOptions {
+     sourceCompatibility JavaVersion.VERSION_1_8

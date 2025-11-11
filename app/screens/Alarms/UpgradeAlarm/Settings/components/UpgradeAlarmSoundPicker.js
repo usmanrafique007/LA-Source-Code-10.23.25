@@ -252,21 +252,34 @@ export default function UpgradeAlarmSoundPicker({
     newArray[index] = true;
     setLoaderArray(newArray);
 
-    await redownloadPurchasedTrack(track.audio);
+    try {
 
-    newArray[index] = false;
-    setLoaderArray(newArray);
-    setSoundAlarm(track.audio.product_identifier + '.mp3');
-    setLastDownloadedIndex(index);
+      await redownloadPurchasedTrack(track.audio,track);
 
-    setTimeout(async () => {
-      const {exist} = await checkAudioExistence(track.track_url);
-      const newTracks = [...tracks];
-      newTracks[index].track_exist = exist;
-      setTracks(newTracks);
-      setHasUpdated(!hasUpdated);
+      newArray[index] = false;
+      setLoaderArray(newArray);
+      setSoundAlarm(track.audio.product_identifier + '.mp3');
+      setLastDownloadedIndex(index);
+
+      setTimeout(async () => {
+        const {exist} = await checkAudioExistence(track.track_url);
+        const newTracks = [...tracks];
+        newTracks[index].track_exist = exist;
+        setTracks(newTracks);
+        setHasUpdated(!hasUpdated);
+        setIsDownloading(false);
+      }, 500);
+
+      newArray[index] = false;
+      setLoaderArray(newArray);
       setIsDownloading(false);
-    }, 500);
+
+    } catch (error) {
+      console.log(error);
+      newArray[index] = false;
+      setLoaderArray(newArray);
+      setIsDownloading(false);
+    }
   }
 
   async function handleSwitch(value) {
@@ -282,8 +295,8 @@ export default function UpgradeAlarmSoundPicker({
 
   function handleSetAlarm(type, track) {
     async function setTrack() {
-      await updateAlarmDetails(alarm?.id, 'alarm_sound', null);
-
+   await updateAlarmDetails(alarm?.id, 'alarm_sound', null);
+   
       addTrackToQueue(track, 'alarm', 'push');
 
       // store the purchased track to async storage as the api only stores text and it is an object containing the details of the track
@@ -302,7 +315,8 @@ export default function UpgradeAlarmSoundPicker({
 
     async function setSound() {
       // store the free audios to api since it is a text containing the name of the audio
-      await updateAlarmDetails(alarm?.id, 'alarm_sound', track);
+    await updateAlarmDetails(alarm?.id, 'alarm_sound', track);
+
 
       addTrackToQueue(track, 'alarm', 'pop');
 
@@ -375,6 +389,7 @@ export default function UpgradeAlarmSoundPicker({
                       style={{
                         marginLeft: responsiveScreenWidth(1),
                         height: responsiveScreenHeight(4),
+                        width:responsiveScreenWidth(6)
                       }}
                       autoPlay
                       loop

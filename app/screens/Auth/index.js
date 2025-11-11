@@ -12,11 +12,9 @@ import {
 
 import {Form} from './form';
 import BackButton from '../../components/Globals/BackButton';
-import RNUxcam from 'react-native-ux-cam';
 
 
 export default function Auth({navigation}) {
-  RNUxcam.tagScreenName('Log-in Screen');
   return (
     <KeyboardAvoidingView
       style={{flex: 1, backgroundColor: '#24146C'}}

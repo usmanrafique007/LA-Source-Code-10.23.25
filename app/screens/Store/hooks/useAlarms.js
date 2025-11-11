@@ -17,23 +17,33 @@ export const useAlarms = (hasAlarmPurchased) => {
   useEffect(() => {
     fetchProducts();
   }, [hasAlarmPurchased]);
+  console.log(products,'ss');
 
   useEffect(() => {
     if (products.length === 0) {
       return setAlarm([]);
     }
-
+    
     get(products);
   }, [hasFetched]);
 
   async function fetchProducts() {
-    setLoader(true);
+    try{
+      setLoader(true);
 
-    if (connected) {
-      await getProducts({skus: alarmIdentifier});
+      if (connected) {
+      await getProducts({skus: alarmIdentifier});       
+      }
+      setLoader(false);
+  
+      setHasFetched(true);
     }
-
-    setHasFetched(true);
+    catch(e){
+      console.error(e);
+      
+      Toast('Error', e);
+    }
+ 
   }
 
   async function get(products) {
@@ -48,7 +58,8 @@ export const useAlarms = (hasAlarmPurchased) => {
       };
 
       const response = await AxiosRequestHandler(requestConfig);
-
+      console.log(response.data.alarm,'RESS');
+      
       if (response) {
         setAlarm(response.data.alarm);
       }

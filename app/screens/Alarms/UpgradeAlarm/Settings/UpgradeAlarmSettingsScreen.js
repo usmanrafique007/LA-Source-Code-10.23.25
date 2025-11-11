@@ -25,7 +25,6 @@ import {
   PeriodText,
   StackChildWrapper,
 } from '../../../../styles/commonStyledComponents';
-import RNUxcam from 'react-native-ux-cam';
 
 export default function UpgradeAlarmSettingsScreen({
   navigation,
@@ -44,8 +43,8 @@ export default function UpgradeAlarmSettingsScreen({
   activeBulbs,
   sleepSoundHourLimit,
   addTrackToQueue,
+  route
 }) {
-  RNUxcam.tagScreenName('Alarm Screen');
   return (
     <ScreenContainer>
       <ScreenHead>
@@ -113,9 +112,10 @@ export default function UpgradeAlarmSettingsScreen({
               alarm={alarm?.alarm}
               hasUpdated={hasUpdated}
               setHasUpdated={setHasUpdated}
+              navigation={navigation}
             />
           ) : (
-            <PairBulbWithUsButton navigation={navigation} />
+            <PairBulbWithUsButton navigation={navigation} route={route} />
           )}
           <UpgradeAlarmSoundPicker
             isScreenFocused={isFocused}
@@ -143,7 +143,7 @@ export default function UpgradeAlarmSettingsScreen({
 const Stack = ({children}) => {
   return (
     <StackContainer
-      style={{marginTop: scaleHeight(96), backgroundColor: '#211168'}}
+      style={{marginTop: scaleHeight(96), backgroundColor: '#210168'}}
       showsVerticalScrollIndicator={true}>
       {React.Children.map(children, (child, index) => {
         const isLastChild = index === children.length - 1;

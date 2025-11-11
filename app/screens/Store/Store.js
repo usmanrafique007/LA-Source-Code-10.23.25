@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {ScrollView, TouchableOpacity, Platform} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, TouchableOpacity, Platform } from 'react-native';
 
 import {
   flushFailedPurchasesCachedAsPendingAndroid,
@@ -20,31 +20,27 @@ import {
   ScreenContainer as DefaultScreenContainer,
   ScreenHead,
 } from '../../styles/commonStyledComponents';
-import {scaleWidth, scaleHeight} from '../../styles/scales';
-import Loader from './components/Loader';
-import RNUxcam from 'react-native-ux-cam';
+import { scaleWidth, scaleHeight } from '../../styles/scales';
 
-const Store = ({navigation}) => {
-  
-  RNUxcam.tagScreenName('Store Screen');
+const Store = ({ navigation }) => {
 
-  const {connected} = useIAP();
+  const { connected } = useIAP();
 
   useEffect(() => {
     async function consumeAllItems() {
       if (connected) {
-        if (Platform.OS === 'android'){
+        if (Platform.OS === 'android') {
           try {
             await flushFailedPurchasesCachedAsPendingAndroid();
-          } catch (_) {
-
-          }        
+          } catch (_) { }
         }
       }
     }
 
     consumeAllItems();
   }, []);
+
+
 
   const handleBackButtonPressed = () => {
     // IAP.endConnection(); // to release the resources when no interations are no longer needed with the library
@@ -54,31 +50,31 @@ const Store = ({navigation}) => {
   return (
     <ScreenContainer>
       <BackgroundImage platform={Platform.OS}>
-      <BulbScreenHead>
-        <BackButton onPress={handleBackButtonPressed} />
-        <ScreenTitle>STORE</ScreenTitle>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('UserProfileSettings')}>
-          <IconImage source={require('../../../assets/account.png')} />
-        </TouchableOpacity>
-      </BulbScreenHead>
-      <ScreenContent>
+        <BulbScreenHead>
+          <BackButton onPress={handleBackButtonPressed} />
+          <ScreenTitle>STORE</ScreenTitle>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('UserProfileSettings')}>
+            <IconImage source={require('../../../assets/account.png')} />
+          </TouchableOpacity>
+        </BulbScreenHead>
+        <ScreenContent>
           <Stack>
-          <ScrollView>
+            <ScrollView>
               <InAppAudios />
               <InAppSleepAudios />
               <InAppAlarm />
             </ScrollView>
           </Stack>
-      </ScreenContent>
+        </ScreenContent>
       </BackgroundImage>
     </ScreenContainer>
   );
 };
 
-const Stack = ({children}) => {
+const Stack = ({ children }) => {
   return (
-    <StackContainer style={{paddingLeft: 0, paddingRight: 0}}>
+    <StackContainer style={{ paddingLeft: 0, paddingRight: 0 }}>
       {React.Children.map(children, (child, index) => {
         const isLastChild = index === children.length - 1;
         return isLastChild ? (
@@ -118,10 +114,7 @@ const BackgroundImage = styled.ImageBackground`
   width: 100%;
   height: 100%;
   bottom: 0;
-  ${({ platform }) => (platform === "ios"
-        ? `top: 50px;`
-        : `top: 0;`
-    )};
+  ${({ platform }) => (platform === 'ios' ? `top: 50px;` : `top: 0;`)};
 `;
 
 const BulbScreenHead = styled(ScreenHead)`

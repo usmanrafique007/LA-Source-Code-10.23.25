@@ -16,7 +16,6 @@ import {
   ScreenContainer,
 } from '../../../styles/commonStyledComponents';
 import {scaleHeight, scaleWidth} from '../../../styles/scales';
-import RNUxcam from 'react-native-ux-cam';
 
 const DATA = [
   {
@@ -100,7 +99,6 @@ const DATA = [
 ];
 
 const WakeUpInformation = ({navigation}) => {
-  RNUxcam.tagScreenName('Wake-up Screen');
   const {timeFormat} = useTimeFormatContext();
   const {timeToDisplay, period} = useTime(timeFormat);
   const {restoreDeviceBrightnessWhenAppIsReady} = useDeviceBrightnessContext();

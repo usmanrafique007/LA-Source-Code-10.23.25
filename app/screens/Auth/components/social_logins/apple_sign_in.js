@@ -15,6 +15,7 @@ import {storeAsyncStorageData} from '../../../../constants/utils';
 import StorageProperty from '../../../../constants/storage-property';
 
 import {Toast} from '../../../../components/Globals/Toast';
+import AxiosMailerLiteRequestHandler, { mailerliteEndpoint } from '../../../../network/AxiosMailerLiteHandler';
 
 export function AppleSignIn({isLogin, navigation}) {
   async function onAppleButtonPress() {
@@ -68,6 +69,17 @@ export function AppleSignIn({isLogin, navigation}) {
           uid: response.headers['uid'],
           'access-token': response.headers['access-token'],
         };
+
+        const sendData = {
+          email: response.headers['uid'],
+        }
+        const mailerliteConfig = {
+          data: sendData,
+          method: method.post,
+          url: mailerliteEndpoint.auth.appleUserSubscriber,
+        };
+  
+        const res = await AxiosMailerLiteRequestHandler(mailerliteConfig);
 
         storeAsyncStorageData(
           StorageProperty.USER_TOKEN,

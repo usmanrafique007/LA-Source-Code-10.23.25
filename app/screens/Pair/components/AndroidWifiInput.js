@@ -18,24 +18,22 @@ export function AndroidWifiInput({
   setSelectedWifiSsid,
 }) {
   const renderedWifiSSIDs = Object.keys(wifiSsids ?? []).map((val) => (
-    <SelectPicker.Item label={wifiSsids[val].SSID} value={wifiSsids[val].SSID} />
+    <SelectPicker.Item label={wifiSsids[val]?.SSID} value={wifiSsids[val]?.SSID} />
   ));
 
-  function getWifiInput() {
     function onInput() {
       return (
         <InputText
           style={{
             height: responsiveScreenHeight(6),
           }}
+          placeholder={'Enter Wi-Fi SSID'}
           onChangeText={(selectedWifiSsid) =>
             setSelectedWifiSsid(selectedWifiSsid)
           }
         />
       );
     }
-
-    
 
     function onPicker() {
       return (
@@ -46,17 +44,14 @@ export function AndroidWifiInput({
               selectedValue={wifiSsid}
               onValueChange={(itemValue) => setWifiSsid(itemValue)}>
               {renderedWifiSSIDs}
-              <SelectPicker.Item label="Input WiFi SSID" value="ssid" />
+              <SelectPicker.Item label="Input WiFi SSID" value=""  />
             </SelectPicker>
           </PickerChildWrapper>
         </PickerContainer>
       );
     }
 
-    return wifiSsid == 'ssid' ? onInput() : onPicker();
-  }
-
-  return getWifiInput();
+  return wifiSsid  ? onPicker() : onInput();
 }
 
 const PickerContainer = styled.View`

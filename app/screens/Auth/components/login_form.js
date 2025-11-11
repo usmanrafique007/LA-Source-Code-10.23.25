@@ -5,6 +5,7 @@ import {
   View,
   ScrollView,
   TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 
 import {
@@ -41,6 +42,7 @@ export default function LoginForm({navigation, isLogin, setIsLogin}) {
   };
 
   async function login() {
+    Keyboard.dismiss();
     try {
       const data = {
         email: email,
@@ -78,7 +80,7 @@ export default function LoginForm({navigation, isLogin, setIsLogin}) {
 
   return (
     <StackContainer>
-      <ScrollView>
+      <ScrollView keyboardShouldPersistTaps='handled'>
         <View>
           <StackChildWrapper>
             <InputTextContainer>
@@ -125,19 +127,20 @@ export default function LoginForm({navigation, isLogin, setIsLogin}) {
             </SetPairButton>
           </StackChildWrapper>
           <Spacer />
-          <StackChildWrapper>
+          {/* {Platform.OS === 'ios' ? <StackChildWrapper>
             <SocialLoginTextSpacer>
               ─── Or continue by ───
             </SocialLoginTextSpacer>
-          </StackChildWrapper>
-          <StackChildWrapper>
+          </StackChildWrapper> : <></>} */}
+          {/* <StackChildWrapper>
             {Platform.OS === 'ios' ? (
               <AppleSignIn isLogin={isLogin} navigation={navigation} />
             ) : (
-              <GoogleSignIn navigation={navigation} />
+              <></>
+              // <GoogleSignIn navigation={navigation} />
             )}
             <Spacer />
-          </StackChildWrapper>
+          </StackChildWrapper> */}
           <StackChildWrapper>
             <Footer>
               <AuthButton onPress={() => setIsLogin(false)}>
@@ -177,14 +180,14 @@ const Icon = styled.Image`
 
 const InputText = styled.TextInput`
   margin: auto;
-  font-size: 16px;
+  font-size: ${scaleWidth(14)}px;
   background-color: white;
   border-color: white;
   border-radius: ${scaleWidth(5)}px;
   border-width: 1px;
   height: ${scaleHeight(50)}px;
-  width: 80%
-  padding: 10px;
+  width: 80%;
+  padding: 0px;
   
 `;
 
