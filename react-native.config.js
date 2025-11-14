@@ -12,7 +12,16 @@ module.exports = {
   },
 
   assets: ['./assets/fonts'],
+
+  // Optional: include modules manually if needed
+  dependencies: {
+    // Example: force Reanimated to be autolinked
+    'react-native-reanimated': {
+      root: path.resolve(__dirname, 'node_modules/react-native-reanimated'),
+    },
+  },
 };
+
 
 
 // module.exports = {

@@ -8,9 +8,10 @@
 .idea
 .gradle
 local.properties
-gradle.properties
 *.iml
 *.hprof
+*.cxx/
+.cxx/
 lightawake_uploadkey_v2.jks
 # Bundle artifacts
 *.jsbundle

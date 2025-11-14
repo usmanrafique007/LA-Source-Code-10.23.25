@@ -1,5 +1,256 @@
+diff --git a/node_modules/expo-error-recovery/android/.project b/node_modules/expo-error-recovery/android/.project
+new file mode 100644
+index 0000000..5d31cc2
+--- /dev/null
++++ b/node_modules/expo-error-recovery/android/.project
+@@ -0,0 +1,34 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<projectDescription>
++	<name>expo-error-recovery</name>
++	<comment>Project expo-error-recovery created by Buildship.</comment>
++	<projects>
++	</projects>
++	<buildSpec>
++		<buildCommand>
++			<name>org.eclipse.jdt.core.javabuilder</name>
++			<arguments>
++			</arguments>
++		</buildCommand>
++		<buildCommand>
++			<name>org.eclipse.buildship.core.gradleprojectbuilder</name>
++			<arguments>
++			</arguments>
++		</buildCommand>
++	</buildSpec>
++	<natures>
++		<nature>org.eclipse.jdt.core.javanature</nature>
++		<nature>org.eclipse.buildship.core.gradleprojectnature</nature>
++	</natures>
++	<filteredResources>
++		<filter>
++			<id>1762889480591</id>
++			<name></name>
++			<type>30</type>
++			<matcher>
++				<id>org.eclipse.core.resources.regexFilterMatcher</id>
++				<arguments>node_modules|\.git|__CREATED_BY_JAVA_LANGUAGE_SERVER__</arguments>
++			</matcher>
++		</filter>
++	</filteredResources>
++</projectDescription>
+diff --git a/node_modules/expo-error-recovery/android/bin/.project b/node_modules/expo-error-recovery/android/bin/.project
+new file mode 100644
+index 0000000..5d31cc2
+--- /dev/null
++++ b/node_modules/expo-error-recovery/android/bin/.project
+@@ -0,0 +1,34 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<projectDescription>
++	<name>expo-error-recovery</name>
++	<comment>Project expo-error-recovery created by Buildship.</comment>
++	<projects>
++	</projects>
++	<buildSpec>
++		<buildCommand>
++			<name>org.eclipse.jdt.core.javabuilder</name>
++			<arguments>
++			</arguments>
++		</buildCommand>
++		<buildCommand>
++			<name>org.eclipse.buildship.core.gradleprojectbuilder</name>
++			<arguments>
++			</arguments>
++		</buildCommand>
++	</buildSpec>
++	<natures>
++		<nature>org.eclipse.jdt.core.javanature</nature>
++		<nature>org.eclipse.buildship.core.gradleprojectnature</nature>
++	</natures>
++	<filteredResources>
++		<filter>
++			<id>1762889480591</id>
++			<name></name>
++			<type>30</type>
++			<matcher>
++				<id>org.eclipse.core.resources.regexFilterMatcher</id>
++				<arguments>node_modules|\.git|__CREATED_BY_JAVA_LANGUAGE_SERVER__</arguments>
++			</matcher>
++		</filter>
++	</filteredResources>
++</projectDescription>
+diff --git a/node_modules/expo-error-recovery/android/bin/build.gradle b/node_modules/expo-error-recovery/android/bin/build.gradle
+new file mode 100644
+index 0000000..f2f34f2
+--- /dev/null
++++ b/node_modules/expo-error-recovery/android/bin/build.gradle
+@@ -0,0 +1,93 @@
++apply plugin: 'com.android.library'
++apply plugin: 'kotlin-android'
++apply plugin: 'maven-publish'
++
++group = 'host.exp.exponent'
++version = '4.1.1'
++
++buildscript {
++  def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
++  if (expoModulesCorePlugin.exists()) {
++    apply from: expoModulesCorePlugin
++    applyKotlinExpoModulesCorePlugin()
++  }
++
++  // Simple helper that allows the root project to override versions declared by this library.
++  ext.safeExtGet = { prop, fallback ->
++    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
++  }
++
++  // Ensures backward compatibility
++  ext.getKotlinVersion = {
++    if (ext.has("kotlinVersion")) {
++      ext.kotlinVersion()
++    } else {
++      ext.safeExtGet("kotlinVersion", "1.8.10")
++    }
++  }
++
++  repositories {
++    mavenCentral()
++  }
++
++  dependencies {
++    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${getKotlinVersion()}")
++  }
++}
++
++// Creating sources with comments
++task androidSourcesJar(type: Jar) {
++  archiveClassifier.set('sources')
++  from android.sourceSets.main.java.srcDirs
++}
++
++afterEvaluate {
++  publishing {
++    publications {
++      release(MavenPublication) {
++        from components.release
++        // Add additional sourcesJar to artifacts
++        artifact(androidSourcesJar)
++      }
++    }
++    repositories {
++      maven {
++        url = mavenLocal().url
++      }
++    }
++  }
++}
++
++android {
++  compileSdkVersion safeExtGet("compileSdkVersion", 33)
++
++  compileOptions {
++    sourceCompatibility JavaVersion.VERSION_11
++    targetCompatibility JavaVersion.VERSION_11
++  }
++
++  kotlinOptions {
++    jvmTarget = JavaVersion.VERSION_11.majorVersion
++  }
++
++  defaultConfig {
++    minSdkVersion safeExtGet("minSdkVersion", 21)
++    targetSdkVersion safeExtGet("targetSdkVersion", 33)
++    versionCode 9
++    versionName '4.1.1'
++  }
++  lintOptions {
++    abortOnError false
++  }
++}
++
++dependencies {
++  implementation project(':expo-modules-core')
++  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${getKotlinVersion()}"
++
++  if (project.findProject(':expo-modules-test-core')) {
++    testImplementation project(':expo-modules-test-core')
++  }
++  testImplementation 'junit:junit:4.12'
++  testImplementation "org.robolectric:robolectric:4.3.1"
++}
+diff --git a/node_modules/expo-error-recovery/android/bin/src/main/AndroidManifest.xml b/node_modules/expo-error-recovery/android/bin/src/main/AndroidManifest.xml
+new file mode 100644
+index 0000000..050c154
+--- /dev/null
++++ b/node_modules/expo-error-recovery/android/bin/src/main/AndroidManifest.xml
+@@ -0,0 +1,4 @@
++<manifest package="expo.modules.errorrecovery">
++
++</manifest>
++
+diff --git a/node_modules/expo-error-recovery/android/bin/src/main/java/expo/modules/errorrecovery/ErrorRecoveryModule.kt b/node_modules/expo-error-recovery/android/bin/src/main/java/expo/modules/errorrecovery/ErrorRecoveryModule.kt
+new file mode 100644
+index 0000000..3ffaa78
+--- /dev/null
++++ b/node_modules/expo-error-recovery/android/bin/src/main/java/expo/modules/errorrecovery/ErrorRecoveryModule.kt
+@@ -0,0 +1,40 @@
++package expo.modules.errorrecovery
++
++import android.content.Context
++import android.content.SharedPreferences
++
++import expo.modules.core.ExportedModule
++import expo.modules.core.Promise
++import expo.modules.core.interfaces.ExpoMethod
++
++const val RECOVERY_STORE = "expo.modules.errorrecovery.store"
++private const val RECOVERY_STORE_KEY = "recoveredProps"
++
++open class ErrorRecoveryModule(context: Context) : ExportedModule(context) {
++  protected open val mSharedPreferences: SharedPreferences = context.applicationContext.getSharedPreferences(RECOVERY_STORE, Context.MODE_PRIVATE)
++
++  override fun getName(): String = "ExpoErrorRecovery"
++
++  @ExpoMethod
++  fun saveRecoveryProps(props: String?, promise: Promise) {
++    props?.let {
++      setRecoveryProps(it)
++    }
++    promise.resolve(null)
++  }
++
++  override fun getConstants(): Map<String, Any?> {
++    return mapOf(RECOVERY_STORE_KEY to consumeRecoveryProps())
++  }
++
++  protected open fun setRecoveryProps(props: String) {
++    mSharedPreferences.edit().putString(RECOVERY_STORE_KEY, props).commit()
++  }
++
++  protected open fun consumeRecoveryProps(): String? {
++    return mSharedPreferences.getString(RECOVERY_STORE_KEY, null)?.let {
++      mSharedPreferences.edit().remove(RECOVERY_STORE_KEY).commit()
++      it
++    }
++  }
++}
+diff --git a/node_modules/expo-error-recovery/android/bin/src/main/java/expo/modules/errorrecovery/ErrorRecoveryPackage.kt b/node_modules/expo-error-recovery/android/bin/src/main/java/expo/modules/errorrecovery/ErrorRecoveryPackage.kt
+new file mode 100644
+index 0000000..8289dd3
+--- /dev/null
++++ b/node_modules/expo-error-recovery/android/bin/src/main/java/expo/modules/errorrecovery/ErrorRecoveryPackage.kt
+@@ -0,0 +1,10 @@
++package expo.modules.errorrecovery
++
++import android.content.Context
++
++import expo.modules.core.BasePackage
++import expo.modules.core.ExportedModule
++
++class ErrorRecoveryPackage : BasePackage() {
++  override fun createExportedModules(context: Context): List<ExportedModule> = listOf(ErrorRecoveryModule(context))
++}
 diff --git a/node_modules/expo-error-recovery/android/build.gradle b/node_modules/expo-error-recovery/android/build.gradle
-index 790da1b..dfe1234 100644
+index 790da1b..f2f34f2 100644
 --- a/node_modules/expo-error-recovery/android/build.gradle
 +++ b/node_modules/expo-error-recovery/android/build.gradle
 @@ -37,7 +37,7 @@ buildscript {
@@ -7,7 +258,7 @@ index 790da1b..dfe1234 100644
  // Creating sources with comments
  task androidSourcesJar(type: Jar) {
 -  classifier = 'sources'
-+  // classifier = 'sources'
++  archiveClassifier.set('sources')
    from android.sourceSets.main.java.srcDirs
  }
  

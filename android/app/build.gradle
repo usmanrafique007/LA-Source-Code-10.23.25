@@ -20,7 +20,8 @@ if (System.getenv('EX_UPDATES_NATIVE_DEBUG') == "1") {
 react {
     entryFile = file("$rootDir/../index.js")
     // entryFile = file(["node", "-e", "require('expo/scripts/resolveAppEntry')", projectRoot, "android", "absolute"].execute(null, rootDir).text.trim())
-    reactNativeDir = new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim()).getParentFile().getAbsoluteFile()
+    // reactNativeDir = new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim()).getParentFile().getAbsoluteFile()
+    reactNativeDir = new File(rootDir, "../node_modules/react-native")
     hermesCommand = new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim()).getParentFile().getAbsolutePath() + "/sdks/hermesc/%OS-BIN%/hermesc"
     debuggableVariants = expoDebuggableVariants
 
@@ -109,6 +110,12 @@ def reactNativeArchitectures() {
     return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
 }
 
+project.ext.react = [
+    enableHermes: true, // or false if not using Hermes
+    reactNativePath: file("../../node_modules/react-native")
+]
+
+
 android {
     ndkVersion rootProject.ext.ndkVersion
 
@@ -123,6 +130,7 @@ android {
         versionName "3.4.1"
         missingDimensionStrategy 'store', 'play'
         multiDexEnabled true
+        resValue "string", "app_name", "LightAwake"
     ndk {
          abiFilters "armeabi-v7a", "arm64-v8a"
       }
@@ -205,13 +213,13 @@ android {
     //         matchingFallbacks = ['amazon', 'play']
     //     }
     // }
-    flavorDimensions "appstore"
-productFlavors {
-    googlePlay { dimension "appstore" }
-    amazon { dimension "appstore"; matchingFallbacks = ['play', 'amazon'] }
-}
+//     flavorDimensions "appstore"
+// productFlavors {
+//     googlePlay { dimension "appstore" }
+//     amazon { dimension "appstore"; matchingFallbacks = ['play', 'amazon'] }
+// }
 
-    buildToolsVersion '35.0.0'
+//     buildToolsVersion '35.0.0'
 }
 
 // Apply static values from `gradle.properties` to the `android.packagingOptions`
@@ -297,6 +305,12 @@ dependencies {
 // }
 
 apply plugin: 'com.google.gms.google-services'
-// apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle");
+apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle");
 apply from: new File(["node", "--print", "require.resolve('@react-native-community/cli-platform-android/package.json')"].execute(null, rootDir).text.trim(), "../native_modules.gradle");
 applyNativeModulesAppBuildGradle(project)
+
+tasks.whenTaskAdded { task ->
+    if (task.name == "generatePackageList") {
+        task.dependsOn(":app:preBuild")
+    }
+}

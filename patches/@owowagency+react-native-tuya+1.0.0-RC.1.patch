@@ -1,68 +1,3975 @@
+diff --git a/node_modules/@owowagency/react-native-tuya/android/.project b/node_modules/@owowagency/react-native-tuya/android/.project
+new file mode 100644
+index 0000000..668dae6
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/.project
+@@ -0,0 +1,28 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<projectDescription>
++	<name>owowagency_react-native-tuya</name>
++	<comment>Project owowagency_react-native-tuya created by Buildship.</comment>
++	<projects>
++	</projects>
++	<buildSpec>
++		<buildCommand>
++			<name>org.eclipse.buildship.core.gradleprojectbuilder</name>
++			<arguments>
++			</arguments>
++		</buildCommand>
++	</buildSpec>
++	<natures>
++		<nature>org.eclipse.buildship.core.gradleprojectnature</nature>
++	</natures>
++	<filteredResources>
++		<filter>
++			<id>1762889480612</id>
++			<name></name>
++			<type>30</type>
++			<matcher>
++				<id>org.eclipse.core.resources.regexFilterMatcher</id>
++				<arguments>node_modules|\.git|__CREATED_BY_JAVA_LANGUAGE_SERVER__</arguments>
++			</matcher>
++		</filter>
++	</filteredResources>
++</projectDescription>
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/TuyaReactPackage.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/TuyaReactPackage.kt
+new file mode 100644
+index 0000000..b139a50
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/TuyaReactPackage.kt
+@@ -0,0 +1,65 @@
++package com.tuya.smart.rnsdk
++
++
++import com.facebook.react.ReactPackage
++import com.facebook.react.bridge.JavaScriptModule
++import com.facebook.react.bridge.NativeModule
++import com.facebook.react.bridge.ReactApplicationContext
++import com.facebook.react.uimanager.ViewManager
++import com.tuya.smart.rnsdk.activator.TuyaActivatorModule
++import com.tuya.smart.rnsdk.core.TuyaCoreModule
++import com.tuya.smart.rnsdk.device.TuyaDeviceModule
++import com.tuya.smart.rnsdk.device.TuyaGatewayModule
++import com.tuya.smart.rnsdk.device.TuyaOTAModule
++import com.tuya.smart.rnsdk.device.TuyaSingleTransferModule
++import com.tuya.smart.rnsdk.feedback.TuyaFeedBackModule
++import com.tuya.smart.rnsdk.group.TuyaGroupModule
++import com.tuya.smart.rnsdk.home.TuyaHomeDataManagerModule
++import com.tuya.smart.rnsdk.home.TuyaHomeManagerModule
++import com.tuya.smart.rnsdk.home.TuyaHomeMemberModule
++import com.tuya.smart.rnsdk.home.TuyaHomeModule
++import com.tuya.smart.rnsdk.home.TuyaRoomModule
++import com.tuya.smart.rnsdk.message.TuyaMessageModule
++import com.tuya.smart.rnsdk.push.TuyaPushModule
++import com.tuya.smart.rnsdk.scene.TuyaSceneModule
++import com.tuya.smart.rnsdk.share.TuyaShareModule
++import com.tuya.smart.rnsdk.timer.TuyaTimerModule
++import com.tuya.smart.rnsdk.user.TuyaUserModule
++
++import java.util.*
++
++class TuyaReactPackage : ReactPackage {
++
++//    override fun createJSModules(): MutableList<Class<out JavaScriptModule>> {
++//        return Collections.emptyList();
++//    }
++
++    override fun createNativeModules(reactContext: ReactApplicationContext): MutableList<NativeModule> {
++        val module: ArrayList<NativeModule> = ArrayList()
++        module.add(TuyaActivatorModule(reactContext))
++        module.add(TuyaCoreModule(reactContext))
++        module.add(TuyaDeviceModule(reactContext))
++        module.add(TuyaGatewayModule(reactContext))
++        module.add(TuyaOTAModule(reactContext))
++        module.add(TuyaSingleTransferModule(reactContext))
++        module.add(TuyaFeedBackModule(reactContext))
++        module.add(TuyaGroupModule(reactContext))
++        module.add(TuyaHomeDataManagerModule(reactContext))
++        module.add(TuyaHomeManagerModule(reactContext))
++        module.add(TuyaHomeMemberModule(reactContext))
++        module.add(TuyaHomeModule(reactContext))
++        module.add(TuyaRoomModule(reactContext))
++        module.add(TuyaMessageModule(reactContext))
++        module.add(TuyaPushModule(reactContext))
++        module.add(TuyaShareModule(reactContext))
++        module.add(TuyaTimerModule(reactContext))
++        module.add(TuyaUserModule(reactContext))
++        module.add(TuyaSceneModule(reactContext))
++        return module
++    }
++
++    override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> {
++        val managers = ArrayList<ViewManager<*, *>>()
++        return managers
++    }
++}
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/activator/TuyaActivatorModule.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/activator/TuyaActivatorModule.kt
+new file mode 100644
+index 0000000..7bb6092
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/activator/TuyaActivatorModule.kt
+@@ -0,0 +1,217 @@
++package com.tuya.smart.rnsdk.activator
++
++import android.content.Intent
++import android.provider.Settings
++import com.facebook.react.bridge.*
++import com.thingclips.smart.android.ble.api.ScanType
++import com.thingclips.smart.android.common.utils.WiFiUtil
++import com.thingclips.smart.home.sdk.ThingHomeSdk
++import com.thingclips.smart.home.sdk.builder.ActivatorBuilder
++import com.thingclips.smart.home.sdk.builder.ThingGwSubDevActivatorBuilder
++import com.thingclips.smart.sdk.api.IMultiModeActivatorListener
++import com.thingclips.smart.sdk.api.IThingActivator
++import com.thingclips.smart.sdk.api.IThingActivatorGetToken
++import com.thingclips.smart.sdk.api.IThingSmartActivatorListener
++import com.thingclips.smart.sdk.bean.DeviceBean
++import com.thingclips.smart.sdk.bean.MultiModeActivatorBean
++import com.thingclips.smart.sdk.enums.ActivatorModelEnum
++import com.tuya.smart.rnsdk.utils.*
++import com.tuya.smart.rnsdk.utils.Constant.HOMEID
++import com.tuya.smart.rnsdk.utils.Constant.PASSWORD
++import com.tuya.smart.rnsdk.utils.Constant.SSID
++import com.tuya.smart.rnsdk.utils.Constant.TIME
++import com.tuya.smart.rnsdk.utils.Constant.DEVID
++import com.tuya.smart.rnsdk.utils.Constant.TYPE
++
++
++class TuyaActivatorModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
++
++  var mITuyaActivator: IThingActivator? = null
++  var mTuyaGWActivator: IThingActivator? = null
++  override fun getName(): String {
++    return "TuyaActivatorModule"
++  }
++
++  @ReactMethod
++  fun startBluetoothScan(promise: Promise) {
++    ThingHomeSdk.getBleOperator().startLeScan(60000, ScanType.SINGLE
++    ) { bean -> promise.resolve(TuyaReactUtils.parseToWritableMap(bean)) };
++  }
++
++  @ReactMethod
++  fun stopBluetoothScan() {
++    ThingHomeSdk.getBleOperator().stopLeScan();
++  }
++
++
++  @ReactMethod
++  fun initBluetoothDualModeActivator(params: ReadableMap, promise: Promise) {
++    if (ReactParamsCheck.checkParams(arrayOf(HOMEID, SSID, PASSWORD), params)) {
++
++      ThingHomeSdk.getBleOperator().startLeScan(60000, ScanType.SINGLE
++      ) { bean ->
++        params.getDouble(HOMEID).toLong().let {
++          ThingHomeSdk.getActivatorInstance()
++            .getActivatorToken(it, object : IThingActivatorGetToken {
++              override fun onSuccess(token: String) {
++                val multiModeActivatorBean = MultiModeActivatorBean();
++                multiModeActivatorBean.ssid = params.getString(SSID);
++                multiModeActivatorBean.pwd = params.getString(PASSWORD);
++
++                multiModeActivatorBean.uuid = bean.getUuid();
++                multiModeActivatorBean.deviceType = bean.getDeviceType();
++                multiModeActivatorBean.mac = bean.getMac();
++                multiModeActivatorBean.address = bean.getAddress();
++
++
++                multiModeActivatorBean.homeId = params.getDouble(HOMEID).toLong();
++                multiModeActivatorBean.token = token;
++                multiModeActivatorBean.timeout = 180000;
++                multiModeActivatorBean.phase1Timeout = 60000;
++
++                ThingHomeSdk.getActivator().newMultiModeActivator()
++                  .startActivator(multiModeActivatorBean, object : IMultiModeActivatorListener {
++                    override fun onSuccess(bean: DeviceBean) {
++                      promise.resolve(TuyaReactUtils.parseToWritableMap(bean));
++                    }
++
++                    override fun onFailure(code: Int, msg: String?, handle: Any?) {
++                      promise.reject(code.toString(), msg);
++                    }
++                  });
++              }
++
++              override fun onFailure(s: String, s1: String) {
++                promise.reject(s, s1);
++              }
++            })
++        }
++      };
++    }
++  }
++
++
++  @ReactMethod
++  fun getCurrentWifi(params: ReadableMap, successCallback: Callback,
++                     errorCallback: Callback) {
++    successCallback.invoke(WiFiUtil.getCurrentSSID(reactApplicationContext.applicationContext));
++  }
++
++  @ReactMethod
++  fun openNetworkSettings(params: ReadableMap) {
++    val currentActivity = currentActivity
++    if (currentActivity == null) {
++      return
++    }
++    try {
++      currentActivity.startActivity(Intent(Settings.ACTION_SETTINGS))
++    } catch (e: Exception) {
++    }
++
++  }
++
++  @ReactMethod
++  fun initActivator(params: ReadableMap, promise: Promise) {
++    if (ReactParamsCheck.checkParams(arrayOf(HOMEID, SSID, PASSWORD, TIME, TYPE), params)) {
++      ThingHomeSdk.getActivatorInstance().getActivatorToken(params.getDouble(HOMEID).toLong(), object : IThingActivatorGetToken {
++        override fun onSuccess(token: String) {
++          mITuyaActivator = ThingHomeSdk.getActivatorInstance().newActivator(
++            ActivatorBuilder()
++            .setSsid(params.getString(SSID))
++            .setContext(reactApplicationContext.applicationContext)
++            .setPassword(params.getString(PASSWORD))
++            .setActivatorModel(ActivatorModelEnum.valueOf(params.getString(TYPE) as String))
++            .setTimeOut(params.getInt(TIME).toLong())
++            .setToken(token).setListener(getITuyaSmartActivatorListener(promise)))
++          mITuyaActivator?.start()
++        }
++
++
++        override fun onFailure(s: String, s1: String) {
++          promise.reject(s, s1)
++        }
++      })
++    }
++
++  }
++
++  /**
++   * ZigBee子设备配网需要ZigBee网关设备云在线的情况下才能发起,且子设备处于配网状态。
++   */
++  @ReactMethod
++  fun newGwSubDevActivator(params: ReadableMap, promise: Promise) {
++    if (ReactParamsCheck.checkParams(arrayOf(DEVID, TIME), params)) {
++      val builder = ThingGwSubDevActivatorBuilder()
++        //设置网关ID
++        .setDevId(params.getString(DEVID))
++        //设置配网超时时间
++        .setTimeOut(params.getInt(TIME).toLong())
++        .setListener(object : IThingSmartActivatorListener {
++          override fun onError(var1: String, var2: String) {
++            promise.reject(var1, var2)
++          }
++
++          /**
++           * 设备配网成功,且设备上线（手机可以直接控制），可以通过
++           */
++          override fun onActiveSuccess(var1: DeviceBean) {
++            promise.resolve(TuyaReactUtils.parseToWritableMap(var1))
++          }
++
++          /**
++           * device_find 发现设备
++          device_bind_success 设备绑定成功，但还未上线，此时设备处于离线状态，无法控制设备。
++           */
++          override fun onStep(var1: String, var2: Any) {
++            // promise.reject(var1,"")
++          }
++        })
++
++      mTuyaGWActivator = ThingHomeSdk.getActivatorInstance().newGwSubDevActivator(builder)
++    }
++  }
++
++  @ReactMethod
++  fun stopConfig() {
++    mITuyaActivator?.stop()
++    mTuyaGWActivator?.stop()
++  }
++
++  @ReactMethod
++  fun onDestory() {
++    mITuyaActivator?.onDestroy()
++    mTuyaGWActivator?.onDestroy()
++  }
++
++  fun getITuyaSmartActivatorListener(promise: Promise): IThingSmartActivatorListener {
++    return object : IThingSmartActivatorListener {
++      /**
++       * 1001        网络错误
++      1002        配网设备激活接口调用失败，接口调用不成功
++      1003        配网设备激活失败，设备找不到。
++      1004        token 获取失败
++      1005        设备没有上线
++      1006        配网超时
++       */
++      override fun onError(var1: String, var2: String) {
++        promise.reject(var1, var2)
++      }
++
++      /**
++       * 设备配网成功,且设备上线（手机可以直接控制），可以通过
++       */
++      override fun onActiveSuccess(var1: DeviceBean) {
++        promise.resolve(TuyaReactUtils.parseToWritableMap(var1))
++      }
++
++      /**
++       * device_find 发现设备
++      device_bind_success 设备绑定成功，但还未上线，此时设备处于离线状态，无法控制设备。
++       */
++      override fun onStep(var1: String, var2: Any) {
++        // IOS 没有onStep保持一致
++        //promise.reject(var1,"")
++      }
++    }
++  }
++}
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/core/TuyaCoreModule.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/core/TuyaCoreModule.kt
+new file mode 100644
+index 0000000..3eed5a4
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/core/TuyaCoreModule.kt
+@@ -0,0 +1,126 @@
++package com.tuya.smart.rnsdk.core
++
++import android.app.Application
++import android.content.Context
++import android.text.TextUtils
++import android.util.Log
++import com.alibaba.fastjson.JSON
++import com.alibaba.fastjson.JSONArray
++import com.facebook.react.bridge.*
++import com.thingclips.smart.home.sdk.ThingHomeSdk
++import com.thingclips.smart.sdk.api.INeedLoginListener
++import com.thingclips.smart.sdk.api.IThingDataCallback
++import com.tuya.smart.rnsdk.utils.Constant.API_REQUEST_ERROR
++import com.tuya.smart.rnsdk.utils.Constant.NEEDLOGIN
++import com.tuya.smart.rnsdk.utils.TYRCTCommonUtil
++import com.tuya.smart.rnsdk.utils.TuyaReactUtils
++import java.util.HashMap
++
++
++class TuyaCoreModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
++
++    companion object {
++        fun initTuyaSDk(appKey:String,appSecret:String,application: Application){
++            ThingHomeSdk.init(application, appKey, appSecret)
++        }
++
++        fun initTuyaSDKWithoutOptions(application: Application){
++            ThingHomeSdk.init(application)
++        }
++
++        fun setSDKDebug(open:Boolean){
++            ThingHomeSdk.setDebugMode(open)
++        }
++    }
++
++    override fun getName(): String {
++        return "TuyaCoreModule"
++    }
++
++    /**
++     *  不带参数的初始化，appKey和appSecret要写在AndroidManifest中
++     */
++    @ReactMethod
++    @Deprecated("Android can't initSDK in react-native,it should be used in application")
++    fun initWithoutOptions() {
++        ThingHomeSdk.init(reactApplicationContext.applicationContext as Application?);
++        ThingHomeSdk.setOnNeedLoginListener {
++            TuyaReactUtils.sendEvent(reactApplicationContext, NEEDLOGIN, null)
++        }
++    }
++
++    @ReactMethod
++    @Deprecated("Android can't initSDK in react-native,it should be used in application")
++    fun initWithOptions(params: ReadableMap) {
++        val appKey = params.getString("appKey")
++        val appSecret = params.getString("appSecret")
++        ThingHomeSdk.init(reactApplicationContext.applicationContext as Application?, appKey, appSecret)
++        ThingHomeSdk.setOnNeedLoginListener(INeedLoginListener() {
++            fun onNeedLogin(context: Context?) {
++                TuyaReactUtils.sendEvent(reactApplicationContext, NEEDLOGIN, null)
++            }
++        })
++    }
++
++    @ReactMethod
++    fun setOnNeedLoginListener(){
++        ThingHomeSdk.setOnNeedLoginListener(INeedLoginListener() {
++            fun onNeedLogin(context: Context?) {
++                TuyaReactUtils.sendEvent(reactApplicationContext, NEEDLOGIN, null)
++            }
++        })
++    }
++
++
++
++    @ReactMethod
++    fun exitApp() {
++        ThingHomeSdk.onDestroy();
++    }
++
++    @ReactMethod
++    fun apiRequest(params: ReadableMap, promise: Promise) {
++        val callback = object : IThingDataCallback<Any> {
++            override fun onSuccess(data: Any?) {
++                if (data is Boolean) {
++                    Log.e("apiRequest", data.toString())
++                    promise.resolve("success")
++                    return
++                }
++
++                if(data is JSONArray){
++                    val writableArray = TYRCTCommonUtil.parseToWritableArray(data as com.alibaba.fastjson.JSONArray)
++                    promise.resolve(writableArray)
++                    return
++                }
++                val writableMap = TYRCTCommonUtil.parseToWritableMap(data)
++                promise.resolve(writableMap)
++
++            }
++
++            override fun onError(errorCode: String?, errorMsg: String?) {
++                promise.reject(errorCode, errorMsg)
++            }
++
++        }
++
++//        val withoutSession = params.getBoolean("withoutSession")
++        val withoutSession = false
++        val apiName = params.getString("apiName")
++        val apiVersion = params.getString("version")
++        val postData = TYRCTCommonUtil.parseToMap(params.getMap("postData"))
++        if (TextUtils.isEmpty(apiName)) {
++            promise.reject(API_REQUEST_ERROR, "ApiName is empty")
++            return
++        }
++
++        if (withoutSession) {
++            ThingHomeSdk.getRequestInstance().requestWithApiNameWithoutSession(apiName, apiVersion, postData, Any::class.java, callback)
++        } else {
++            ThingHomeSdk.getRequestInstance().requestWithApiName(apiName, apiVersion, postData, Any::class.java,callback)
++        }
++
++    }
++
++}
++
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/device/TuyaDeviceModule.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/device/TuyaDeviceModule.kt
+new file mode 100644
+index 0000000..30d028a
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/device/TuyaDeviceModule.kt
+@@ -0,0 +1,181 @@
++package com.tuya.smart.rnsdk.device
++
++import android.util.Log
++import com.alibaba.fastjson.JSONObject
++import com.facebook.react.bridge.*
++import com.thingclips.smart.android.device.api.IGetDataPointStatCallback
++import com.thingclips.smart.android.device.bean.DataPointStatBean
++import com.thingclips.smart.android.device.enums.DataPointTypeEnum
++import com.thingclips.smart.home.sdk.ThingHomeSdk
++import com.thingclips.smart.sdk.api.IDevListener
++import com.thingclips.smart.sdk.api.IThingDevice
++import com.tuya.smart.rnsdk.utils.BridgeUtils
++import com.tuya.smart.rnsdk.utils.Constant.COMMAND
++import com.tuya.smart.rnsdk.utils.Constant.DATAPOINTTYPEENUM
++import com.tuya.smart.rnsdk.utils.Constant.DEVID
++import com.tuya.smart.rnsdk.utils.Constant.DPID
++import com.tuya.smart.rnsdk.utils.Constant.NAME
++import com.tuya.smart.rnsdk.utils.Constant.NUMBER
++import com.tuya.smart.rnsdk.utils.Constant.STARTTIME
++import com.tuya.smart.rnsdk.utils.Constant.getIResultCallback
++import com.tuya.smart.rnsdk.utils.ReactParamsCheck
++import com.tuya.smart.rnsdk.utils.TuyaReactUtils
++
++
++class TuyaDeviceModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
++
++    var device: IThingDevice? = null
++
++    override fun getName(): String {
++        return "TuyaDeviceModule"
++    }
++
++    @ReactMethod
++    fun getDevice(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
++            promise.resolve(TuyaReactUtils.parseToWritableMap(getDevice(params.getString(DEVID) as String)))
++        }
++    }
++
++    @ReactMethod
++    fun getDeviceData(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
++            promise.resolve(TuyaReactUtils.parseToWritableMap(ThingHomeSdk.getDataInstance().getDeviceBean(params.getString(DEVID))))
++        }
++    }
++
++    @ReactMethod
++    fun registerDevListener(params: ReadableMap) {
++        if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
++            device = getDevice(params.getString(DEVID) as String)
++            device?.registerDevListener(object : IDevListener {
++                override fun onDpUpdate(devId: String, dpStr: String) {
++                    //dp数据更新:devId 和相应dp数据
++                    val map = Arguments.createMap()
++                    map.putString("devId", devId)
++                    map.putString("dpStr", dpStr)
++                    map.putString("type", "onDpUpdate");
++                    BridgeUtils.devListener(reactApplicationContext, map, params.getString(DEVID) as String)
++                }
++
++                override fun onRemoved(devId: String) {
++                    //设备被移除
++                    val map = Arguments.createMap()
++                    map.putString("devId", devId)
++                    map.putString("type", "onRemoved");
++                    BridgeUtils.devListener(reactApplicationContext, map, params.getString(DEVID) as String)
++                }
++
++                override fun onStatusChanged(devId: String, online: Boolean) {
++                    //设备在线状态，online
++                    val map = Arguments.createMap()
++                    map.putString("devId", devId)
++                    map.putBoolean("online", online)
++                    map.putString("type", "onStatusChanged");
++                    BridgeUtils.devListener(reactApplicationContext, map, params.getString(DEVID) as String)
++                }
++
++                override fun onNetworkStatusChanged(devId: String, status: Boolean) {
++                    //网络状态监听
++                    val map = Arguments.createMap()
++                    map.putString("devId", devId)
++                    map.putBoolean("status", status)
++                    map.putString("type", "onNetworkStatusChanged");
++
++                    BridgeUtils.devListener(reactApplicationContext, map, params.getString(DEVID) as String)
++                }
++
++                override fun onDevInfoUpdate(devId: String) {
++                    //设备信息变更，目前只有设备名称变化，会调用该接口
++                    val map = Arguments.createMap()
++                    map.putString("devId", devId)
++                    map.putString("type", "onDevInfoUpdate");
++                    BridgeUtils.devListener(reactApplicationContext, map, params.getString(DEVID) as String)
++                }
++            })
++
++        }
++    }
++
++    @ReactMethod
++    fun unRegisterDevListener(params: ReadableMap) {
++        if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
++            if (device != null) {
++                device!!.unRegisterDevListener()
++            }
++        }
++    }
++
++    @ReactMethod
++    fun onDestroy(params: ReadableMap) {
++        if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
++            getDevice(params.getString(DEVID) as String)?.onDestroy()
++        }
++    }
++
++
++    @ReactMethod
++    fun send(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(DEVID, COMMAND), params)) {
++            getDevice(params.getString(DEVID) as String)?.publishDps(JSONObject.toJSONString(TuyaReactUtils.parseToMap(params.getMap(COMMAND) as ReadableMap))
++                    , getIResultCallback(promise))
++        }
++    }
++
++
++    @ReactMethod
++    fun getDp(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(DEVID, DPID), params)) {
++            promise.resolve(getDevice(params.getString(DEVID) as String)?.getDp(
++                    params.getString(DPID),
++                    getIResultCallback(promise)
++            ))
++        }
++    }
++
++    @ReactMethod
++    fun renameDevice(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(DEVID, NAME), params)) {
++            getDevice(params.getString(DEVID) as String)?.renameDevice(params.getString(NAME), getIResultCallback(promise))
++        }
++    }
++
++    @ReactMethod
++    fun getDataPointStat(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(DEVID, DATAPOINTTYPEENUM, NUMBER, DPID, STARTTIME), params)) {
++            getDevice(params.getString(DEVID) as String)?.getDataPointStat(DataPointTypeEnum.valueOf(params.getString(DATAPOINTTYPEENUM) as String),
++                    params.getDouble(STARTTIME).toLong(),
++                    params.getInt(NUMBER),
++                    params.getString(DPID),
++                    getIGetDataPointStatCallback(promise)
++            )
++        }
++    }
++
++    @ReactMethod
++    fun removeDevice(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
++            getDevice(params.getString(DEVID) as String)?.removeDevice(getIResultCallback(promise))
++        }
++    }
++
++    fun getIGetDataPointStatCallback(promise: Promise): IGetDataPointStatCallback {
++        return object : IGetDataPointStatCallback {
++
++            override fun onSuccess(p0: DataPointStatBean?) {
++                promise.resolve(TuyaReactUtils.parseToWritableMap(p0))
++            }
++
++
++            override fun onError(code: String?, error: String?) {
++                promise.reject(code, error)
++            }
++        }
++    }
++
++
++    fun getDevice(devId: String): IThingDevice {
++        return ThingHomeSdk.newDeviceInstance(devId);
++    }
++
++}
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/device/TuyaGatewayModule.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/device/TuyaGatewayModule.kt
+new file mode 100644
+index 0000000..5b547e3
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/device/TuyaGatewayModule.kt
+@@ -0,0 +1,90 @@
++package com.tuya.smart.rnsdk.device
++
++import com.facebook.react.bridge.*
++import com.thingclips.smart.home.sdk.ThingHomeSdk
++import com.thingclips.smart.sdk.api.ISubDevListener
++import com.tuya.smart.rnsdk.utils.*
++
++class TuyaGatewayModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
++    override fun getName(): String {
++        return "TuyaGatewayModule"
++    }
++
++    @ReactMethod
++    fun publishDps(params: ReadableMap,promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(Constant.DEVID,Constant.LOCALID,Constant.DPS), params)) {
++            ThingHomeSdk.newGatewayInstance(params.getString(Constant.DEVID)).publishDps(params.getString(Constant.LOCALID),params.getString(Constant.DPS),Constant.getIResultCallback(promise))
++        }
++    }
++
++
++
++    @ReactMethod
++    fun broadcastDps(params: ReadableMap,promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(Constant.DEVID,Constant.DPS), params)) {
++            ThingHomeSdk.newGatewayInstance(params.getString(Constant.DEVID)).broadcastDps(params.getString(Constant.DPS),Constant.getIResultCallback(promise))
++        }
++    }
++
++    @ReactMethod
++    fun multicastDps(params: ReadableMap,promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(Constant.DEVID,Constant.LOCALID,Constant.DPS), params)) {
++            ThingHomeSdk.newGatewayInstance(params.getString(Constant.DEVID)).multicastDps(params.getString(Constant.LOCALID),params.getString(Constant.DPS),Constant.getIResultCallback(promise))
++        }
++    }
++
++
++
++    @ReactMethod
++    fun registerSubDevListener(params: ReadableMap) {
++        if (ReactParamsCheck.checkParams(arrayOf(Constant.DEVID), params)) {
++            ThingHomeSdk.newGatewayInstance(params.getString(Constant.DEVID)).registerSubDevListener(object : ISubDevListener {
++                override fun onSubDevDpUpdate(var1: String, var2: String){
++                    val map = Arguments.createMap()
++                    map.putString("devId", var1)
++                    map.putString("dpStr", var2)
++                    map.putString("type", "onSubDevDpUpdate");
++                    BridgeUtils.subDevListener(reactApplicationContext, map, params.getString(Constant.DEVID) as String)
++                }
++
++                override fun onSubDevRemoved(var1: String){
++                    val map = Arguments.createMap()
++                    map.putString("devId", var1)
++                    map.putString("type", "onSubDevRemoved");
++                    BridgeUtils.subDevListener(reactApplicationContext, map, params.getString(Constant.DEVID) as String)
++                }
++
++                override fun onSubDevAdded(var1: String){
++                    val map = Arguments.createMap()
++                    map.putString("devId", var1)
++                    map.putString("type", "onSubDevAdded");
++                    BridgeUtils.subDevListener(reactApplicationContext, map, params.getString(Constant.DEVID) as String)
++                }
++
++                override fun onSubDevInfoUpdate(var1: String){
++                    val map = Arguments.createMap()
++                    map.putString("devId", var1)
++                    map.putString("type", "onSubDevInfoUpdate");
++                    BridgeUtils.subDevListener(reactApplicationContext, map, params.getString(Constant.DEVID) as String)
++                }
++
++                override fun onSubDevStatusChanged(var1: List<String>, var2: List<String>){
++                    val map = Arguments.createMap()
++                    map.putArray("data1", TuyaReactUtils.parseToWritableArray(
++                            JsonUtils.toJsonArray(var1)))
++                    map.putArray("data2", TuyaReactUtils.parseToWritableArray(
++                            JsonUtils.toJsonArray(var2)));
++                    map.putString("type", "onSubDevStatusChanged");
++                    BridgeUtils.subDevListener(reactApplicationContext, map, params.getString(Constant.DEVID) as String)
++                }
++            })
++        }
++    }
++
++    @ReactMethod
++    fun unRegisterSubDevListener(params: ReadableMap) {
++        if (ReactParamsCheck.checkParams(arrayOf(Constant.DEVID), params)) {
++            ThingHomeSdk.newGatewayInstance(params.getString(Constant.DEVID)).unRegisterSubDevListener()
++        }
++    }
++}
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/device/TuyaOTAModule.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/device/TuyaOTAModule.kt
+new file mode 100644
+index 0000000..bee2dcc
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/device/TuyaOTAModule.kt
+@@ -0,0 +1,88 @@
++package com.tuya.smart.rnsdk.device
++
++import com.facebook.react.bridge.*
++import com.thingclips.smart.android.device.bean.UpgradeInfoBean
++import com.thingclips.smart.home.sdk.ThingHomeSdk
++import com.thingclips.smart.sdk.api.IGetOtaInfoCallback
++import com.thingclips.smart.sdk.api.IOtaListener
++import com.thingclips.smart.sdk.api.IThingOta
++import com.thingclips.smart.sdk.bean.OTAErrorMessageBean
++import com.tuya.smart.rnsdk.utils.*
++import com.tuya.smart.rnsdk.utils.Constant.DEVID
++
++
++class TuyaOTAModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
++    override fun getName(): String {
++       return "TuyaOTAModule"
++    }
++
++    var iTuyaOta: IThingOta?=null
++    /* 获取固件升级信息 */
++    @ReactMethod
++    fun getOtaInfo(params: ReadableMap,promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
++            getIoat(params.getString(DEVID) as String).getOtaInfo(object : IGetOtaInfoCallback {
++                override fun onSuccess(list: List<UpgradeInfoBean>) {
++                    promise.resolve(TuyaReactUtils.parseToWritableArray(
++                            JsonUtils.toJsonArray(list)))
++                }
++
++               override fun onFailure(code: String, error: String){
++                    promise.reject(code,error)
++                }
++            })
++        }
++    }
++    /* 设置升级状态回调 */
++    @ReactMethod
++    fun startOta(params: ReadableMap) {
++        if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
++            iTuyaOta = getIoat(params.getString(DEVID) as String)
++            iTuyaOta?.setOtaListener(object : IOtaListener {
++                override fun onSuccess(otaType: Int) {
++                    var map=Arguments.createMap();
++                    map.putInt("otaType",otaType)
++                    map.putString("type","onSuccess")
++                    BridgeUtils.hardwareUpgradeListener(reactApplicationContext,map,params.getString(DEVID) as String)
++                }
++
++                override fun onStatusChanged(otaStatus: Int, otaType: Int) {
++                  //
++                }
++
++                override fun onTimeout(otaType: Int) {
++                  //
++                }
++
++                override fun onFailureWithText(otaType: Int, code: String, messageBean: OTAErrorMessageBean) {
++                  //
++                }
++
++                override fun onFailure(otaType: Int, code: String, error: String) {
++                    var map=Arguments.createMap();
++                    map.putInt("otaType",otaType)
++                    map.putString("error",error)
++                    map.putString("code",code)
++                    map.putString("type","onFailure")
++                    BridgeUtils.hardwareUpgradeListener(reactApplicationContext,map,params.getString(DEVID) as String)
++                }
++
++                override fun onProgress(otaType: Int, progress: Int) {
++                    var map=Arguments.createMap();
++                    map.putInt("otaType",otaType)
++                    map.putInt("progress",progress)
++                    map.putString("type","onProgress")
++                    BridgeUtils.hardwareUpgradeListener(reactApplicationContext,map,params.getString(DEVID) as String)
++                }
++            })
++            iTuyaOta?.startOta()
++        }
++    }
++    @ReactMethod
++    fun onDestroy(){
++        iTuyaOta?.onDestroy()
++    }
++    fun getIoat(devId:String): IThingOta {
++        return ThingHomeSdk.newOTAInstance(devId)
++    }
++}
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/device/TuyaSingleTransferModule.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/device/TuyaSingleTransferModule.kt
+new file mode 100644
+index 0000000..c249843
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/device/TuyaSingleTransferModule.kt
+@@ -0,0 +1,86 @@
++package com.tuya.smart.rnsdk.device
++
++import com.facebook.react.bridge.*
++import com.thingclips.smart.home.sdk.ThingHomeSdk
++import com.thingclips.smart.home.sdk.bean.TransferDataBean
++import com.thingclips.smart.sdk.api.IThingDataCallback
++import com.tuya.smart.rnsdk.utils.BridgeUtils
++import com.tuya.smart.rnsdk.utils.Constant
++import com.tuya.smart.rnsdk.utils.Constant.DEVID
++import com.tuya.smart.rnsdk.utils.ReactParamsCheck
++import com.tuya.smart.rnsdk.utils.TuyaReactUtils
++
++class TuyaSingleTransferModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
++    override fun getName(): String {
++        return "TuyaSingleTransferModule"
++    }
++
++    /**
++     * 开始连接
++     */
++    @ReactMethod
++    fun startConnect() {
++       ThingHomeSdk.getTransferInstance().startConnect()
++    }
++
++    /**
++     * 是否在线
++     */
++    @ReactMethod
++    fun isOnline(promise: Promise) {
++       promise.resolve(ThingHomeSdk.getTransferInstance().isOnline)
++    }
++
++    /**
++     * 订阅设备数据，订阅设备之后，设备如果有数据上报上来，便可以通过 registerTransferDataListener 回调上来。需要注意的是，每次通道连接成功都需要重新订阅设备数据
++     */
++    @ReactMethod
++    fun subscribeDevice(params: ReadableMap) {
++        if (ReactParamsCheck.checkParams(arrayOf(Constant.DEVID), params)) {
++            ThingHomeSdk.getTransferInstance().subscribeDevice(params.getString(DEVID))
++        }
++    }
++
++    /**
++     * 取消订阅设备信息，则设备数据不在收到
++     *
++     */
++    @ReactMethod
++    fun unSubscribeDevice(params: ReadableMap) {
++        if (ReactParamsCheck.checkParams(arrayOf(Constant.DEVID), params)) {
++            ThingHomeSdk.getTransferInstance().unSubscribeDevice(params.getString(DEVID))
++        }
++    }
++
++    @ReactMethod
++    fun registerTransferDataListener(params: ReadableMap) {
++        if (ReactParamsCheck.checkParams(arrayOf(Constant.DEVID), params)) {
++            ThingHomeSdk.getTransferInstance().registerTransferDataListener(object : IThingDataCallback<TransferDataBean> {
++                override fun onSuccess(var1: TransferDataBean){
++                    val map = Arguments.createMap()
++                    map.putString("devId", params.getString(DEVID))
++                    map.putMap("data", TuyaReactUtils.parseToWritableMap(var1))
++                    map.putString("type", "onSuccess");
++                    BridgeUtils.singleTransferListener(reactApplicationContext, map, params.getString(DEVID) as String)
++                }
++
++                override fun onError(var1: String, var2: String){
++                    val map = Arguments.createMap()
++                    map.putString("devId", params.getString(DEVID))
++                    map.putString("var1", var1)
++                    map.putString("var2", var2)
++                    map.putString("type", "onError");
++                    BridgeUtils.singleTransferListener(reactApplicationContext, map, params.getString(DEVID) as String)
++                }
++            })
++        }
++    }
++
++    @ReactMethod
++    fun unRegisterTransferDataListener(params: ReadableMap) {
++    }
++    @ReactMethod
++    fun stopConnect() {
++        ThingHomeSdk.getTransferInstance().stopConnect()
++    }
++}
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/feedback/TuyaFeedBackModule.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/feedback/TuyaFeedBackModule.kt
+new file mode 100644
+index 0000000..0c6bee7
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/feedback/TuyaFeedBackModule.kt
+@@ -0,0 +1,108 @@
++package com.tuya.smart.rnsdk.feedback
++
++import com.facebook.react.bridge.*
++import com.thingclips.smart.home.sdk.ThingHomeSdk
++import com.thingclips.smart.sdk.api.IThingDataCallback
++import com.thingclips.smart.sdk.bean.feedback.FeedbackBean
++import com.thingclips.smart.sdk.bean.feedback.FeedbackMsgBean
++import com.thingclips.smart.sdk.bean.feedback.FeedbackTypeRespBean
++import com.tuya.smart.rnsdk.utils.Constant
++import com.tuya.smart.rnsdk.utils.Constant.HDID
++import com.tuya.smart.rnsdk.utils.Constant.HDTYPE
++import com.tuya.smart.rnsdk.utils.JsonUtils
++import com.tuya.smart.rnsdk.utils.ReactParamsCheck
++import com.tuya.smart.rnsdk.utils.TuyaReactUtils
++
++
++class TuyaFeedBackModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
++    override fun getName(): String {
++        return "TuyaFeedBackModule"
++    }
++
++    /*获取反馈列表*/
++    @ReactMethod
++    fun getFeedbackList(promise: Promise) {
++        ThingHomeSdk.getThingFeekback().getFeedbackManager().getFeedbackList(object : IThingDataCallback<List<FeedbackBean>> {
++            override fun onSuccess(var1: List<FeedbackBean>) {
++                promise.resolve(TuyaReactUtils.parseToWritableArray(JsonUtils.toJsonArray(var1!!)))
++            }
++
++            override fun onError(var1: String, var2: String) {
++                promise.reject(var1, var2)
++            }
++        })
++    }
++
++
++    /*获取反馈列表*/
++    @ReactMethod
++    fun getFeedbackType(promise: Promise) {
++        ThingHomeSdk.getThingFeekback().getFeedbackManager().getFeedbackType(object : IThingDataCallback<List<FeedbackTypeRespBean>> {
++            override fun onSuccess(var1: List<FeedbackTypeRespBean>) {
++                promise.resolve(TuyaReactUtils.parseToWritableArray(JsonUtils.toJsonArray(var1!!)))
++            }
++
++            override fun onError(var1: String, var2: String) {
++                promise.reject(var1, var2)
++            }
++        })
++    }
++
++
++    /*添加反馈*/
++    @ReactMethod
++    fun addFeedback(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(Constant.MESEAGE, Constant.CONTACT, Constant.HDID, Constant.HDTYPE), params)) {
++            ThingHomeSdk.getThingFeekback().getFeedbackManager().addFeedback(params.getString(Constant.MESEAGE), params.getString(Constant.CONTACT),
++                    params.getString(HDID), params.getInt(HDTYPE),
++                    object : IThingDataCallback<FeedbackMsgBean> {
++                        override fun onSuccess(var1: FeedbackMsgBean) {
++                            promise.resolve(TuyaReactUtils.parseToWritableMap(var1!!))
++                        }
++
++                        override fun onError(var1: String, var2: String) {
++                            promise.reject(var1, var2)
++                        }
++                    })
++        }
++    }
++
++
++    /*获取反馈消息列表*/
++    @ReactMethod
++    fun getFeedbackMsg(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(Constant.HDID, Constant.HDTYPE), params)) {
++            ThingHomeSdk.getThingFeekback().getFeedbackMsg(params.getString(HDID), params.getInt(HDTYPE))
++                    .getMsgList(
++                            object : IThingDataCallback<List<FeedbackMsgBean>> {
++                                override fun onSuccess(var1: List<FeedbackMsgBean>) {
++                                    promise.resolve(TuyaReactUtils.parseToWritableArray(JsonUtils.toJsonArray(var1!!)))
++                                }
++
++                                override fun onError(var1: String, var2: String) {
++                                    promise.reject(var1, var2)
++                                }
++                            })
++        }
++    }
++
++
++    /*添加新反馈*/
++    @ReactMethod
++    fun addMsg(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(Constant.HDID, Constant.HDTYPE, Constant.MESEAGE, Constant.CONTACT), params)) {
++            ThingHomeSdk.getThingFeekback().getFeedbackMsg(params.getString(HDID), params.getInt(HDTYPE))
++                    .addMsg(params.getString(Constant.MESEAGE), params.getString(Constant.CONTACT),
++                            object : IThingDataCallback<FeedbackMsgBean> {
++                                override fun onSuccess(var1: FeedbackMsgBean) {
++                                    promise.resolve(TuyaReactUtils.parseToWritableMap(var1!!))
++                                }
++
++                                override fun onError(var1: String, var2: String) {
++                                    promise.reject(var1, var2)
++                                }
++                            })
++        }
++    }
++
++}
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/group/TuyaGroupModule.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/group/TuyaGroupModule.kt
+new file mode 100644
+index 0000000..54da2df
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/group/TuyaGroupModule.kt
+@@ -0,0 +1,152 @@
++package com.tuya.smart.rnsdk.group
++
++import com.facebook.react.bridge.*
++import com.thingclips.smart.home.sdk.ThingHomeSdk
++import com.thingclips.smart.home.sdk.api.IThingHome
++import com.thingclips.smart.home.sdk.callback.IThingResultCallback
++import com.thingclips.smart.sdk.api.IGroupListener
++import com.thingclips.smart.sdk.api.IThingGroup
++import com.thingclips.smart.sdk.bean.GroupDeviceBean
++import com.tuya.smart.rnsdk.utils.*
++import com.tuya.smart.rnsdk.utils.Constant.COMMAND
++import com.tuya.smart.rnsdk.utils.Constant.DEVIDS
++import com.tuya.smart.rnsdk.utils.Constant.GROUPID
++import com.tuya.smart.rnsdk.utils.Constant.HOMEID
++import com.tuya.smart.rnsdk.utils.Constant.NAME
++import com.tuya.smart.rnsdk.utils.Constant.PRODUCTID
++import com.tuya.smart.rnsdk.utils.Constant.getIResultCallback
++
++
++
++
++class TuyaGroupModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
++    override fun getName(): String {
++        return "TuyaGroupModule"
++    }
++
++    /*创建群组*/
++    @ReactMethod
++    fun createGroup(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID, PRODUCTID, NAME, DEVIDS), params)) {
++            getITuyaHome(params.getDouble(HOMEID).toLong()).createGroup(
++                    params.getString((PRODUCTID)),
++                            params.getString(NAME),
++                            JsonUtils.parserArraybyMap(params.getArray(DEVIDS) as ReadableArray,
++                                    String::class.java) as MutableList<String>?,
++                            object : IThingResultCallback<Long> {
++                                override fun onSuccess(p0: Long) {
++                                    promise.resolve(p0)
++                                }
++
++                                override fun onError(p0: String?, p1: String?) {
++                                    promise.reject(p0,p1)
++                                }
++                            }
++                    )
++        }
++    }
++
++    /**onNetworkStatusChanged
++     * 此接口主要是从云端拉取最新群组列表 根据产品ID
++     */
++    @ReactMethod
++    fun queryDeviceListToAddGroup(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID,PRODUCTID), params)) {
++            getITuyaHome(params.getDouble(HOMEID).toLong()).queryDeviceListToAddGroup(params.getDouble(HOMEID).toLong(),params.getString(PRODUCTID),
++                    object : IThingResultCallback<List<GroupDeviceBean>>{
++                override fun onSuccess(bizResult: List<GroupDeviceBean>) {
++                    promise.resolve(TuyaReactUtils.parseToWritableArray(JsonUtils.toJsonArray(bizResult)))
++                }
++
++                override fun onError(errorCode: String, errorMsg: String) {
++                    promise.reject(errorCode,errorMsg)
++                }
++            })
++        }
++    }
++
++    @ReactMethod
++    fun dismissGroup(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(GROUPID), params)) {
++            getITuyaGroup(params.getDouble(GROUPID).toLong())
++                    ?.dismissGroup(getIResultCallback(promise)
++                    )
++        }
++    }
++
++    @ReactMethod
++    fun updateGroupName(params: ReadableMap, promise: Promise){
++        if (ReactParamsCheck.checkParams(arrayOf(GROUPID, NAME), params)) {
++            getITuyaGroup(params.getDouble(GROUPID).toLong())
++                    ?.renameGroup( params.getString(NAME)
++                            ,getIResultCallback(promise)
++                    )
++        }
++    }
++
++    @ReactMethod
++    fun registerGroupListener(params: ReadableMap) {
++        if (ReactParamsCheck.checkParams(arrayOf(GROUPID), params)) {
++            getITuyaGroup(params.getDouble(GROUPID).toLong())
++                    ?.registerGroupListener(object : IGroupListener {
++                        override fun onDpUpdate(var1: Long, var3: String){
++                            var map=Arguments.createMap();
++                            map.putDouble("id",var1.toDouble())
++                            map.putString("dps",var3)
++                            map.putString("type","onDpUpdate")
++                            BridgeUtils.groupListener(reactApplicationContext,map,params.getDouble(GROUPID).toLong())
++                        }
++
++                        override fun onDpCodeUpdate(groupId: Long, dpCodeMap: MutableMap<String, Any>?) {
++                            //
++                        }
++
++                        override fun onGroupInfoUpdate(var1: Long){
++                            var map=Arguments.createMap();
++                            map.putDouble("id",var1.toDouble())
++                            map.putString("type","onGroupInfoUpdate")
++                            BridgeUtils.groupListener(reactApplicationContext,map,params.getDouble(GROUPID).toLong())
++                        }
++
++                        override fun onGroupRemoved(var1: Long){
++                            var map=Arguments.createMap();
++                            map.putDouble("id",var1.toDouble())
++                            map.putString("type","onGroupRemoved")
++                            BridgeUtils.groupListener(reactApplicationContext,map,params.getDouble(GROUPID).toLong())
++                        }
++                    })
++        }
++    }
++
++    @ReactMethod
++    fun unregisterGroupListener(params: ReadableMap) {
++        if (ReactParamsCheck.checkParams(arrayOf(GROUPID), params)) {
++            getITuyaGroup(params.getDouble(GROUPID).toLong())
++                    ?.unRegisterGroupListener()
++        }
++    }
++    @ReactMethod
++    fun publishDps(params: ReadableMap,promise: Promise){
++        if (ReactParamsCheck.checkParams(arrayOf(GROUPID,COMMAND), params)) {
++            getITuyaGroup(params.getDouble(GROUPID).toLong())
++                    ?.publishDps(JsonUtils.toString(TuyaReactUtils.parseToMap(params.getMap(COMMAND) as ReadableMap)), getIResultCallback(promise))
++        }
++    }
++
++    @ReactMethod
++    fun onDestroy(params: ReadableMap){
++        if (ReactParamsCheck.checkParams(arrayOf(GROUPID,COMMAND), params)) {
++            getITuyaGroup(params.getDouble(GROUPID).toLong())
++                    ?.onDestroy()
++        }
++    }
++
++    fun getITuyaHome(homeId: Long): IThingHome {
++        return ThingHomeSdk.newHomeInstance(homeId)
++    }
++
++    fun getITuyaGroup(groupId: Long): IThingGroup {
++        return ThingHomeSdk.newGroupInstance(groupId)
++    }
++
++}
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/home/TuyaHomeDataManagerModule.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/home/TuyaHomeDataManagerModule.kt
+new file mode 100644
+index 0000000..196be8e
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/home/TuyaHomeDataManagerModule.kt
+@@ -0,0 +1,140 @@
++package com.tuya.smart.rnsdk.home
++
++import com.facebook.react.bridge.*
++import com.thingclips.smart.home.sdk.ThingHomeSdk
++import com.tuya.smart.rnsdk.utils.Constant.DEVID
++import com.tuya.smart.rnsdk.utils.Constant.GROUPID
++import com.tuya.smart.rnsdk.utils.Constant.HOMEID
++import com.tuya.smart.rnsdk.utils.Constant.MESHID
++import com.tuya.smart.rnsdk.utils.Constant.ROOMID
++import com.tuya.smart.rnsdk.utils.JsonUtils
++import com.tuya.smart.rnsdk.utils.ReactParamsCheck
++import com.tuya.smart.rnsdk.utils.TuyaReactUtils
++
++
++class TuyaHomeDataManagerModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
++    override fun getName(): String {
++        return "TuyaHomeDataManagerModule"
++    }
++
++
++    /*  家庭下面的房间列表 */
++    @ReactMethod
++    fun getHomeRoomList(params: ReadableMap, promise: Promise) {
++        promise.resolve(TuyaReactUtils.parseToWritableArray(
++                JsonUtils.toJsonArray(ThingHomeSdk.getDataInstance().getHomeRoomList(params.getDouble(HOMEID).toLong()))))
++    }
++
++
++    /* 获取家庭下面的设备列表 */
++    @ReactMethod
++    fun getHomeDeviceList(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID), params)) {
++            promise.resolve(TuyaReactUtils.parseToWritableArray(
++                    JsonUtils.toJsonArray(ThingHomeSdk.getDataInstance().getHomeDeviceList(params.getDouble(HOMEID).toLong()))))
++        }
++    }
++    /* 获取家庭下面的群组列表 */
++    @ReactMethod
++    fun getHomeGroupList(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID), params)) {
++            promise.resolve(TuyaReactUtils.parseToWritableArray(
++                    JsonUtils.toJsonArray(ThingHomeSdk.getDataInstance().getHomeGroupList(params.getDouble(HOMEID).toLong()))))
++        }
++    }
++
++    /* 获取群组 */
++    @ReactMethod
++    fun getGroupBean(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(GROUPID), params)) {
++            promise.resolve(TuyaReactUtils.parseToWritableMap(ThingHomeSdk.getDataInstance().getGroupBean(params.getDouble(GROUPID).toLong())))
++        }
++    }
++
++    /* 获取设备 */
++    @ReactMethod
++    fun getDeviceBean(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
++            promise.resolve(TuyaReactUtils.parseToWritableMap(ThingHomeSdk.getDataInstance().getDeviceBean(params.getString(DEVID))))
++        }
++    }
++
++    /* 获取设备 */
++    @ReactMethod
++    fun getGroupRoomBean(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(GROUPID), params)) {
++            promise.resolve(TuyaReactUtils.parseToWritableMap(ThingHomeSdk.getDataInstance().getGroupRoomBean(params.getDouble(GROUPID).toLong())))
++        }
++    }
++
++    /* 获取房间 */
++    @ReactMethod
++    fun getRoomBean(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(ROOMID), params)) {
++            promise.resolve(TuyaReactUtils.parseToWritableMap(ThingHomeSdk.getDataInstance().getRoomBean(params.getDouble(ROOMID).toLong())))
++        }
++    }
++
++    /* 根据设备获取房间信息 */
++    @ReactMethod
++    fun getDeviceRoomBean(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
++            promise.resolve(TuyaReactUtils.parseToWritableMap(ThingHomeSdk.getDataInstance().getDeviceRoomBean(params.getString(DEVID))))
++        }
++    }
++
++    /* 获取群组下面的设备列表 */
++    @ReactMethod
++    fun getGroupDeviceList(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(GROUPID), params)) {
++            promise.resolve(TuyaReactUtils.parseToWritableArray(
++                    JsonUtils.toJsonArray(ThingHomeSdk.getDataInstance().getGroupDeviceList(params.getDouble(GROUPID).toLong()))))
++        }
++    }
++
++    /* 获取mesh下面的群组列表 */
++    @ReactMethod
++    fun getMeshGroupList(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(MESHID), params)) {
++            promise.resolve(TuyaReactUtils.parseToWritableArray(
++                    JsonUtils.toJsonArray(ThingHomeSdk.getDataInstance().getMeshGroupList(params.getString(MESHID)))))
++        }
++    }
++
++    @ReactMethod
++    fun getMeshDeviceList(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(MESHID), params)) {
++            promise.resolve(TuyaReactUtils.parseToWritableArray(
++                    JsonUtils.toJsonArray(ThingHomeSdk.getDataInstance().getMeshDeviceList(params.getString(MESHID)))))
++        }
++    }
++
++
++    /* 根据房间ID获取房间下面的设备列表 */
++    @ReactMethod
++    fun getRoomDeviceList(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(ROOMID), params)) {
++            promise.resolve(TuyaReactUtils.parseToWritableArray(
++                    JsonUtils.toJsonArray(ThingHomeSdk.getDataInstance().getRoomDeviceList(params.getDouble(ROOMID).toLong()))))
++        }
++    }
++
++
++    /* 根据房间ID获取房间下面的群组列表 */
++    @ReactMethod
++    fun getRoomGroupList(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(ROOMID), params)) {
++            promise.resolve(TuyaReactUtils.parseToWritableArray(
++                    JsonUtils.toJsonArray(ThingHomeSdk.getDataInstance().getRoomGroupList(params.getDouble(ROOMID).toLong()))))
++        }
++    }
++
++    /* 根据房间ID获取房间下面的群组列表 */
++    @ReactMethod
++    fun getHomeBean(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID), params)) {
++            promise.resolve(TuyaReactUtils.parseToWritableMap(ThingHomeSdk.getDataInstance().getHomeBean(params.getDouble(HOMEID).toLong())))
++        }
++    }
++
++}
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/home/TuyaHomeManagerModule.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/home/TuyaHomeManagerModule.kt
+new file mode 100644
+index 0000000..3f768e6
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/home/TuyaHomeManagerModule.kt
+@@ -0,0 +1,135 @@
++package com.tuya.smart.rnsdk.home
++
++import com.facebook.react.bridge.*
++import com.thingclips.smart.home.sdk.ThingHomeSdk
++import com.thingclips.smart.home.sdk.api.IThingHomeChangeListener
++import com.thingclips.smart.home.sdk.bean.HomeBean
++import com.thingclips.smart.home.sdk.callback.IThingGetHomeListCallback
++import com.thingclips.smart.home.sdk.callback.IThingHomeResultCallback
++import com.thingclips.smart.sdk.bean.DeviceBean
++import com.thingclips.smart.sdk.bean.GroupBean
++import com.tuya.smart.rnsdk.utils.*
++
++class TuyaHomeManagerModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
++    override fun getName(): String {
++        return "TuyaHomeManagerModule"
++    }
++
++
++    /* 获取家庭列表 */
++    @ReactMethod
++    fun queryHomeList(promise: Promise) {
++        ThingHomeSdk.getHomeManagerInstance().queryHomeList(object : IThingGetHomeListCallback {
++            override fun onSuccess(var1: List<HomeBean>) {
++                promise.resolve(TuyaReactUtils.parseToWritableArray(JsonUtils.toJsonArray(var1!!)))
++            }
++
++            override fun onError(var1: String, var2: String) {
++                promise.reject(var1, var2)
++            }
++        })
++    }
++
++    /* 创建家庭 */
++    @ReactMethod
++    fun createHome(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(Constant.NAME, Constant.LON, Constant.LAT, Constant.GEONAME, Constant.ROMMS), params)) {
++            var list = ArrayList<String>()
++            var length = (params.getArray(Constant.ROMMS) as ReadableArray).size()
++            for (index in 0 until length) {
++                list.add((params.getArray(Constant.ROMMS) as ReadableArray).getString(index) as String)
++            }
++            ThingHomeSdk.getHomeManagerInstance().createHome(
++                    params.getString(Constant.NAME),
++                    params.getDouble(Constant.LON),
++                    params.getDouble(Constant.LAT),
++                    params.getString(Constant.GEONAME),
++                    list,
++                    getITuyaHomeResultCallback(promise)
++            )
++
++        }
++    }
++
++
++    @ReactMethod
++    fun joinFamily(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(Constant.HOMEID, Constant.ACTION), params)) {
++            ThingHomeSdk.getMemberInstance().processInvitation(
++                    params.getDouble(Constant.HOMEID).toLong(),
++                    params.getBoolean(Constant.ACTION),
++                    Constant.getIResultCallback(promise)
++            )
++
++        }
++    }
++
++
++    /* 注册家庭信息的变更
++     * 有：家庭的增加、删除、信息变更、分享列表的变更和服务器连接成功的监听 */
++    @ReactMethod
++    fun registerTuyaHomeChangeListener(params: ReadableMap) {
++        ThingHomeSdk.getHomeManagerInstance().registerThingHomeChangeListener(object : IThingHomeChangeListener {
++            override fun onHomeInvite(p0: Long, p1: String?) {
++                val map = Arguments.createMap()
++                map.putDouble("homeId", p0.toDouble())
++                map.putString("homeName", p1)
++                BridgeUtils.homeChange(reactApplicationContext, map, params.getDouble("homeId"))
++            }
++
++            override fun onHomeAdded(var1: Long) {
++                val map = Arguments.createMap()
++                map.putDouble("homeId", var1.toDouble())
++                map.putString("type", "onHomeAdded");
++                BridgeUtils.homeChange(reactApplicationContext, map, params.getDouble("homeId"))
++            }
++
++            override fun onHomeRemoved(var1: Long) {
++                val map = Arguments.createMap()
++                map.putDouble("homeId", var1.toDouble())
++                map.putString("type", "onHomeRemoved");
++                BridgeUtils.homeChange(reactApplicationContext, map, params.getDouble("homeId"))
++            }
++
++            override fun onHomeInfoChanged(var1: Long) {
++                val map = Arguments.createMap()
++                map.putDouble("homeId", var1.toDouble())
++                map.putString("type", "onHomeInfoChanged");
++                BridgeUtils.homeChange(reactApplicationContext, map, params.getDouble("homeId"))
++            }
++
++            override fun onSharedDeviceList(var1: List<DeviceBean>) {
++                val map = Arguments.createMap()
++                map.putArray("deviceBeans", TuyaReactUtils.parseToWritableArray(JsonUtils.toJsonArray(var1)))
++                map.putString("type", "onSharedDeviceList");
++                BridgeUtils.homeChange(reactApplicationContext, map, params.getDouble("homeId"))
++            }
++
++            override fun onSharedGroupList(var1: List<GroupBean>) {
++                val map = Arguments.createMap()
++                map.putArray("groupBeans", TuyaReactUtils.parseToWritableArray(JsonUtils.toJsonArray(var1)))
++                map.putString("type", "onSharedGroupList");
++                BridgeUtils.homeChange(reactApplicationContext, map, params.getDouble("homeId"))
++            }
++
++            override fun onServerConnectSuccess() {
++                val map = Arguments.createMap()
++                map.putString("type", "onServerConnectSuccess");
++                BridgeUtils.homeChange(reactApplicationContext, map, params.getDouble("homeId"))
++            }
++        })
++    }
++
++
++    fun getITuyaHomeResultCallback(promise: Promise): IThingHomeResultCallback? {
++        return object : IThingHomeResultCallback {
++            override fun onSuccess(p0: HomeBean?) {
++                promise.resolve(TuyaReactUtils.parseToWritableMap(p0))
++            }
++
++            override fun onError(code: String?, error: String?) {
++                promise.reject(code, error)
++            }
++        }
++    }
++}
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/home/TuyaHomeMemberModule.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/home/TuyaHomeMemberModule.kt
+new file mode 100644
+index 0000000..d81fd69
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/home/TuyaHomeMemberModule.kt
+@@ -0,0 +1,69 @@
++package com.tuya.smart.rnsdk.home
++
++import com.facebook.react.bridge.*
++import com.thingclips.smart.home.sdk.ThingHomeSdk
++import com.thingclips.smart.home.sdk.bean.MemberBean
++import com.thingclips.smart.home.sdk.callback.IThingGetMemberListCallback
++import com.thingclips.smart.home.sdk.callback.IThingMemberResultCallback
++import com.tuya.smart.rnsdk.utils.Constant
++import com.tuya.smart.rnsdk.utils.JsonUtils
++import com.tuya.smart.rnsdk.utils.ReactParamsCheck
++import com.tuya.smart.rnsdk.utils.TuyaReactUtils
++
++class TuyaHomeMemberModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
++    override fun getName(): String {
++        return "TuyaHomeMemberModule"
++    }
++    /* 添加成员 */
++    @ReactMethod
++    fun addMember(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(Constant.HOMEID, Constant.COUNTRYCODE, Constant.USERACCOUNT, Constant.NAME, Constant.ADMIN), params)) {
++            ThingHomeSdk.getMemberInstance().addMember(
++                    params.getDouble(Constant.HOMEID).toLong(),
++                    params.getString(Constant.COUNTRYCODE),
++                    params.getString(Constant.USERACCOUNT),
++                    params.getString(Constant.NAME),
++                    params.getBoolean(Constant.ADMIN),
++                    object : IThingMemberResultCallback {
++                        override fun onSuccess(var1: MemberBean){
++                            promise.resolve(TuyaReactUtils.parseToWritableMap(var1))
++                        }
++
++                        override fun onError(var1: String, var2: String){
++                            promise.reject(var1,var2)
++                        }
++                    }
++            )
++        }
++    }
++    /* 移除Home下面的成员 */
++    @ReactMethod
++    fun removeMember(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(Constant.MEMBERID),params)) {
++            ThingHomeSdk.getMemberInstance().removeMember(params.getDouble(Constant.MEMBERID).toLong(), Constant.getIResultCallback(promise))
++        }
++    }
++    /* 更新成员备注名和权限 */
++    @ReactMethod
++    fun updateMember(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(Constant.MEMBERID, Constant.NAME, Constant.ADMIN),params)) {
++            ThingHomeSdk.getMemberInstance().updateMember(params.getDouble(Constant.MEMBERID).toLong(),params.getString(Constant.NAME),params.getBoolean(Constant.ADMIN), Constant.getIResultCallback(promise))
++        }
++    }
++
++    /* 查询Home下面的成员列表 */
++    @ReactMethod
++    fun queryMemberList(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(Constant.HOMEID),params)) {
++            ThingHomeSdk.getMemberInstance().queryMemberList(params.getDouble(Constant.HOMEID).toLong(),object : IThingGetMemberListCallback {
++                override fun onSuccess(var1: List<MemberBean>){
++                    promise.resolve(TuyaReactUtils.parseToWritableArray(JsonUtils.toJsonArray(var1)))
++                }
++
++                override fun onError(var1: String, var2: String){
++                    promise.reject(var1,var2)
++                }
++            })
++        }
++    }
++}
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/home/TuyaHomeModule.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/home/TuyaHomeModule.kt
+new file mode 100644
+index 0000000..e272828
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/home/TuyaHomeModule.kt
+@@ -0,0 +1,266 @@
++package com.tuya.smart.rnsdk.home
++
++import com.facebook.react.bridge.*
++import com.thingclips.smart.home.sdk.ThingHomeSdk
++import com.thingclips.smart.home.sdk.api.IThingHome
++import com.thingclips.smart.home.sdk.api.IThingHomeStatusListener
++import com.thingclips.smart.home.sdk.bean.HomeBean
++import com.thingclips.smart.home.sdk.bean.RoomBean
++import com.thingclips.smart.home.sdk.callback.IThingGetRoomListCallback
++import com.thingclips.smart.home.sdk.callback.IThingHomeResultCallback
++import com.thingclips.smart.home.sdk.callback.IThingResultCallback
++import com.thingclips.smart.home.sdk.callback.IThingRoomResultCallback
++import com.thingclips.smart.sdk.bean.GroupDeviceBean
++import com.tuya.smart.rnsdk.utils.*
++import com.tuya.smart.rnsdk.utils.Constant.DEVIDLIST
++import com.tuya.smart.rnsdk.utils.Constant.GEONAME
++import com.tuya.smart.rnsdk.utils.Constant.HOMEID
++import com.tuya.smart.rnsdk.utils.Constant.IDLIST
++import com.tuya.smart.rnsdk.utils.Constant.LAT
++import com.tuya.smart.rnsdk.utils.Constant.LON
++import com.tuya.smart.rnsdk.utils.Constant.NAME
++import com.tuya.smart.rnsdk.utils.Constant.PRODUCTID
++import com.tuya.smart.rnsdk.utils.Constant.ROOMID
++import com.tuya.smart.rnsdk.utils.Constant.getIResultCallback
++
++
++class TuyaHomeModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
++    override fun getName(): String {
++        return "TuyaHomeModule"
++    }
++
++    /* 初始化家庭下的所有数据 */
++    @ReactMethod
++    fun getHomeDetail(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID), params)) {
++            getHomeInstance(params.getDouble(HOMEID))?.getHomeDetail(getITuyaHomeResultCallback(promise))
++        }
++    }
++
++    /* 获取本地缓存中的数据信息 */
++    @ReactMethod
++    fun getHomeLocalCache(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID), params)) {
++            getHomeInstance(params.getDouble(HOMEID))?.getHomeLocalCache(getITuyaHomeResultCallback(promise))
++        }
++    }
++
++    /* 更新家庭信息 */
++    @ReactMethod
++    fun updateHome(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID, NAME, LON, LAT, GEONAME), params)) {
++            getHomeInstance(params.getDouble(HOMEID))?.updateHome(params.getString(NAME), params.getDouble(LON), params.getDouble(LAT), params.getString(GEONAME), getIResultCallback(promise))
++        }
++    }
++
++    /* 解散家庭 */
++    @ReactMethod
++    fun dismissHome(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID), params)) {
++            getHomeInstance(params.getDouble(HOMEID))?.dismissHome(getIResultCallback(promise))
++        }
++    }
++
++    /* 添加房间 */
++    @ReactMethod
++    fun addRoom(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID, NAME), params)) {
++            getHomeInstance(params.getDouble(HOMEID))?.addRoom(params.getString(NAME), getITuyaRoomResultCallback(promise))
++        }
++    }
++
++    /* 移除房间 */
++    @ReactMethod
++    fun removeRoom(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID, ROOMID), params)) {
++            getHomeInstance(params.getDouble(HOMEID))?.removeRoom(params.getDouble(ROOMID).toLong(), getIResultCallback(promise))
++        }
++    }
++
++    @ReactMethod
++    fun sortRoom(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID, IDLIST), params)) {
++            var list = ArrayList<Long>()
++            var length = (params.getArray(IDLIST) as ReadableArray).size()
++            for (index in 0..length - 1) {
++                list.add((params.getArray(IDLIST) as ReadableArray).getDouble(index).toLong())
++            }
++            getHomeInstance(params.getDouble(HOMEID))?.sortRoom(list, getIResultCallback(promise))
++        }
++    }
++
++    /* 排序房间 */
++    @ReactMethod
++    fun sortHome(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID, IDLIST), params)) {
++            var list = ArrayList<Long>()
++            var length = (params.getArray(IDLIST) as ReadableArray).size()
++            for (index in 0..length - 1) {
++                list.add((params.getArray(IDLIST) as ReadableArray).getDouble(index).toLong())
++            }
++            getHomeInstance(params.getDouble(HOMEID))?.sortHome(list, getIResultCallback(promise))
++        }
++    }
++
++
++    /* 查询房间列表 */
++    @ReactMethod
++    fun queryRoomList(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID), params)) {
++            getHomeInstance(params.getDouble(HOMEID))?.queryRoomList(ITuyaGetRoomListCallback(promise))
++        }
++    }
++
++    /* 创建群组 */
++    @ReactMethod
++    fun createGroup(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID, PRODUCTID, NAME, DEVIDLIST), params)) {
++            var list = ArrayList<String>()
++            var length = (params.getArray(DEVIDLIST) as ReadableArray).size()
++            for (index in 0..length) {
++                list.add((params.getArray(DEVIDLIST) as ReadableArray).getString(index) as String)
++            }
++            getHomeInstance(params.getDouble(HOMEID))?.createGroup(
++                    params.getString(PRODUCTID),
++                    params.getString(NAME),
++                    list,
++                    object : IThingResultCallback<Long> {
++                        override fun onSuccess(var1: Long) {
++                            promise.resolve(var1)
++                        }
++
++                        override fun onError(var1: String, var2: String) {
++                            promise.reject(var1, var2)
++                        }
++                    }
++            )
++        }
++    }
++
++
++    /* 监听家庭下面信息(设备的新增或者删除)变更的监听 */
++    @ReactMethod
++    fun registerHomeStatusListener(params: ReadableMap) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID), params)) {
++            getHomeInstance(params.getDouble(HOMEID))?.registerHomeStatusListener(object : IThingHomeStatusListener {
++                override fun onDeviceAdded(var1: String){
++                    val map = Arguments.createMap()
++                    map.putString("devId", var1)
++                    map.putDouble("homeId", params.getDouble(HOMEID))
++                    map.putString("type","onDeviceAdded");
++                    BridgeUtils.homeStatus(reactApplicationContext,map,params.getString(HOMEID) as String)
++                }
++
++                override fun onDeviceRemoved(var1: String){
++                    val map = Arguments.createMap()
++                    map.putString("devId", var1)
++                    map.putDouble("homeId", params.getDouble(HOMEID))
++                    map.putString("type","onDeviceRemoved");
++                    BridgeUtils.homeStatus(reactApplicationContext,map,params.getString(HOMEID) as String)
++                }
++
++                override fun onGroupAdded(var1: Long){
++                    val map = Arguments.createMap()
++                    map.putDouble("groupId", var1.toDouble())
++                    map.putDouble("homeId", params.getDouble(HOMEID))
++                    map.putString("type","onGroupAdded");
++                    BridgeUtils.homeStatus(reactApplicationContext,map,params.getString(HOMEID) as String)
++                }
++
++                override fun onGroupRemoved(var1: Long){
++                    val map = Arguments.createMap()
++                    map.putDouble("groupId", var1.toDouble())
++                    map.putDouble("homeId", params.getDouble(HOMEID))
++                    map.putString("type","onGroupRemoved");
++                    BridgeUtils.homeStatus(reactApplicationContext,map,params.getString(HOMEID) as String)
++                }
++
++                override fun onMeshAdded(var1: String){
++                    val map = Arguments.createMap()
++                    map.putDouble("meshId", var1.toDouble())
++                    map.putDouble("homeId", params.getDouble(HOMEID))
++                    map.putString("type","onMeshAdded");
++                    BridgeUtils.homeStatus(reactApplicationContext,map,params.getString(HOMEID) as String)
++                }
++            })
++        }
++    }
++    /* 注销家庭下面信息变更的监听 */
++    @ReactMethod
++    fun unRegisterHomeStatusListener(params: ReadableMap) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID), params)) {
++            getHomeInstance(params.getDouble(HOMEID))
++        }
++    }
++
++    /* 查询用户下面相同产品且支持群组的设备列表 */
++    @ReactMethod
++    fun queryDeviceListToAddGroup(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID, PRODUCTID), params)) {
++            getHomeInstance(params.getDouble(HOMEID))?.queryDeviceListToAddGroup(params.getDouble(HOMEID).toLong(),
++                    params.getString(PRODUCTID),
++                    object : IThingResultCallback<List<GroupDeviceBean>> {
++                        override fun onSuccess(var1: List<GroupDeviceBean>) {
++                            promise.resolve(TuyaReactUtils.parseToWritableArray(JsonUtils.toJsonArray(var1)))
++                        }
++
++                        override fun onError(var1: String, var2: String) {
++                            promise.reject(var1, var2)
++                        }
++                    }
++            )
++        }
++    }
++
++    /* 查询用户下面相同产品且支持群组的设备列表 */
++    @ReactMethod
++    fun onDestroy(params: ReadableMap) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID), params)) {
++            getHomeInstance(params.getDouble(HOMEID))?.onDestroy()
++        }
++    }
++
++    fun getHomeInstance(homeId: Double): IThingHome? {
++        return ThingHomeSdk.newHomeInstance(homeId.toLong())
++    }
++
++
++
++    fun ITuyaGetRoomListCallback(promise: Promise): IThingGetRoomListCallback? {
++        return object : IThingGetRoomListCallback {
++            override fun onSuccess(var1: List<RoomBean>) {
++                promise.resolve(TuyaReactUtils.parseToWritableArray(JsonUtils.toJsonArray(var1)))
++            }
++
++            override fun onError(code: String?, error: String?) {
++                promise.reject(code, error)
++            }
++        }
++    }
++
++
++    fun getITuyaRoomResultCallback(promise: Promise): IThingRoomResultCallback? {
++        return object : IThingRoomResultCallback {
++            override fun onSuccess(p0: RoomBean) {
++                promise.resolve(TuyaReactUtils.parseToWritableMap(p0))
++            }
++
++            override fun onError(code: String?, error: String?) {
++                promise.reject(code, error)
++            }
++        }
++    }
++
++    fun getITuyaHomeResultCallback(promise: Promise): IThingHomeResultCallback? {
++        return object : IThingHomeResultCallback {
++            override fun onSuccess(p0: HomeBean?) {
++                promise.resolve(TYCommonUtls.parseToWritableMap(p0))
++            }
++
++            override fun onError(code: String?, error: String?) {
++                promise.reject(code, error)
++            }
++        }
++    }
++}
++
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/home/TuyaRoomModule.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/home/TuyaRoomModule.kt
+new file mode 100644
+index 0000000..0985539
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/home/TuyaRoomModule.kt
+@@ -0,0 +1,63 @@
++package com.tuya.smart.rnsdk.home
++
++import com.facebook.react.bridge.*
++import com.thingclips.smart.home.sdk.ThingHomeSdk
++import com.thingclips.smart.home.sdk.api.IThingRoom
++import com.tuya.smart.rnsdk.utils.Constant.NAME
++import com.tuya.smart.rnsdk.utils.Constant.DEVID
++import com.tuya.smart.rnsdk.utils.Constant.GROUPID
++import com.tuya.smart.rnsdk.utils.Constant.ROOMID
++import com.tuya.smart.rnsdk.utils.Constant.getIResultCallback
++import com.tuya.smart.rnsdk.utils.ReactParamsCheck
++
++
++class TuyaRoomModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
++    override fun getName(): String {
++        return "TuyaRoomModule"
++    }
++
++    /* 更新房间名称 */
++    @ReactMethod
++    fun updateRoom(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(ROOMID, NAME), params)) {
++            getRoomInstance(params.getDouble(ROOMID)).updateRoom(params.getString(NAME), getIResultCallback(promise))
++        }
++    }
++
++    /* 添加设备 */
++    @ReactMethod
++    fun addDevice(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(ROOMID, DEVID), params)) {
++            getRoomInstance(params.getDouble(ROOMID)).addDevice(params.getString(DEVID), getIResultCallback(promise))
++        }
++    }
++
++    /* 删除设备  */
++    @ReactMethod
++    fun removeDevice(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(ROOMID, DEVID), params)) {
++            getRoomInstance(params.getDouble(ROOMID)).removeDevice(params.getString(DEVID), getIResultCallback(promise))
++        }
++    }
++
++    /* 删除群组  */
++    @ReactMethod
++    fun removeGroup(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(ROOMID, GROUPID), params)) {
++            getRoomInstance(params.getDouble(ROOMID)).removeGroup(params.getDouble(GROUPID).toLong(), getIResultCallback(promise))
++        }
++    }
++
++    /* 添加群组  */
++    @ReactMethod
++    fun addGroup(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(ROOMID, GROUPID), params)) {
++            getRoomInstance(params.getDouble(ROOMID)).addGroup(params.getDouble(GROUPID).toLong(), getIResultCallback(promise))
++        }
++    }
++
++    fun getRoomInstance(roomId: Double): IThingRoom {
++        return ThingHomeSdk.newRoomInstance(roomId.toLong())
++    }
++
++}
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/message/TuyaMessageModule.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/message/TuyaMessageModule.kt
+new file mode 100644
+index 0000000..5cd755d
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/message/TuyaMessageModule.kt
+@@ -0,0 +1,66 @@
++package com.tuya.smart.rnsdk.message
++
++import com.facebook.react.bridge.*
++import com.thingclips.smart.android.user.api.IBooleanCallback
++import com.thingclips.smart.home.sdk.ThingHomeSdk
++import com.thingclips.smart.sdk.api.IThingDataCallback
++import com.thingclips.smart.sdk.bean.message.MessageBean
++import com.tuya.smart.rnsdk.utils.Constant
++import com.tuya.smart.rnsdk.utils.Constant.IDS
++import com.tuya.smart.rnsdk.utils.JsonUtils
++import com.tuya.smart.rnsdk.utils.ReactParamsCheck
++import com.tuya.smart.rnsdk.utils.TuyaReactUtils
++import java.util.ArrayList
++
++
++
++class TuyaMessageModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
++    override fun getName(): String {
++        return "TuyaMessageModule"
++    }
++    @ReactMethod
++    fun getMessageList(promise: Promise) {
++       ThingHomeSdk.getMessageInstance().getMessageList(object : IThingDataCallback<List<MessageBean>> {
++            override fun onSuccess(p0: List<MessageBean>?) {
++                promise.resolve(TuyaReactUtils.parseToWritableArray(JsonUtils.toJsonArray(p0!!)))
++            }
++
++            override fun onError(p0: String?, p1: String?) {
++                promise.reject(p0,p1)
++            }
++        })
++    }
++
++    @ReactMethod
++    fun deleteMessage(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(IDS), params)) {
++            var list = ArrayList<String>()
++            var length = (params.getArray(Constant.IDS) as ReadableArray).size()-1
++            for (index in 0..length) {
++                list.add((params.getArray(Constant.IDS) as ReadableArray).getString(index) as String)
++            }
++            ThingHomeSdk.getMessageInstance().deleteMessages(list,object : IBooleanCallback {
++                override fun onSuccess(){
++                    promise.resolve(Constant.SUCCESS)
++                }
++
++                override fun onError(var1: String, var2: String) {
++                  promise.reject(var1,var2)
++                }
++            })
++        }
++    }
++
++    @ReactMethod
++    fun getMessageMaxTime(promise: Promise){
++        ThingHomeSdk.getMessageInstance().getMessageMaxTime(object : IThingDataCallback<Int> {
++            override fun onSuccess(p0: Int) {
++                promise.resolve(p0)
++            }
++
++            override fun onError(p0: String?, p1: String?) {
++                promise.reject(p0,p1)
++            }
++        })
++    }
++}
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/push/TuyaPushModule.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/push/TuyaPushModule.kt
+new file mode 100644
+index 0000000..851001f
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/push/TuyaPushModule.kt
+@@ -0,0 +1,27 @@
++package com.tuya.smart.rnsdk.push
++
++import com.facebook.react.bridge.*
++import com.thingclips.smart.home.sdk.ThingHomeSdk
++import com.tuya.smart.rnsdk.utils.Constant
++import com.tuya.smart.rnsdk.utils.ReactParamsCheck
++
++class TuyaPushModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
++    override fun getName(): String {
++        return "TuyaPushModule"
++    }
++
++    /* Push涂鸦云注册 */
++    @ReactMethod
++    fun registerDevice(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(Constant.ALIASID, Constant.PUSHPROVIDER), params)) {
++            ThingHomeSdk.getPushInstance().registerDevice(params.getString(Constant.ALIASID),params.getString(Constant.PUSHPROVIDER),Constant.getIResultCallback(promise))
++        }
++    }
++
++
++    /* 手机密码登录 */
++    @ReactMethod
++    fun onDestroy() {
++        ThingHomeSdk.getPushInstance().onDestroy()
++    }
++}
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/scene/TuyaSceneModule.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/scene/TuyaSceneModule.kt
+new file mode 100644
+index 0000000..78f33e7
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/scene/TuyaSceneModule.kt
+@@ -0,0 +1,629 @@
++package com.tuya.smart.rnsdk.scene
++
++import android.text.TextUtils
++import android.util.Log
++import com.facebook.react.bridge.*
++import com.thingclips.smart.home.sdk.ThingHomeSdk
++import com.thingclips.smart.home.sdk.api.IThingHomeScene
++import com.thingclips.smart.home.sdk.bean.scene.PlaceFacadeBean
++import com.thingclips.smart.home.sdk.bean.scene.SceneBean
++import com.thingclips.smart.home.sdk.bean.scene.SceneCondition
++import com.thingclips.smart.home.sdk.bean.scene.SceneTask
++import com.thingclips.smart.home.sdk.bean.scene.condition.ConditionListBean
++import com.thingclips.smart.home.sdk.bean.scene.condition.rule.BoolRule
++import com.thingclips.smart.home.sdk.bean.scene.condition.rule.EnumRule
++import com.thingclips.smart.home.sdk.bean.scene.condition.rule.Rule
++import com.thingclips.smart.home.sdk.bean.scene.condition.rule.TimerRule
++import com.thingclips.smart.home.sdk.bean.scene.condition.rule.ValueRule
++import com.thingclips.smart.home.sdk.bean.scene.dev.TaskListBean
++import com.thingclips.smart.home.sdk.callback.IThingResultCallback
++import com.thingclips.smart.sdk.bean.DeviceBean
++import com.tuya.smart.rnsdk.utils.Constant
++import com.tuya.smart.rnsdk.utils.Constant.BACKGROUND
++import com.tuya.smart.rnsdk.utils.Constant.CITYID
++import com.tuya.smart.rnsdk.utils.Constant.CITYIDS
++import com.tuya.smart.rnsdk.utils.Constant.CONDITIONLISTS
++import com.tuya.smart.rnsdk.utils.Constant.CONDITIONS
++import com.tuya.smart.rnsdk.utils.Constant.COUNTRYCODE
++import com.tuya.smart.rnsdk.utils.Constant.DEVID
++import com.tuya.smart.rnsdk.utils.Constant.DEVIDS
++import com.tuya.smart.rnsdk.utils.Constant.DISPLAY
++import com.tuya.smart.rnsdk.utils.Constant.DPID
++import com.tuya.smart.rnsdk.utils.Constant.DPVALUE
++import com.tuya.smart.rnsdk.utils.Constant.ENTITY_TYPE
++import com.tuya.smart.rnsdk.utils.Constant.ENTITY_TYPE_DEVICE
++import com.tuya.smart.rnsdk.utils.Constant.ENTITY_TYPE_WEATHER
++import com.tuya.smart.rnsdk.utils.Constant.HOMEID
++import com.tuya.smart.rnsdk.utils.Constant.ID
++import com.tuya.smart.rnsdk.utils.Constant.LAT
++import com.tuya.smart.rnsdk.utils.Constant.LON
++import com.tuya.smart.rnsdk.utils.Constant.MATCHTYPE
++import com.tuya.smart.rnsdk.utils.Constant.NAME
++import com.tuya.smart.rnsdk.utils.Constant.OPERATOR
++import com.tuya.smart.rnsdk.utils.Constant.RANGE
++import com.tuya.smart.rnsdk.utils.Constant.RULE
++import com.tuya.smart.rnsdk.utils.Constant.RULES
++import com.tuya.smart.rnsdk.utils.Constant.SCENEID
++import com.tuya.smart.rnsdk.utils.Constant.SCENEIDS
++import com.tuya.smart.rnsdk.utils.Constant.SHOWFAHRENHEIT
++import com.tuya.smart.rnsdk.utils.Constant.STICKYONTOP
++import com.tuya.smart.rnsdk.utils.Constant.TASK
++import com.tuya.smart.rnsdk.utils.Constant.TASKS
++import com.tuya.smart.rnsdk.utils.Constant.TYPE
++import com.tuya.smart.rnsdk.utils.Constant.VALUE
++import com.tuya.smart.rnsdk.utils.JsonUtils
++import com.tuya.smart.rnsdk.utils.ReactParamsCheck
++import com.tuya.smart.rnsdk.utils.TuyaReactUtils
++import org.eclipse.paho.client.mqttv3.logging.LoggerFactory
++import java.util.*
++import java.util.stream.Stream
++import kotlin.collections.ArrayList
++import kotlin.collections.HashMap
++
++
++class TuyaSceneModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
++    override fun getName(): String {
++        return "TuyaSceneModule"
++    }
++
++    @ReactMethod
++    fun getSceneList(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID), params)) {
++            ThingHomeSdk.getSceneManagerInstance().getSceneList(params.getDouble(HOMEID).toLong(), object : IThingResultCallback<List<SceneBean>> {
++                override fun onSuccess(var1: List<SceneBean>) {
++                    promise.resolve(TuyaReactUtils.parseToWritableArray(JsonUtils.toJsonArray(var1!!)))
++                }
++
++                override fun onError(var1: String, var2: String) {
++                    promise.reject(var1, var2)
++                }
++            })
++        }
++    }
++
++
++    @ReactMethod
++    fun getConditionList(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(SHOWFAHRENHEIT), params)) {
++            ThingHomeSdk.getSceneManagerInstance().getConditionList(params.getBoolean(SHOWFAHRENHEIT), object : IThingResultCallback<List<ConditionListBean>> {
++                override fun onSuccess(p0: List<ConditionListBean>) {
++                    promise.resolve(TuyaReactUtils.parseToWritableArray(JsonUtils.toJsonArray(p0!!)))
++                }
++
++                override fun onError(var1: String, var2: String) {
++                    promise.reject(var1, var2)
++                }
++            })
++        }
++    }
++
++    @ReactMethod
++    fun getConditionDevList(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID), params)) {
++            ThingHomeSdk.getSceneManagerInstance().getConditionDevList(params.getDouble(HOMEID).toLong(), object : IThingResultCallback<List<DeviceBean>> {
++                override fun onSuccess(p0: List<DeviceBean>) {
++                    promise.resolve(TuyaReactUtils.parseToWritableArray(JsonUtils.toJsonArray(p0!!)))
++                }
++
++                override fun onError(var1: String, var2: String) {
++                    promise.reject(var1, var2)
++                }
++            })
++        }
++    }
++
++    @ReactMethod
++    fun getDeviceConditionOperationList(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
++            ThingHomeSdk.getSceneManagerInstance().getDeviceConditionOperationList(params.getString(DEVID), object : IThingResultCallback<List<TaskListBean>> {
++                override fun onSuccess(p0: List<TaskListBean>) {
++                    promise.resolve(TuyaReactUtils.parseToWritableArray(JsonUtils.toJsonArray(p0!!)))
++                }
++
++                override fun onError(var1: String, var2: String) {
++                    promise.reject(var1, var2)
++                }
++            })
++        }
++    }
++
++    @ReactMethod
++    fun getCityListByCountryCode(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE), params)) {
++            ThingHomeSdk.getSceneManagerInstance().getCityListByCountryCode(params.getString(COUNTRYCODE), object : IThingResultCallback<List<PlaceFacadeBean>> {
++                override fun onSuccess(p0: List<PlaceFacadeBean>) {
++                    promise.resolve(TuyaReactUtils.parseToWritableArray(JsonUtils.toJsonArray(p0!!)))
++                }
++
++                override fun onError(var1: String, var2: String) {
++                    promise.reject(var1, var2)
++                }
++            })
++        }
++    }
++
++    @ReactMethod
++    fun getCityByCityIndex(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(CITYID), params)) {
++            ThingHomeSdk.getSceneManagerInstance().getCityByCityIndex(params.getDouble(CITYID).toLong(), object : IThingResultCallback<PlaceFacadeBean> {
++                override fun onSuccess(p0: PlaceFacadeBean) {
++                    promise.resolve(TuyaReactUtils.parseToWritableMap(p0!!))
++                }
++
++                override fun onError(var1: String, var2: String) {
++                    promise.reject(var1, var2)
++                }
++            })
++        }
++    }
++
++    @ReactMethod
++    fun getCityByLatLng(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(LON, LAT), params)) {
++            ThingHomeSdk.getSceneManagerInstance()
++                    .getCityByLatLng(params.getString(LON), params.getString(LAT), object : IThingResultCallback<PlaceFacadeBean> {
++                        override fun onSuccess(p0: PlaceFacadeBean) {
++                            promise.resolve(TuyaReactUtils.parseToWritableMap(p0!!))
++                        }
++
++                        override fun onError(var1: String, var2: String) {
++                            promise.reject(var1, var2)
++                        }
++                    })
++        }
++    }
++
++    @ReactMethod
++    fun createDpTask(params: ReadableMap, promise: Promise) {
++//        if (ReactParamsCheck.checkParams(arrayOf(DEVID, TASK), params)) {
++//            promise.resolve(TuyaReactUtils.parseToWritableMap(createTask(params.getString(DEVID), params.getMap(TASK))))
++//        }
++    }
++
++    @ReactMethod
++    fun getTaskDevList(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID), params)) {
++            ThingHomeSdk.getSceneManagerInstance().getTaskDevList(params.getDouble(HOMEID).toLong(),
++                    object : IThingResultCallback<List<DeviceBean>> {
++                        override fun onSuccess(var1: List<DeviceBean>) {
++                            promise.resolve(TuyaReactUtils.parseToWritableArray(JsonUtils.toJsonArray(var1!!)))
++                        }
++
++                        override fun onError(var1: String, var2: String) {
++                            promise.reject(var1, var2)
++                        }
++                    })
++        }
++    }
++
++    @ReactMethod
++    fun getDeviceTaskOperationList(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
++            promise.resolve(ThingHomeSdk.getSceneManagerInstance().getDeviceTaskOperationList(params.getString(DEVID),
++                    object : IThingResultCallback<List<TaskListBean>> {
++                        override fun onSuccess(var1: List<TaskListBean>) {
++                            promise.resolve(TuyaReactUtils.parseToWritableArray(JsonUtils.toJsonArray(var1!!)))
++                        }
++
++                        override fun onError(var1: String, var2: String) {
++                            promise.reject(var1, var2)
++                        }
++                    }))
++        }
++    }
++
++
++    @ReactMethod  //创建场景 不带条件的那种 对应tuya场景的功能 没有条件 支持多任务
++    fun createScene(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID, NAME, STICKYONTOP, TASKS, DEVIDS, BACKGROUND, MATCHTYPE), params)) {
++            var tasks = createTasks(params)
++            var b = false
++            if (params.hasKey(STICKYONTOP) && params.getBoolean(STICKYONTOP)) {
++                b = true
++            }
++            var mathType = SceneBean.MATCH_TYPE_AND
++            if (params.getString(MATCHTYPE).equals("MATCH_TYPE_OR")) {
++                mathType = SceneBean.MATCH_TYPE_OR
++            } else if (params.getString(MATCHTYPE).equals("MATCH_TYPE_BY_EXPR")) {
++                mathType = SceneBean.MATCH_TYPE_BY_EXPR
++            }
++            ThingHomeSdk.getSceneManagerInstance().createScene(
++                    params.getDouble(HOMEID).toLong(),//家庭id
++                    params.getString(NAME), //场景名称
++                    b,//是否显示首页
++                    null,//背景 params.getString(BACKGROUND)
++                    null,//conditions 条件 场景就不要条件了 自动化要
++                    tasks, //任务
++                    mathType,
++                    object : IThingResultCallback<SceneBean> {
++                        override fun onSuccess(sceneBean: SceneBean) {
++                            promise.resolve(TuyaReactUtils.parseToWritableMap(sceneBean))
++                        }
++
++                        override fun onError(errorCode: String, errorMessage: String) {
++                            promise.reject(errorCode, errorMessage)
++                        }
++                    })
++        }
++    }
++
++    @ReactMethod  //修改已创建的场景 切勿创新的创景进来  //将创建的值都穿进来
++    fun modifyScene(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(SCENEID, HOMEID, DEVIDS, TASKS, NAME, STICKYONTOP, MATCHTYPE), params)) {
++            ThingHomeSdk.getSceneManagerInstance().getSceneList(params.getDouble(HOMEID).toLong(),
++                    object : IThingResultCallback<List<SceneBean>> {
++                        override fun onSuccess(p0: List<SceneBean>) {
++                            for (item in p0) {
++                                if (item.id.equals(params.getString(SCENEID))) {
++                                    if (params.hasKey(NAME)) {
++                                        item.name = params.getString(NAME)
++                                    }
++                                    if (params.hasKey(TASKS)) {
++                                        var tasks = createTasks(params)
++                                        item.actions = tasks
++                                    }
++
++                                    getScene(item.id)?.modifyScene(
++                                            item, //修改后的场景数据类
++                                            object : IThingResultCallback<SceneBean> {
++                                                override fun onSuccess(sceneBean: SceneBean) {
++                                                    promise.resolve(TuyaReactUtils.parseToWritableMap(sceneBean))
++                                                }
++
++                                                override fun onError(errorCode: String, errorMessage: String) {
++                                                    promise.reject(errorCode, errorMessage)
++                                                }
++                                            })
++                                    return
++                                }
++                            }
++                            promise.reject("-1", "no find SceneBean")
++                        }
++
++                        override fun onError(code: String?, error: String?) {
++                            promise.reject(code, error)
++                        }
++                    }
++            )
++        }
++    }
++
++    @ReactMethod  //创建自动化场景 带条件的 这边只有天气条件
++    fun createAutoScene(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID, NAME, STICKYONTOP, TASKS, DEVIDS, BACKGROUND, MATCHTYPE, CONDITIONLISTS), params)) {
++            var tasks = createTasks(params)
++            var b = false
++            if (params.hasKey(STICKYONTOP) && params.getBoolean(STICKYONTOP)) {
++                b = true
++            }
++            var mathType = SceneBean.MATCH_TYPE_AND
++            if (params.getString(MATCHTYPE).equals("MATCH_TYPE_OR")) {
++                mathType = SceneBean.MATCH_TYPE_OR
++            } else if (params.getString(MATCHTYPE).equals("MATCH_TYPE_BY_EXPR")) {
++                mathType = SceneBean.MATCH_TYPE_BY_EXPR
++            }
++            var conditionLists = params.getArray(CONDITIONLISTS) as ReadableArray
++            var placebeanList = ArrayList<PlaceFacadeBean>();
++            var k = 0
++            var sceneConditionList = ArrayList<SceneCondition>()
++            while (k < conditionLists.size()) {
++                val condition = conditionLists.getMap(k) as ReadableMap
++                // 自动化条件创建方式有三个方法 四种类型 首先根据方法来排除 然后根据type来对weather排除
++                if (condition.getInt(ENTITY_TYPE) == ENTITY_TYPE_WEATHER) {
++                    val placeBean = condition.getMap("placeBean") as ReadableMap
++                    val placeFacadeBean = PlaceFacadeBean();
++                    placeFacadeBean.area = placeBean.getString("area")
++                    placeFacadeBean.city = placeBean.getString("city")
++                    placeFacadeBean.isChoose = placeBean.getBoolean("choose")
++                    placeFacadeBean.province = placeBean.getString("province")
++                    placeFacadeBean.cityId = (placeBean.getString("cityId") as String).toLong();
++                    placebeanList.add(placeFacadeBean)
++                    if (condition.getString(TYPE) == "temp") {
++                        val weatherCondition = SceneCondition.createWeatherCondition(
++                                placeFacadeBean, //城市
++                                (conditionLists.getMap(k) as ReadableMap).getString(TYPE) as String, //类别
++                                getTempRule(condition.getString(TYPE) as String, condition.getString(RANGE) as String, condition.getString(RULE) as String)            //规则
++                        )
++                        sceneConditionList.add(weatherCondition)
++                    } else {
++                        val weatherCondition = SceneCondition.createWeatherCondition(
++                                placeFacadeBean, //城市
++                                (conditionLists.getMap(k) as ReadableMap).getString(TYPE) as String, //类别
++                                getEnumRule(condition.getString(TYPE) as String, condition.getString(RULE) as String)            //规则
++                        )
++                        sceneConditionList.add(weatherCondition)
++                    }
++                } else if (condition.getInt(ENTITY_TYPE) == ENTITY_TYPE_DEVICE) { //创建设备
++                    var rules = ArrayList<Rule>()
++                    rules.add(getRules(condition))
++                    val devCondition = SceneCondition.createDevCondition(ThingHomeSdk.getDataInstance().getDeviceBean(condition.getString(DEVID)),
++                            condition.getString(DPID),
++                            getRules(condition))
++                    sceneConditionList.add(devCondition)
++                } else { //创建定时
++                    /**
++                     *
++                     * @param timeZoneId 时区，格式例如"Asia/Shanghai"
++                     * @param loops 7位字符串，每一位表示星期几，第一位表示星期日，第二位表示星期一，
++                     * 依次类推，表示在哪些天启用定时。0表示未选中，1表示选中.格式例如只选中星期一
++                     * 星期二："0110000"。如果都未选中，则表示定时只执行一次，格式："0000000"
++                     * @param time 时间，24小时制。格式例如"08:00",如果用户使用12小时制，需要
++                     * 开发者将之转换为24小时制上传
++                     * @param date 日期，格式例如"20180310"
++                     * @return
++                     */
++                    //      TimerRule timerRule = TimerRule.newInstance("Asia/Shanghai","0111110","16:00","20180310")
++                    var timeRule = TimerRule.newInstance(condition.getString("loop"), condition.getString("time"), condition.getString("date"))
++                    val timerCondition = SceneCondition.createTimerCondition(
++                            condition.getString(DISPLAY),
++                            condition.getString(NAME),
++                            condition.getString(TYPE),
++                            timeRule
++                    )
++                    sceneConditionList.add(timerCondition)
++                }
++
++                k++
++            }
++            ThingHomeSdk.getSceneManagerInstance().createScene(
++                    params.getDouble(HOMEID).toLong(),//家庭id
++                    params.getString(NAME), //场景名称
++                    b,//是否显示首页
++                    null,//背景 params.getString(BACKGROUND)
++                    sceneConditionList,//conditions 条件 场景就不要条件了 自动化要
++                    tasks, //任务
++                    mathType,
++                    object : IThingResultCallback<SceneBean> {
++                        override fun onSuccess(sceneBean: SceneBean) {
++                            promise.resolve(TuyaReactUtils.parseToWritableMap(sceneBean))
++                        }
++
++                        override fun onError(errorCode: String, errorMessage: String) {
++                            promise.reject(errorCode, errorMessage)
++                        }
++                    })
++        }
++    }
++
++    fun getRules(params: ReadableMap): Rule {
++        var rule: Rule
++        if (params.getString(TYPE).equals("bool")) {
++            rule = BoolRule.newInstance(
++                    "dp" + params.getString(DPID),
++                    params.getBoolean(RULE)
++            )
++        } else if (params.getString(TYPE).equals("enum")) {
++            rule = EnumRule.newInstance(
++                    params.getString(DPID),
++                    params.getString(RULE)
++
++            )
++        } else {
++            rule = ValueRule.newInstance(
++                    params.getString(DPID),
++                    params.getString(OPERATOR),
++                    params.getInt(RULE)
++            )
++        }
++        return rule;
++    }
++
++    @ReactMethod
++    fun modifyAutoScene(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(SCENEID, HOMEID, DEVIDS, TASKS, NAME, STICKYONTOP, MATCHTYPE, CONDITIONLISTS), params)) {
++            ThingHomeSdk.getSceneManagerInstance().getSceneList(params.getDouble(HOMEID).toLong(),
++                    object : IThingResultCallback<List<SceneBean>> {
++                        override fun onSuccess(p0: List<SceneBean>) {
++                            for (item in p0) {
++                                if (item.id.equals(params.getString(SCENEID))) {
++                                    if (params.hasKey(NAME)) {
++                                        item.name = params.getString(NAME)
++                                    }
++                                    if (params.hasKey(TASKS)) {
++                                        var tasks = createTasks(params)
++                                        item.actions = tasks
++                                    }
++                                    if (params.hasKey(BACKGROUND)) {
++                                        item.background = params.getString(BACKGROUND)
++                                    }
++                                    var conditionLists = params.getArray(CONDITIONLISTS) as ReadableArray
++                                    var placebeanList = ArrayList<PlaceFacadeBean>();
++                                    var k = 0
++                                    var sceneConditionList = ArrayList<SceneCondition>()
++                                    while (k < conditionLists.size()) {
++                                        val condition = conditionLists.getMap(k) as ReadableMap
++                                        var placeBean = condition.getMap("placeBean") as ReadableMap
++                                        var placeFacadeBean = PlaceFacadeBean();
++                                        placeFacadeBean.area = placeBean.getString("area")
++                                        placeFacadeBean.city = placeBean.getString("city")
++                                        placeFacadeBean.isChoose = placeBean.getBoolean("choose")
++                                        placeFacadeBean.province = placeBean.getString("province")
++                                        placeFacadeBean.cityId = (placeBean.getString("cityId") as String).toLong();
++                                        placebeanList.add(placeFacadeBean)
++                                        // 自动化条件创建方式有三个方法 四种类型 首先根据方法来排除 然后根据type来对weather排除
++                                        if (condition.getInt(ENTITY_TYPE) == ENTITY_TYPE_WEATHER) {
++                                            if (condition.getString(TYPE) == "temp") {
++                                                val weatherCondition = SceneCondition.createWeatherCondition(
++                                                        placeFacadeBean, //城市
++                                                        (conditionLists.getMap(k) as ReadableMap).getString(TYPE) as String, //类别
++                                                        getTempRule(condition.getString(TYPE) as String, condition.getString(RANGE) as String, condition.getString(RULE) as String)            //规则
++                                                )
++                                                sceneConditionList.add(weatherCondition)
++                                            } else {
++                                                val weatherCondition = SceneCondition.createWeatherCondition(
++                                                        placeFacadeBean, //城市
++                                                        (conditionLists.getMap(k) as ReadableMap).getString(TYPE), //类别
++                                                        getEnumRule(condition.getString(TYPE) as String, condition.getString(RULE) as String)            //规则
++                                                )
++                                                sceneConditionList.add(weatherCondition)
++                                            }
++                                        } else if (condition.getInt(ENTITY_TYPE) == ENTITY_TYPE_DEVICE) { //创建设备
++                                            var rules = ArrayList<Rule>()
++                                            rules.add(getRules(condition))
++                                            val devCondition = SceneCondition.createDevCondition(ThingHomeSdk.getDataInstance().getDeviceBean(condition.getString(DEVID)),
++                                                    condition.getString(DPID),
++                                                    getRules(condition))
++                                            sceneConditionList.add(devCondition)
++                                        } else { //创建定时
++                                            //      TimerRule timerRule = TimerRule.newInstance("Asia/Shanghai","0111110","16:00","20180310")
++                                            var timeRule = TimerRule.newInstance(condition.getString("loop"), condition.getString("time"), condition.getString("date"))
++                                            val timerCondition = SceneCondition.createTimerCondition(
++                                                    condition.getString(DISPLAY),
++                                                    condition.getString(NAME),
++                                                    condition.getString(TYPE),
++                                                    timeRule
++                                            )
++                                            sceneConditionList.add(timerCondition)
++                                        }
++                                        k++
++                                    }
++                                    item.conditions = sceneConditionList
++                                    getScene(item.id)?.modifyScene(
++                                            item, //修改后的场景数据类
++                                            object : IThingResultCallback<SceneBean> {
++                                                override fun onSuccess(sceneBean: SceneBean) {
++                                                    promise.resolve(TuyaReactUtils.parseToWritableMap(sceneBean))
++                                                }
++
++                                                override fun onError(errorCode: String, errorMessage: String) {
++                                                    promise.reject(errorCode, errorMessage)
++                                                }
++                                            })
++                                    return
++                                }
++                            }
++                            promise.reject("-1", "no find the SceneBean")
++                        }
++
++                        override fun onError(code: String?, error: String?) {
++                            promise.reject(code, error)
++                        }
++                    }
++            )
++        }
++    }
++
++
++    @ReactMethod
++    fun executeScene(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(SCENEID), params)) {
++            getScene(params.getString(SCENEID) as String)?.executeScene(Constant.getIResultCallback(promise))
++        }
++    }
++
++    @ReactMethod
++    fun deleteScene(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(SCENEID), params)) {
++            getScene(params.getString(SCENEID) as String)?.deleteScene(Constant.getIResultCallback(promise))
++        }
++    }
++
++    @ReactMethod
++    fun enableScene(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(SCENEID), params)) {
++            getScene(params.getString(SCENEID) as String)?.enableScene(params.getString(SCENEID), Constant.getIResultCallback(promise))
++        }
++    }
++
++    @ReactMethod
++    fun disableScene(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(SCENEID), params)) {
++            getScene(params.getString(SCENEID) as String)?.disableScene(params.getString(SCENEID), Constant.getIResultCallback(promise))
++        }
++    }
++
++    /**
++     * 场景排序
++     * @param homeId 家庭id
++     * @param sceneIds 手动场景或自动化场景已排序好的的id列表
++     * @param callback    回调
++     */
++
++    @ReactMethod
++    fun sortSceneList(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID, SCENEIDS), params)) {
++            var list = java.util.ArrayList<String>()
++            var length = (params.getArray(SCENEIDS) as ReadableArray).size()-1
++            for (index in 0..length) {
++                list.add((params.getArray(Constant.SCENEIDS) as ReadableArray).getString(index) as String)
++            }
++            ThingHomeSdk.getSceneManagerInstance().sortSceneList(
++                    params.getDouble(HOMEID).toLong(), //家庭列表
++                    list, //场景id列表
++                    Constant.getIResultCallback(promise))
++        }
++    }
++
++
++    @ReactMethod
++    fun onDestroy(params: ReadableMap) {
++        ThingHomeSdk.getSceneManagerInstance().onDestroy();
++        if (ReactParamsCheck.checkParams(arrayOf(SCENEID), params)) {
++            getScene(params.getString(SCENEID) as String)?.onDestroy()
++        }
++    }
++
++
++    fun createTask(devids: String, tasks: HashMap<String, Any>): SceneTask {
++        return ThingHomeSdk.getSceneManagerInstance().createDpTask(devids, tasks)
++    }
++
++    fun createTasks(params: ReadableMap): ArrayList<SceneTask> {
++        var array = params.getArray(TASKS) as ReadableArray
++        var devidsArray = params.getArray(DEVIDS) as ReadableArray
++        var tasks = ArrayList<SceneTask>()
++        var i = 0
++        var j = 0
++        while (j < array.size()) {
++            while (i < devidsArray.size()) {
++                if ((array.getMap(i) as ReadableMap).getString(DEVID) == devidsArray.getString(i)) {
++                    val hashMap = hashMapOf<String, Any>()
++                    hashMap.put((array.getMap(i) as ReadableMap).getDouble(DPID).toInt().toString(), (array.getMap(i) as ReadableMap).getBoolean(VALUE))
++                    tasks.add(createTask((array.getMap(i) as ReadableMap).getString(DEVID) as String, hashMap))
++                }
++                i++;
++            }
++            j++;
++        }
++
++        return tasks
++    }
++
++    fun getRule(params: ReadableMap): Rule {
++        var enumRule: Rule
++        if (params.getString(TYPE).equals("temp")) {
++            enumRule = ValueRule.newInstance(
++                    "temp", //类别
++                    params.getString(RANGE), //运算规则(">", "==", "<")
++                    params.getInt(VALUE)      //临界值
++            )
++        } else {
++            enumRule = EnumRule.newInstance(
++                    params.getString(TYPE),
++                    params.getString(VALUE)
++            )
++        }
++        return enumRule
++    }
++
++    fun getEnumRule(type: String, value: String): Rule {
++        var enumRule: Rule
++        enumRule = EnumRule.newInstance(
++                type,
++                value)
++        return enumRule
++    }
++
++    fun getTempRule(type: String, range: String, value: String): Rule {
++        var enumRule: Rule
++        enumRule = ValueRule.newInstance(
++                type,
++                range,
++                value.toInt())
++        return enumRule
++    }
++
++    fun getScene(scendId: String): IThingHomeScene? {
++        return ThingHomeSdk.newSceneInstance(scendId);
++    }
++}
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/share/TuyaShareModule.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/share/TuyaShareModule.kt
+new file mode 100644
+index 0000000..1962a00
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/share/TuyaShareModule.kt
+@@ -0,0 +1,236 @@
++package com.tuya.smart.rnsdk.share
++
++import com.facebook.react.bridge.*
++import com.thingclips.smart.home.sdk.ThingHomeSdk
++import com.thingclips.smart.home.sdk.bean.ShareReceivedUserDetailBean
++import com.thingclips.smart.home.sdk.bean.ShareSentUserDetailBean
++import com.thingclips.smart.home.sdk.bean.SharedUserInfoBean
++import com.thingclips.smart.home.sdk.callback.IThingResultCallback
++import com.tuya.smart.rnsdk.utils.Constant
++import com.tuya.smart.rnsdk.utils.Constant.COUNTRYCODE
++import com.tuya.smart.rnsdk.utils.Constant.DEVID
++import com.tuya.smart.rnsdk.utils.Constant.DEVIDS
++import com.tuya.smart.rnsdk.utils.Constant.HOMEID
++import com.tuya.smart.rnsdk.utils.Constant.MEMBERID
++import com.tuya.smart.rnsdk.utils.Constant.SHAREID
++import com.tuya.smart.rnsdk.utils.Constant.NAME
++import com.tuya.smart.rnsdk.utils.Constant.USERACCOUNT
++import com.tuya.smart.rnsdk.utils.Constant.getIResultCallback
++import com.tuya.smart.rnsdk.utils.JsonUtils
++import com.tuya.smart.rnsdk.utils.ReactParamsCheck
++import com.tuya.smart.rnsdk.utils.TuyaReactUtils
++
++
++class TuyaShareModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
++
++    override fun getName(): String {
++        return "TuyaShareModule"
++    }
++
++
++    /*添加多个设备共享（追加）*/
++    @ReactMethod
++    fun addShareWithHomeId(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID, COUNTRYCODE, USERACCOUNT, DEVIDS), params)) {
++            var list = ArrayList<String>()
++            var length = (params.getArray(Constant.DEVIDS) as ReadableArray).size()-1
++            var array = params.getArray(Constant.DEVIDS) as ReadableArray
++            var newlist= TuyaReactUtils.parseToList(array);
++            for(index in 0..length){
++                list.add(newlist.get(index).toString())
++            }
++            ThingHomeSdk.getDeviceShareInstance().addShareWithHomeId(params.getDouble(HOMEID).toLong()
++                    , params.getString(COUNTRYCODE),
++                    params.getString(USERACCOUNT),
++                    list,
++                    getITuyaResultCallbackSingle(promise))
++        }
++    }
++
++    /*批量添加设备共享*/
++    @ReactMethod
++    fun addShareWithMemberId(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(MEMBERID, DEVIDS), params)) {
++            var list = ArrayList<String>()
++            var length = (params.getArray(Constant.DEVIDS) as ReadableArray).size()
++            for (index in 0..length) {
++                list.add((params.getArray(Constant.DEVIDS) as ReadableArray).getString(index) as String)
++            }
++            ThingHomeSdk.getDeviceShareInstance().addShareWithMemberId(params.getDouble(MEMBERID).toLong(),
++                    list,
++                    getIResultCallback(promise))
++        }
++    }
++    /*单个设备取消共享*/
++    @ReactMethod
++    fun disableDevShare(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(MEMBERID, DEVID), params)) {
++            ThingHomeSdk.getDeviceShareInstance().disableDevShare(params.getString(DEVID), params.getDouble(MEMBERID).toLong(),
++                    getIResultCallback(promise))
++        }
++    }
++    /*查询主动分享的关系列表*/
++    @ReactMethod
++    fun queryUserShareList(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(HOMEID), params)) {
++            ThingHomeSdk.getDeviceShareInstance().queryUserShareList(params.getDouble(HOMEID).toLong(),
++                    getITuyaResultCallback(promise))
++        }
++    }
++    /*查询收到分享关系列表*/
++    @ReactMethod
++    fun queryShareReceivedUserList(promise: Promise) {
++        ThingHomeSdk.getDeviceShareInstance().queryShareReceivedUserList(
++                getITuyaResultCallback(promise))
++    }
++    /*查询指定设备的分享用户列表*/
++    @ReactMethod
++    fun queryDevShareUserList(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
++            ThingHomeSdk.getDeviceShareInstance().queryDevShareUserList(params.getString(DEVID),
++                    getITuyaResultCallback(promise))
++        }
++    }
++    /* 查询指定设备是谁共享的 */
++    @ReactMethod
++    fun queryShareDevFromInfo(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
++            ThingHomeSdk.getDeviceShareInstance().queryShareDevFromInfo(params.getString(DEVID),
++                    getITuyaResultCallbackSingle(promise))
++        }
++    }
++    /* 查询分享到指定用户的共享关系 */
++    @ReactMethod
++    fun getUserShareInfo(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(MEMBERID), params)) {
++            ThingHomeSdk.getDeviceShareInstance().getUserShareInfo(
++                    params.getDouble(MEMBERID).toLong(),
++                    getITuyaResultShareSentUserDetailBeanCallback(promise))
++        }
++    }
++
++
++    /*查询收到指定用户共享的信息*/
++    @ReactMethod
++    fun getReceivedShareInfo(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(MEMBERID), params)) {
++            ThingHomeSdk.getDeviceShareInstance().getReceivedShareInfo(
++                    params.getDouble(MEMBERID).toLong(),
++                    object : IThingResultCallback<ShareReceivedUserDetailBean> {
++                        override fun onSuccess(bean: ShareReceivedUserDetailBean) {
++                            promise.resolve(TuyaReactUtils.parseToWritableMap(bean))
++                        }
++
++                        override fun onError(errorCode: String, errorMessage: String) {
++                            promise.reject(errorCode, errorMessage)
++                        }
++                    })
++        }
++    }
++
++
++    /*可分享给未注册用户*/
++    @ReactMethod
++    fun inviteShare(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(MEMBERID), params)) {
++
++        }
++    }
++
++    /* 邀请分享确认*/
++    @ReactMethod
++    fun confirmShareInviteShare(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(MEMBERID), params)) {
++
++        }
++    }
++
++
++    /*删除共享关系*/
++    @ReactMethod
++    fun removeUserShare(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(MEMBERID), params)) {
++            ThingHomeSdk.getDeviceShareInstance().removeUserShare(
++                    params.getDouble(MEMBERID).toLong(),
++                    getIResultCallback(promise))
++        }
++    }
++
++    /*删除收到的共享关系*/
++    @ReactMethod
++    fun removeReceivedUserShare(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(MEMBERID), params)) {
++            ThingHomeSdk.getDeviceShareInstance().removeReceivedUserShare(
++                    params.getDouble(MEMBERID).toLong(),
++                    getIResultCallback(promise))
++        }
++    }
++
++
++    /*移除收到的分享设备*/
++    @ReactMethod
++    fun removeReceivedDevShare(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
++            ThingHomeSdk.getDeviceShareInstance().removeReceivedDevShare(
++                    params.getString(DEVID),
++                    getIResultCallback(promise))
++        }
++    }
++    /*修改发出的分享人的备注名*/
++    @ReactMethod
++    fun renameShareNickname(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(MEMBERID, NAME), params)) {
++            ThingHomeSdk.getDeviceShareInstance().renameShareNickname(
++                    params.getDouble(MEMBERID).toLong(),
++                    params.getString(NAME),
++                    getIResultCallback(promise))
++        }
++    }
++    /*修改接收到的分享人的备注名*/
++    @ReactMethod
++    fun renameReceivedShareNickname(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(MEMBERID, NAME), params)) {
++            ThingHomeSdk.getDeviceShareInstance().renameReceivedShareNickname(
++                    params.getDouble(MEMBERID).toLong(),
++                    params.getString(NAME),
++                    getIResultCallback(promise))
++        }
++    }
++
++    fun getITuyaResultCallback(promise: Promise):  IThingResultCallback<List<SharedUserInfoBean>> {
++        return object :  IThingResultCallback<List<SharedUserInfoBean>> {
++            override fun onSuccess(p0: List<SharedUserInfoBean>) {
++                promise.resolve(TuyaReactUtils.parseToWritableArray(
++                        JsonUtils.toJsonArray(p0)))
++            }
++
++            override fun onError(p0: String?, p1: String?) {
++                promise.reject(p0, p1)
++            }
++        }
++    }
++
++    fun getITuyaResultCallbackSingle(promise: Promise):  IThingResultCallback<SharedUserInfoBean> {
++        return object :  IThingResultCallback<SharedUserInfoBean> {
++            override fun onSuccess(bean: SharedUserInfoBean) {
++                promise.resolve(TuyaReactUtils.parseToWritableMap(bean))
++            }
++
++            override fun onError(errorCode: String, errorMessage: String) {
++                promise.reject(errorCode, errorMessage)
++            }
++        }
++    }
++
++    fun getITuyaResultShareSentUserDetailBeanCallback(promise: Promise):  IThingResultCallback<ShareSentUserDetailBean> {
++        return object :  IThingResultCallback<ShareSentUserDetailBean> {
++            override fun onSuccess(bean: ShareSentUserDetailBean) {
++                promise.resolve(TuyaReactUtils.parseToWritableMap(bean))
++            }
++
++            override fun onError(errorCode: String, errorMessage: String) {
++                promise.reject(errorCode, errorMessage)
++            }
++        }
++    }
++}
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/timer/TuyaTimerModule.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/timer/TuyaTimerModule.kt
+new file mode 100644
+index 0000000..4a7896c
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/timer/TuyaTimerModule.kt
+@@ -0,0 +1,199 @@
++package com.tuya.smart.rnsdk.timer
++
++import com.facebook.react.bridge.*
++import com.thingclips.smart.home.sdk.ThingHomeSdk
++import com.thingclips.smart.sdk.api.IGetAllTimerWithDevIdCallback
++import com.thingclips.smart.sdk.api.IGetDeviceTimerStatusCallback
++import com.thingclips.smart.sdk.api.IGetTimerWithTaskCallback
++import com.thingclips.smart.sdk.api.IResultStatusCallback
++import com.thingclips.smart.sdk.bean.TimerTask
++import com.thingclips.smart.sdk.bean.TimerTaskStatus
++import com.tuya.smart.rnsdk.utils.Constant
++import com.tuya.smart.rnsdk.utils.Constant.DEVID
++import com.tuya.smart.rnsdk.utils.Constant.DPS
++import com.tuya.smart.rnsdk.utils.Constant.ISOPEN
++import com.tuya.smart.rnsdk.utils.Constant.LOOPS
++import com.tuya.smart.rnsdk.utils.Constant.STATUS
++import com.tuya.smart.rnsdk.utils.Constant.TASKNAME
++import com.tuya.smart.rnsdk.utils.Constant.TIME
++import com.tuya.smart.rnsdk.utils.Constant.TIMERID
++import com.tuya.smart.rnsdk.utils.JsonUtils
++import com.tuya.smart.rnsdk.utils.ReactParamsCheck
++import com.tuya.smart.rnsdk.utils.TuyaReactUtils
++import java.util.ArrayList
++
++
++class TuyaTimerModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
++
++    override fun getName(): String {
++        return "TuyaTimerModule"
++    }
++
++    /**
++     *   增加定时器 单dp点 默认置为true  支持子设备
++     *  @param taskName     定时任务名称
++     *  @param loops        循环次数 "0000000", 每一位 0:关闭,1:开启, 从左至右依次表示: 周日 周一 周二 周三 周四 周五 周六
++     *  @param devId        设备Id或群组Id
++     *  @param dps          dp点键值对，key是dpId，value是dpValue,仅支持单dp点
++     *  @param time         定时任务下的定时钟
++     *  @param callback     回调
++     */
++    @ReactMethod
++    fun addTimerWithTask(params: ReadableMap,promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(TASKNAME, LOOPS,DEVID, DPS, TIME), params)) {
++            ThingHomeSdk.getTimerManagerInstance().addTimerWithTask(
++                    params.getString(TASKNAME),
++                    params.getString(DEVID),
++                    params.getString(LOOPS),
++                    TuyaReactUtils.parseToMap(params.getMap(DPS) as ReadableMap),
++                    params.getString(TIME),
++                    getIResultStatusCallback(promise)
++            )
++        }
++    }
++
++    /*获取某设备下的所有定时任务状态*/
++    @ReactMethod
++    fun getTimerTaskStatusWithDeviceId(params: ReadableMap,promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
++            ThingHomeSdk.getTimerManagerInstance().getTimerTaskStatusWithDeviceId(
++                    params.getString(DEVID),
++                    getIGetDeviceTimerStatusCallback(promise)
++            )
++        }
++    }
++
++    /*控制定时任务中所有定时器的开关状态*/
++    @ReactMethod
++    fun updateTimerTaskStatusWithTask(params: ReadableMap,promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(TASKNAME,DEVID,STATUS), params)) {
++            ThingHomeSdk.getTimerManagerInstance().updateTimerTaskStatusWithTask(
++                    params.getString(TASKNAME),
++                    params.getString(DEVID),
++                    params.getInt(STATUS),
++                    getIResultStatusCallback(promise)
++            )
++        }
++    }
++
++    /*控制某个定时器的开关状态*/
++    @ReactMethod
++    fun updateTimerStatusWithTask(params: ReadableMap,promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(TASKNAME,DEVID,TIMERID, ISOPEN), params)) {
++            ThingHomeSdk.getTimerManagerInstance().updateTimerStatusWithTask(
++                    params.getString(TASKNAME),
++                    params.getString(DEVID),
++                    params.getString(TIMERID),
++                    params.getBoolean(ISOPEN),
++                    getIResultStatusCallback(promise)
++            )
++        }
++    }
++
++
++    /*删除定时器*/
++    @ReactMethod
++    fun removeTimerWithTask(params: ReadableMap,promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(TASKNAME,DEVID, TIMERID), params)) {
++            ThingHomeSdk.getTimerManagerInstance().removeTimerWithTask(
++                    params.getString(TASKNAME),
++                    params.getString(DEVID),
++                    params.getString(TIMERID),
++                    getIResultStatusCallback(promise)
++            )
++        }
++    }
++
++    /**
++     * * 更新定时器的状态
++     * @param taskName 定时任务名称
++     * @param loops    循环次数 如每周每天传”1111111”
++     * @param devId    设备Id或群组Id
++     * @param timerId  定时钟Id
++     * @param time     定时时间
++     * @param isOpen	  是否开启
++     * @param callback 回调
++     */
++    @ReactMethod
++    fun updateTimerWithTask(params: ReadableMap,promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(TASKNAME, LOOPS, DEVID, TIMERID, TIME, ISOPEN), params)) {
++            ThingHomeSdk.getTimerManagerInstance().updateTimerWithTask(
++                    params.getString(TASKNAME),
++                    params.getString(LOOPS),
++                    params.getString(DEVID),
++                    params.getString(TIMERID),
++                    // Unfortunately we cannot update dps values, we can only give a single dp id but we also want to control the dp value
++                    null,
++                    params.getString(TIME),
++                    params.getBoolean(ISOPEN),
++                    getIResultStatusCallback(promise))
++        }
++    }
++
++    /*获取定时任务下所有定时器*/
++    @ReactMethod
++    fun getTimerWithTask(params: ReadableMap,promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(TASKNAME, DEVID), params)) {
++            ThingHomeSdk.getTimerManagerInstance().getTimerWithTask(
++                    params.getString(TASKNAME),
++                    params.getString(DEVID),
++                    getIGetTimerWithTaskCallback(promise))
++        }
++    }
++
++    /*获取设备所有定时任务下所有定时器*/
++    @ReactMethod
++    fun getAllTimerWithDeviceId(params: ReadableMap,promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
++            ThingHomeSdk.getTimerManagerInstance().getAllTimerWithDeviceId(
++                    params.getString(DEVID),
++                    getIGetAllTimerWithDevIdCallback(promise))
++        }
++    }
++
++    fun getIGetAllTimerWithDevIdCallback(promise: Promise): IGetAllTimerWithDevIdCallback {
++        return object : IGetAllTimerWithDevIdCallback {
++            override fun onSuccess(p0: ArrayList<TimerTask>?) {
++                promise.resolve(TuyaReactUtils.parseToWritableArray(JsonUtils.toJsonArray(p0!!)))
++            }
++
++            override fun onError(code: String?, error: String?) {
++                promise.reject(code, error)
++            }
++        }
++    }
++    fun getIGetTimerWithTaskCallback(promise: Promise): IGetTimerWithTaskCallback {
++        return object : IGetTimerWithTaskCallback {
++            override fun onSuccess(p0: TimerTask?) {
++                promise.resolve(TuyaReactUtils.parseToWritableMap(p0))
++            }
++
++            override fun onError(code: String?, error: String?) {
++                promise.reject(code, error)
++            }
++        }
++    }
++    fun getIGetDeviceTimerStatusCallback(promise: Promise): IGetDeviceTimerStatusCallback {
++        return object : IGetDeviceTimerStatusCallback {
++            override fun onSuccess(p0: ArrayList<TimerTaskStatus>?) {
++                promise.resolve(TuyaReactUtils.parseToWritableArray(JsonUtils.toJsonArray(p0!!)))
++            }
++
++            override fun onError(code: String?, error: String?) {
++                promise.reject(code, error)
++            }
++        }
++    }
++
++    fun getIResultStatusCallback(promise: Promise): IResultStatusCallback {
++        return object : IResultStatusCallback {
++            override fun onSuccess() {
++                promise.resolve(Constant.SUCCESS)
++            }
++
++            override fun onError(code: String?, error: String?) {
++                promise.reject(code, error)
++            }
++        }
++    }
++}
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/user/TuyaUserModule.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/user/TuyaUserModule.kt
+new file mode 100644
+index 0000000..7465a27
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/user/TuyaUserModule.kt
+@@ -0,0 +1,378 @@
++package com.tuya.smart.rnsdk.user
++
++import com.facebook.react.bridge.*
++import com.thingclips.smart.android.user.api.IBooleanCallback
++import com.thingclips.smart.android.user.api.ILoginCallback
++import com.thingclips.smart.android.user.api.ILogoutCallback
++import com.thingclips.smart.android.user.api.IRegisterCallback
++import com.thingclips.smart.android.user.api.IResetPasswordCallback
++import com.thingclips.smart.android.user.api.IValidateCallback
++import com.thingclips.smart.android.user.bean.User
++import com.thingclips.smart.home.sdk.ThingHomeSdk
++import com.thingclips.smart.sdk.enums.TempUnitEnum
++import com.tuya.smart.rnsdk.utils.Constant
++import com.tuya.smart.rnsdk.utils.Constant.ACCESSTOKEN
++import com.tuya.smart.rnsdk.utils.Constant.CODE
++import com.tuya.smart.rnsdk.utils.Constant.COUNTRYCODE
++import com.tuya.smart.rnsdk.utils.Constant.EMAIL
++import com.tuya.smart.rnsdk.utils.Constant.FILEPATH
++import com.tuya.smart.rnsdk.utils.Constant.KEY
++import com.tuya.smart.rnsdk.utils.Constant.NEWPASSWORD
++import com.tuya.smart.rnsdk.utils.Constant.PASSWORD
++import com.tuya.smart.rnsdk.utils.Constant.PHONENUMBER
++import com.tuya.smart.rnsdk.utils.Constant.SECRET
++import com.tuya.smart.rnsdk.utils.Constant.TEMPUNITENUM
++import com.tuya.smart.rnsdk.utils.Constant.TOKEN
++import com.tuya.smart.rnsdk.utils.Constant.UID
++import com.tuya.smart.rnsdk.utils.Constant.USERID
++import com.tuya.smart.rnsdk.utils.Constant.VALIDATECODE
++import com.tuya.smart.rnsdk.utils.Constant.getIResultCallback
++import com.tuya.smart.rnsdk.utils.ReactParamsCheck
++import com.tuya.smart.rnsdk.utils.TuyaReactUtils
++import java.io.File
++
++class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
++
++    override fun getName(): String {
++        return "TuyaUserModule"
++    }
++
++    /* 检测是否要升级用户数据 */
++    @ReactMethod
++    fun checkVersionUpgrade(promise: Promise) {
++        promise.resolve(ThingHomeSdk.getUserInstance().checkVersionUpgrade())
++    }
++
++    /* 升级账号 */
++    @ReactMethod
++    fun upgradeVersion(promise: Promise) {
++        ThingHomeSdk.getUserInstance().upgradeVersion(getIResultCallback(promise))
++    }
++
++    /* 获取手机验证码 */
++    @ReactMethod
++    fun getValidateCode(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, PHONENUMBER), params)) {
++            ThingHomeSdk.getUserInstance().getValidateCode(
++                    params.getString(COUNTRYCODE),
++                    params.getString(PHONENUMBER),
++                    getValidateCodeCallback(promise)
++            )
++        }
++    }
++
++    /* 手机验证码登录 */
++    @ReactMethod
++    fun loginWithValidateCode(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, PHONENUMBER, VALIDATECODE), params)) {
++            ThingHomeSdk.getUserInstance().loginWithPhone(
++                    params.getString(COUNTRYCODE),
++                    params.getString(PHONENUMBER),
++                    params.getString(VALIDATECODE),
++                    getLoginCallback(promise))
++        }
++    }
++
++    /* 注册手机密码账户*/
++    @ReactMethod
++    fun registerAccountWithPhone(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, PHONENUMBER, PASSWORD, VALIDATECODE), params)) {
++            ThingHomeSdk.getUserInstance().registerAccountWithPhone(
++                    params.getString(COUNTRYCODE),
++                    params.getString(PHONENUMBER),
++                    params.getString(PASSWORD),
++                    params.getString(VALIDATECODE),
++                    getRegisterCallback(promise))
++        }
++    }
++
++
++    /* 手机密码登录 */
++    @ReactMethod
++    fun loginWithPhonePassword(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, PHONENUMBER, PASSWORD), params)) {
++            ThingHomeSdk.getUserInstance().loginWithPhonePassword(
++                    params.getString(COUNTRYCODE),
++                    params.getString(PHONENUMBER),
++                    params.getString(PASSWORD),
++                    getLoginCallback(promise))
++        }
++    }
++
++    /* 手机密码重置 */
++    @ReactMethod
++    fun resetPhonePassword(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, PHONENUMBER, CODE, NEWPASSWORD), params)) {
++            ThingHomeSdk.getUserInstance().resetPhonePassword(
++                    params.getString(COUNTRYCODE),
++                    params.getString(PHONENUMBER),
++                    params.getString(CODE),
++                    params.getString(NEWPASSWORD),
++                    getResetPasswdCallback(promise))
++        }
++    }
++
++    /*注册获取邮箱验证码。*/
++    @ReactMethod
++    fun getRegisterEmailValidateCode(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, EMAIL), params)) {
++            ThingHomeSdk.getUserInstance().getRegisterEmailValidateCode(
++                    params.getString(COUNTRYCODE),
++                    params.getString(EMAIL),
++                    getIResultCallback(promise)
++            )
++        }
++    }
++
++
++    /* 邮箱密码注册 */
++    @ReactMethod
++    fun registerAccountWithEmail(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, EMAIL, PASSWORD, VALIDATECODE), params)) {
++            ThingHomeSdk.getUserInstance().registerAccountWithEmail(
++                    params.getString(COUNTRYCODE),
++                    params.getString(EMAIL),
++                    params.getString(PASSWORD),
++                    params.getString(VALIDATECODE),
++                    getRegisterCallback(promise)
++            )
++        }
++    }
++
++    /* 邮箱密码登陆 */
++    @ReactMethod
++    fun loginWithEmail(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, EMAIL, PASSWORD), params)) {
++            ThingHomeSdk.getUserInstance().loginWithEmail(
++                    params.getString(COUNTRYCODE),
++                    params.getString(EMAIL),
++                    params.getString(PASSWORD),
++                    getLoginCallback(promise)
++            )
++        }
++    }
++
++    /* 邮箱获取验证码 找密码 */
++    @ReactMethod
++    fun getEmailValidateCode(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, EMAIL), params)) {
++            ThingHomeSdk.getUserInstance().getEmailValidateCode(
++                    params.getString(COUNTRYCODE),
++                    params.getString(EMAIL),
++                    getValidateCodeCallback(promise)
++            )
++        }
++    }
++
++    /* 邮箱重置密码 */
++    @ReactMethod
++    fun resetEmailPassword(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, EMAIL, VALIDATECODE, NEWPASSWORD), params)) {
++            ThingHomeSdk.getUserInstance().resetEmailPassword(
++                    params.getString(COUNTRYCODE),
++                    params.getString(EMAIL),
++                    params.getString(VALIDATECODE),
++                    params.getString(NEWPASSWORD),
++                    getResetPasswdCallback(promise)
++            )
++        }
++    }
++
++    /* logout */
++    @ReactMethod
++    fun logout(promise: Promise) {
++        ThingHomeSdk.getUserInstance().logout(object : ILogoutCallback {
++            override fun onSuccess() {
++                promise.resolve(Constant.SUCCESS)
++            }
++
++            override fun onError(code: String?, error: String?) {
++                promise.reject(code, error)
++            }
++
++        })
++    }
++
++    /* 注销账户 */
++    @ReactMethod
++    fun cancelAccount(promise: Promise) {
++        ThingHomeSdk.getUserInstance().cancelAccount(getIResultCallback(promise))
++    }
++
++    /* 用户uid注册*/
++    @ReactMethod
++    fun registerAccountWithUid(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, UID, PASSWORD), params)) {
++            ThingHomeSdk.getUserInstance().registerAccountWithUid(
++                    params.getString(COUNTRYCODE),
++                    params.getString(UID),
++                    params.getString(PASSWORD),
++                    getRegisterCallback(promise))
++        }
++    }
++
++    /* uid 登陆*/
++    @ReactMethod
++    fun loginWithUid(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, UID, PASSWORD), params)) {
++            ThingHomeSdk.getUserInstance().loginWithUid(
++                    params.getString(COUNTRYCODE),
++                    params.getString(UID),
++                    params.getString(PASSWORD),
++                    getLoginCallback(promise))
++        }
++    }
++
++    /* uid 登陆和注册合并一个接口*/
++    @ReactMethod
++    fun loginOrRegisterWithUid(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, UID, PASSWORD), params)) {
++            ThingHomeSdk.getUserInstance().loginOrRegisterWithUid(
++                    params.getString(COUNTRYCODE),
++                    params.getString(UID),
++                    params.getString(PASSWORD),
++                    getLoginCallback(promise))
++        }
++    }
++
++
++    /* Twitter登陆*/
++    @ReactMethod
++    fun loginByTwitter(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, KEY, SECRET), params)) {
++            ThingHomeSdk.getUserInstance().loginByTwitter(
++                    params.getString(COUNTRYCODE),
++                    params.getString(KEY),
++                    params.getString(SECRET),
++                    getLoginCallback(promise))
++        }
++    }
++
++
++    /* QQ登陆*/
++    @ReactMethod
++    fun loginByQQ(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, USERID, ACCESSTOKEN), params)) {
++            ThingHomeSdk.getUserInstance().loginByQQ(
++                    params.getString(COUNTRYCODE),
++                    params.getString(USERID),
++                    params.getString(ACCESSTOKEN),
++                    getLoginCallback(promise))
++        }
++    }
++
++    /* 微信登陆*/
++    @ReactMethod
++    fun loginByWechat(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, CODE), params)) {
++            ThingHomeSdk.getUserInstance().loginByWechat(
++                    params.getString(COUNTRYCODE),
++                    params.getString(CODE),
++                    getLoginCallback(promise))
++        }
++    }
++
++    /* Facebook登陆*/
++    @ReactMethod
++    fun loginByFacebook(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, TOKEN), params)) {
++            ThingHomeSdk.getUserInstance().loginByFacebook(
++                    params.getString(COUNTRYCODE),
++                    params.getString(TOKEN),
++                    getLoginCallback(promise))
++        }
++    }
++
++    @ReactMethod
++    fun getCurrentUser(promise: Promise) {
++        if (ThingHomeSdk.getUserInstance().user != null) {
++            promise.resolve(TuyaReactUtils.parseToWritableMap(ThingHomeSdk.getUserInstance().user))
++        } else {
++            promise.resolve(null)
++        }
++    }
++
++
++    /* 上传用户头像*/
++    @ReactMethod
++    fun uploadUserAvatar(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(FILEPATH), params)) {
++            ThingHomeSdk.getUserInstance().uploadUserAvatar(
++                    File(params.getString(FILEPATH)), getIBooleanCallback(promise))
++        }
++    }
++
++    /* 设置温度单位*/
++    @ReactMethod
++    fun setTempUnit(params: ReadableMap, promise: Promise) {
++        if (ReactParamsCheck.checkParams(arrayOf(TEMPUNITENUM), params)) {
++            ThingHomeSdk.getUserInstance().setTempUnit(TempUnitEnum.valueOf(params.getString(TEMPUNITENUM) as String), getIResultCallback(promise))
++        }
++    }
++
++
++    fun getLoginCallback(promise: Promise): ILoginCallback? {
++        val callback = object : ILoginCallback {
++            override fun onSuccess(user: User?) {
++                promise.resolve(TuyaReactUtils.parseToWritableMap(user))
++            }
++
++            override fun onError(code: String?, error: String?) {
++                promise.reject(code, error)
++            }
++
++        }
++        return callback
++    }
++
++    fun getRegisterCallback(promise: Promise): IRegisterCallback? {
++        return object : IRegisterCallback {
++            override fun onSuccess(user: User?) {
++                promise.resolve(TuyaReactUtils.parseToWritableMap(user))
++            }
++
++            override fun onError(code: String?, error: String?) {
++                promise.reject(code, error)
++            }
++
++        }
++    }
++
++    fun getResetPasswdCallback(promise: Promise): IResetPasswordCallback? {
++        return object : IResetPasswordCallback {
++            override fun onSuccess() {
++                promise.resolve(Constant.SUCCESS)
++            }
++
++            override fun onError(code: String?, error: String?) {
++                promise.reject(code, error)
++            }
++
++        }
++    }
++
++    fun getValidateCodeCallback(promise: Promise): IValidateCallback {
++        return object : IValidateCallback {
++            override fun onSuccess() {
++                promise.resolve(Constant.SUCCESS)
++            }
++
++            override fun onError(code: String?, error: String?) {
++                promise.reject(code, error)
++            }
++        }
++    }
++
++
++    fun getIBooleanCallback(promise: Promise): IBooleanCallback? {
++        return object : IBooleanCallback {
++            override fun onSuccess() {
++                promise.resolve(Constant.SUCCESS)
++            }
++
++            override fun onError(code: String?, error: String?) {
++                promise.reject(code, error)
++            }
++        }
++    }
++}
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/utils/BridgeUtils.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/utils/BridgeUtils.kt
+new file mode 100644
+index 0000000..a5d6295
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/utils/BridgeUtils.kt
+@@ -0,0 +1,45 @@
++package com.tuya.smart.rnsdk.utils
++
++import android.util.Log
++import com.facebook.react.bridge.ReactContext
++import com.facebook.react.bridge.WritableMap
++
++object BridgeUtils {
++
++    private val GROUPLISTENER = "groupListener"
++    private val HARDWAREUPGRADELISTENER = "hardwareUpgradeListener"
++    private val DEVLISTENER = "devListener"
++    private val SUBDEVLISTENER = "subDevListener"
++    private val HOMESTATUS = "homeStatus"
++    private val HOMECHANGE = "homeChange"
++    private val SINGLETRANSFER = "SingleTransfer"
++
++    fun groupListener(context: ReactContext, map: WritableMap, groupId: Long) {
++        TuyaReactUtils.sendEvent(context, bindEventname(GROUPLISTENER, groupId), map)
++    }
++
++    fun hardwareUpgradeListener(context: ReactContext, map: WritableMap, devId: String){
++        TuyaReactUtils.sendEvent(context, bindEventname(HARDWAREUPGRADELISTENER, devId), map)
++    }
++    fun devListener(context: ReactContext, map: WritableMap, devId: String){
++        TuyaReactUtils.sendEvent(context, bindEventname(DEVLISTENER, devId), map)
++    }
++    fun subDevListener(context: ReactContext, map: WritableMap, devId: String){
++        TuyaReactUtils.sendEvent(context, bindEventname(SUBDEVLISTENER, devId), map)
++    }
++    fun singleTransferListener(context: ReactContext, map: WritableMap, devId: String){
++        TuyaReactUtils.sendEvent(context, bindEventname(SINGLETRANSFER, devId), map)
++    }
++    fun homeStatus(context: ReactContext, map: WritableMap, devId: String){
++        TuyaReactUtils.sendEvent(context, bindEventname(HOMESTATUS, devId), map)
++    }
++
++    fun homeChange(context: ReactContext, map: WritableMap, homeId: Double){
++        TuyaReactUtils.sendEvent(context, HOMECHANGE, map)
++    }
++
++    private fun bindEventname(key: String, id: Any): String {
++        return key + "//" + id.toString()
++    }
++
++}
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/utils/Constant.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/utils/Constant.kt
+new file mode 100644
+index 0000000..9375783
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/utils/Constant.kt
+@@ -0,0 +1,120 @@
++package com.tuya.smart.rnsdk.utils
++
++import com.facebook.react.bridge.Promise
++import com.thingclips.smart.sdk.api.IResultCallback
++
++object Constant {
++
++    /**
++     * 在创建自动化条件时标识符
++     */
++    const val ENTITY_TYPE_TIMER = 6
++    const val ENTITY_TYPE_WEATHER = 3
++    const val ENTITY_TYPE_DEVICE = 1
++    const val ENTITY_TYPE = "entityType"
++
++    const val SUCCESS = "success"
++    const val FAILED = "failed"
++
++    const val NEEDLOGIN = "needLogin"
++    const val API_REQUEST_ERROR = "api request error"
++
++    const val COUNTRYCODE = "countryCode"
++    const val EMAIL = "email"
++    const val PHONENUMBER = "phoneNumber"
++    const val VALIDATECODE = "validateCode"
++    const val PASSWORD = "password"
++    const val NEWPASSWORD = "newPassword"
++    const val CODE = "code"
++    const val UID = "uid"
++    const val KEY = "key"
++    const val SECRET = "secret"
++    const val USERID = "userId"
++    const val ACCESSTOKEN = "accessToken"
++    const val TOKEN = "token"
++    const val FILEPATH = "filePath"
++    const val TEMPUNITENUM = "tempUnitEnum"
++
++    const val DEVID = "devId"
++    const val GROUPID = "groupId"
++    const val MESHID = "meshId"
++    const val HOMEID = "homeId"
++    const val NAME = "name"
++    const val LON = "lon"
++    const val LAT = "lat"
++    const val GEONAME = "geoName"
++    const val ROOMID = "roomId"
++    const val ACTION = "action"
++    const val IDLIST = "idList"
++    const val PRODUCTID = "productId"
++    const val DEVIDLIST = "devIdList"
++    const val ROMMS = "rooms"
++    const val MEMBERID = "memberId"
++    const val USERACCOUNT = "userAccount"
++    const val ADMIN = "admin"
++    const val SSID = "ssid"
++    const val TIME = "time"
++    const val ACTIVATORMODELENUM = "ActivatorModelEnum"
++    const val COMMAND = "command"
++    const val DATAPOINTTYPEENUM = "DataPointTypeEnum"
++    const val NUMBER = "number"
++    const val STARTTIME = "startTime"
++    const val DEVIDS = "devIds"
++    const val IDS = "ids"
++    const val OPERATOR = "operator"
++
++    const val TASKNAME = "taskName"
++    const val LOOPS = "loops"
++    const val DPS = "dps"
++    const val TIMERID = "timerId"
++    const val INSTRUCT = "instruct"
++    const val DPID = "dpId"
++    const val ISOPEN = "isOpen"
++    const val STATUS = "status"
++    const val SHAREID = "shareId"
++    const val GROUPNAME = "groupName"
++    const val GROUPLISTENER = "GroupListener"
++    const val SHOWFAHRENHEIT = "showFahrenheit"
++
++    const val LOCALID = "localId"
++
++    const val CITYID = "cityId"
++    const val CITYIDS = "cityIdS"
++    const val CONDITIONLISTS = "conditionList"
++
++    const val RULE = "rule"
++    const val CONDITIONS = "conditions"
++    const val SCENETASK = "SceneTask"
++    const val SCENEID = "sceneId"
++    const val SCENEIDS = "sceneIds"
++    const val TASK = "task"
++    const val TYPE = "type"
++    const val DISPLAY = "display"
++    const val VALUE = "value"
++    const val TASKS = "tasks"
++    const val RANGE = "range"
++    const val ID = "id"
++    const val MESEAGE = "message"
++    const val CONTACT = "contact"
++    const val HDID = "hdId"
++    const val HDTYPE = "hdType"
++    const val RULES = "rules"
++    const val DPVALUE = "dpvalue"
++
++    const val STICKYONTOP = "stickyOnTop"
++    const val BACKGROUND = "background"
++    const val MATCHTYPE = "matchType"
++    const val ALIASID = "aliasId"
++    const val PUSHPROVIDER = "pushProvider"
++    fun getIResultCallback(promise: Promise): IResultCallback? {
++        return object : IResultCallback {
++            override fun onSuccess() {
++                promise.resolve(Constant.SUCCESS)
++            }
++
++            override fun onError(code: String?, error: String?) {
++                promise.reject(code, error)
++            }
++        }
++    }
++}
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/utils/JsonUtils.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/utils/JsonUtils.kt
+new file mode 100644
+index 0000000..ddd074a
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/utils/JsonUtils.kt
+@@ -0,0 +1,32 @@
++package com.tuya.smart.rnsdk.utils
++
++import com.alibaba.fastjson.JSON
++import com.alibaba.fastjson.JSONArray
++import com.alibaba.fastjson.JSONObject
++import com.facebook.react.bridge.ReadableArray
++import com.facebook.react.bridge.ReadableMap
++
++object JsonUtils {
++    fun parse(json: String, c: Class<*>): Any {
++        return JSONObject.parseObject(json, c)
++    }
++
++
++    fun parseArray(json: String, c: Class<*>): List<Any> {
++        return JSONObject.parseArray(json, c)
++    }
++
++    fun  parserArraybyMap(map: ReadableArray, c: Class<*>): List<Any>? {
++        return parseArray(toString(TuyaReactUtils.parseToList(map)), c)
++    }
++
++    fun parseBymap(map: ReadableMap, c: Class<*>): Any? {
++        return parse(JSONObject(TuyaReactUtils.parseToMap(map)).toJSONString(), c)
++    }
++    fun toString(obj:Any):String{
++        return JSONObject.toJSONString(obj)
++    }
++    fun toJsonArray(obj:Any):JSONArray{
++        return JSONArray.parseArray(JSON.toJSONString(obj))
++    }
++}
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/utils/ReactParamsCheck.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/utils/ReactParamsCheck.kt
+new file mode 100644
+index 0000000..6c4d998
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/utils/ReactParamsCheck.kt
+@@ -0,0 +1,17 @@
++package com.tuya.smart.rnsdk.utils
++
++import com.facebook.react.bridge.ReadableMap
++
++object ReactParamsCheck {
++    /**
++     *  接口输入参数check
++     */
++    fun checkParams(keys: Array<String>, params: ReadableMap): Boolean {
++        for (key in keys) {
++            if (!params.hasKey(key)) {
++                throw  IllegalArgumentException("need ${key}")
++            }
++        }
++        return true
++    }
++}
+\ No newline at end of file
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/utils/TYCommonUtls.class b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/utils/TYCommonUtls.class
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/utils/TYRCTCommonUtil.class b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/utils/TYRCTCommonUtil.class
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/utils/TuyaReactUtils.kt b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/utils/TuyaReactUtils.kt
+new file mode 100644
+index 0000000..fe0c05d
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/bin/src/main/java/com/tuya/smart/rnsdk/utils/TuyaReactUtils.kt
+@@ -0,0 +1,161 @@
++package com.tuya.smart.rnsdk.utils
++
++import android.text.TextUtils
++import com.alibaba.fastjson.JSON
++import com.alibaba.fastjson.JSONArray
++import com.alibaba.fastjson.JSONObject
++import com.facebook.react.bridge.*
++import com.facebook.react.modules.core.DeviceEventManagerModule
++import java.math.BigDecimal
++import java.util.ArrayList
++import java.util.HashMap
++
++
++object TuyaReactUtils {
++    /**
++     *  发送事件给React Native
++     */
++    fun sendEvent(reactContext: ReactContext, eventName: String, params: WritableMap?) {
++        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
++                .emit(eventName, params)
++    }
++
++    fun parseToMap(readableMap: ReadableMap): HashMap<String, Any?> {
++        val iterator = readableMap.keySetIterator()
++        val deconstructedMap = HashMap<String, Any?>()
++        while (iterator.hasNextKey()) {
++            val key = iterator.nextKey()
++            val type = readableMap.getType(key)
++            when (type) {
++                ReadableType.Null -> deconstructedMap[key] = null
++                ReadableType.Boolean -> deconstructedMap[key] = readableMap.getBoolean(key)
++                ReadableType.Number -> {
++                    val value = readableMap.getDouble(key)
++                    try {
++                        // Long型支持，如果数字大于int, 且是整数,转化成long
++                        if (value > Integer.MAX_VALUE && value % 1 == 0.0) {
++                            deconstructedMap[key] = value.toLong()
++                        } else {
++                            deconstructedMap[key] = value
++                        }
++                    } catch (e: Exception) {
++                        deconstructedMap[key] = value
++                    }
++
++                }
++                ReadableType.String -> deconstructedMap[key] = readableMap.getString(key)
++                ReadableType.Map -> deconstructedMap[key] = parseToMap(readableMap.getMap(key) as ReadableMap)
++                ReadableType.Array -> deconstructedMap[key] = parseToList(readableMap.getArray(key) as ReadableArray)
++            }
++
++        }
++        return deconstructedMap
++    }
++
++    fun parseToLongMap(readableMap: ReadableMap): HashMap<String, Any?> {
++        val iterator = readableMap.keySetIterator()
++        val deconstructedMap = HashMap<String, Any?>()
++        while (iterator.hasNextKey()) {
++            val key = iterator.nextKey()
++            val type = readableMap.getType(key)
++            when (type) {
++                ReadableType.Null -> deconstructedMap[key] = null
++                ReadableType.Boolean -> deconstructedMap[key] = readableMap.getBoolean(key)
++                ReadableType.Number -> {
++                    val value = readableMap.getDouble(key)
++                    try {
++                        // Long型支持，如果数字大于int, 且是整数,转化成long
++                        if (value > Integer.MAX_VALUE && value % 1 == 0.0) {
++                            deconstructedMap[key] = value.toLong()
++                        } else {
++                            deconstructedMap[key] = value.toLong()
++                        }
++                    } catch (e: Exception) {
++                        deconstructedMap[key] = value
++                    }
++
++                }
++                ReadableType.String -> deconstructedMap[key] = readableMap.getString(key)
++                ReadableType.Map -> deconstructedMap[key] = parseToMap(readableMap.getMap(key) as ReadableMap)
++                ReadableType.Array -> deconstructedMap[key] = parseToList(readableMap.getArray(key) as ReadableArray)
++            }
++
++        }
++        return deconstructedMap
++    }
++
++    fun parseToList(readableArray: ReadableArray): ArrayList<Any?> {
++        val deconstructedList = ArrayList<Any?>(readableArray.size())
++        for (i in 0 until readableArray.size()) {
++            val indexType = readableArray.getType(i)
++            when (indexType) {
++                ReadableType.Null -> deconstructedList.add(i, null)
++                ReadableType.Boolean -> deconstructedList.add(i, readableArray.getBoolean(i))
++                ReadableType.Number -> {
++                    val value = readableArray.getDouble(i)
++                    try {
++                        // Long型支持，如果数字大于int, 且是整数,转化成long
++                        if (value > Integer.MAX_VALUE && value % 1 == 0.0) {
++                            deconstructedList.add(i, value.toLong())
++                        } else {
++                            deconstructedList.add(i, value)
++                        }
++                    } catch (e: Exception) {
++                        deconstructedList.add(i, value)
++                    }
++
++                }
++                ReadableType.String -> deconstructedList.add(i, readableArray.getString(i))
++                ReadableType.Map -> deconstructedList.add(i, parseToMap(readableArray.getMap(i) as ReadableMap))
++                ReadableType.Array -> deconstructedList.add(i, parseToList(readableArray.getArray(i) as ReadableArray))
++            }
++        }
++        return deconstructedList
++    }
++
++    fun parseToWritableMap(s: String): WritableMap {
++        return if (TextUtils.isEmpty(s)) Arguments.createMap() else parseToWritableMap(JSON.parseObject(s))
++    }
++
++    fun parseToWritableMap(data: Any?): WritableMap {
++        return if (null == data) Arguments.createMap() else parseToWritableMap(JSON.toJSONString(data))
++    }
++
++    fun parseToWritableMap(json: JSONObject): WritableMap {
++        val map = Arguments.createMap()
++        val entries = json.entries
++        for ((key, obv) in entries) {
++            when (obv) {
++                is JSONObject -> map.putMap(key, parseToWritableMap(obv))
++                is JSONArray -> map.putArray(key, parseToWritableArray(obv))
++                is Int -> map.putInt(key, obv)
++                is String -> map.putString(key, obv)
++                is Boolean -> map.putBoolean(key, obv)
++                is Double -> map.putDouble(key, obv)
++                is BigDecimal -> map.putDouble(key, obv.toDouble())
++                is Long ->map.putString(key,obv.toString())
++                else -> map.putNull(key)
++            }
++        }
++        return map
++    }
++
++    fun parseToWritableArray(jsonArray: JSONArray): WritableArray {
++        val list = Arguments.createArray()
++        for (obv in jsonArray.toTypedArray()) {
++            when (obv) {
++                is JSONObject -> list.pushMap(parseToWritableMap(obv))
++                is JSONArray -> list.pushArray(parseToWritableArray(obv))
++                is Int -> list.pushInt(obv)
++                is String -> list.pushString(obv)
++                is Boolean -> list.pushBoolean(obv)
++                is Double -> list.pushDouble(obv)
++                is BigDecimal -> list.pushDouble(obv.toDouble())
++                is Long -> list.pushString(obv.toString())
++                else -> list.pushNull()
++            }
++        }
++        return list
++
++    }
++}
 diff --git a/node_modules/@owowagency/react-native-tuya/android/build.gradle b/node_modules/@owowagency/react-native-tuya/android/build.gradle
-index e148e50..37cb78a 100644
+index e148e50..5ec35ff 100644
 --- a/node_modules/@owowagency/react-native-tuya/android/build.gradle
 +++ b/node_modules/@owowagency/react-native-tuya/android/build.gradle
-@@ -18,11 +18,11 @@ buildscript {
+@@ -2,12 +2,12 @@ apply plugin: 'com.android.library'
+ apply plugin: 'kotlin-android'
+ apply plugin: 'maven-publish'
  
+-
+ buildscript {
+-    ext.kotlin_version = '1.7.20'
++    ext.kotlin_version = '1.9.25'
+     repositories {
+         jcenter()
+         google()
++        mavenCentral()
+     }
  
+     dependencies {
+@@ -16,13 +16,13 @@ buildscript {
+     }
+ }
+ 
+-
  android {
 -    compileSdkVersion 31
++     namespace "com.tuya.smart.rnsdk" 
 +    compileSdkVersion 35
  
      defaultConfig {
--        minSdkVersion 23
+         minSdkVersion 23
 -        targetSdkVersion 25
-+        minSdkVersion 24
 +        targetSdkVersion 35
          versionCode 1
          versionName "1.0"
  
-@@ -32,12 +32,26 @@ android {
-             abiFilters "armeabi-v7a","arm64-v8a"
-         }
-     }
-+    // flavorDimensions "appstore"
-+    //   productFlavors {
-+    //     play { dimension "appstore"
-+    //     matchingFallbacks = ['play'] }
-+    //     amazon { dimension "appstore"
-+    //     matchingFallbacks = ['amazon', 'play'] }
-+    // }
- 
-+
-+    flavorDimensions "appstore"
-+    productFlavors {
-+    googlePlay { dimension "appstore" }
-+    amazon { dimension "appstore"; matchingFallbacks = ['play', 'amazon'] }
-+}
-     packagingOptions {
-         pickFirst 'lib/*/libc++_shared.so'
+@@ -45,13 +45,18 @@ android {
      }
  
-     buildTypes {
-+      debug {}
-         release {
-             minifyEnabled false
-             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-@@ -48,6 +62,9 @@ android {
-       sourceCompatibility JavaVersion.VERSION_1_8
-       targetCompatibility JavaVersion.VERSION_1_8
-     }
-+    kotlinOptions {
-+        jvmTarget = "1.8"
+     compileOptions {
+-      sourceCompatibility JavaVersion.VERSION_1_8
+-      targetCompatibility JavaVersion.VERSION_1_8
++        sourceCompatibility JavaVersion.VERSION_11
++        targetCompatibility JavaVersion.VERSION_11
 +    }
++
++    kotlinOptions {
++        jvmTarget = "11"
+     }
  }
  
++// Exclude conflicting module
  configurations.all {
-@@ -67,6 +84,7 @@ dependencies {
-     implementation 'io.reactivex.rxjava2:rxjava:2.1.7'
-     implementation 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.1'
-     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
-+    implementation "com.facebook.react:react-android:${rootProject.ext.reactNativeVersion}"
+-  exclude group: "com.thingclips.smart", module: 'thingsmart-modularCampAnno'
++    exclude group: "com.thingclips.smart", module: 'thingsmart-modularCampAnno'
  }
  
+ dependencies {
+@@ -61,7 +66,12 @@ dependencies {
+     implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.0'
+     implementation 'com.thingclips.smart:thingsmart:5.11.3'
+     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+-    implementation 'com.facebook.react:react-native:+'
++    
++    // React Native local dependency
++    // implementation project(':react-native')
++    implementation "com.facebook.react:react-android:0.75.5"
++
++    
+     implementation 'de.greenrobot:eventbus:2.4.0'
+     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+     implementation 'io.reactivex.rxjava2:rxjava:2.1.7'
+@@ -69,7 +79,11 @@ dependencies {
+     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
+ }
+ 
++// Repositories
  repositories {
-@@ -79,18 +97,3 @@ repositories {
++    // Local React Native must come first
++    maven { url "$rootDir/../node_modules/react-native/android" }
++    
+     mavenCentral()
+     google()
+     maven { url 'https://maven-other.tuya.com/repository/maven-releases/' }
+@@ -79,18 +93,3 @@ repositories {
      maven { url 'https://developer.huawei.com/repo/' }
      maven { url 'https://jitpack.io' }
  }
@@ -81,3 +3988,77 @@ index e148e50..37cb78a 100644
 -    }
 -  }
 -}
+diff --git a/node_modules/@owowagency/react-native-tuya/android/build/intermediates/aar_metadata/debug/writeDebugAarMetadata/aar-metadata.properties b/node_modules/@owowagency/react-native-tuya/android/build/intermediates/aar_metadata/debug/writeDebugAarMetadata/aar-metadata.properties
+new file mode 100644
+index 0000000..1211b1e
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/build/intermediates/aar_metadata/debug/writeDebugAarMetadata/aar-metadata.properties
+@@ -0,0 +1,6 @@
++aarFormatVersion=1.0
++aarMetadataVersion=1.0
++minCompileSdk=1
++minCompileSdkExtension=0
++minAndroidGradlePluginVersion=1.0.0
++coreLibraryDesugaringEnabled=false
+diff --git a/node_modules/@owowagency/react-native-tuya/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties b/node_modules/@owowagency/react-native-tuya/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
+new file mode 100644
+index 0000000..cc96a1f
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
+@@ -0,0 +1 @@
++#Wed Nov 12 07:55:46 WET 2025
+diff --git a/node_modules/@owowagency/react-native-tuya/android/build/intermediates/incremental/debug/packageDebugResources/merged.dir/values/values.xml b/node_modules/@owowagency/react-native-tuya/android/build/intermediates/incremental/debug/packageDebugResources/merged.dir/values/values.xml
+new file mode 100644
+index 0000000..b452ba0
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/build/intermediates/incremental/debug/packageDebugResources/merged.dir/values/values.xml
+@@ -0,0 +1,4 @@
++<?xml version="1.0" encoding="utf-8"?>
++<resources>
++    <string name="app_name">tuyasmart-sdk-react-native</string>
++</resources>
+\ No newline at end of file
+diff --git a/node_modules/@owowagency/react-native-tuya/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml b/node_modules/@owowagency/react-native-tuya/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml
+new file mode 100644
+index 0000000..c48d1d6
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/jamz/Desktop/light_awake/light_awake_ractnative-master/node_modules/@owowagency/react-native-tuya/android/src/main/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main" generated-set="main$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/jamz/Desktop/light_awake/light_awake_ractnative-master/node_modules/@owowagency/react-native-tuya/android/src/main/res"><file path="/Users/jamz/Desktop/light_awake/light_awake_ractnative-master/node_modules/@owowagency/react-native-tuya/android/src/main/res/values/strings.xml" qualifiers=""><string name="app_name">tuyasmart-sdk-react-native</string></file></source></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/jamz/Desktop/light_awake/light_awake_ractnative-master/node_modules/@owowagency/react-native-tuya/android/src/debug/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug" generated-set="debug$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/jamz/Desktop/light_awake/light_awake_ractnative-master/node_modules/@owowagency/react-native-tuya/android/src/debug/res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/jamz/Desktop/light_awake/light_awake_ractnative-master/node_modules/@owowagency/react-native-tuya/android/build/generated/res/resValues/debug"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated" generated-set="generated$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="/Users/jamz/Desktop/light_awake/light_awake_ractnative-master/node_modules/@owowagency/react-native-tuya/android/build/generated/res/resValues/debug"/></dataSet><mergedItems/></merger>
+\ No newline at end of file
+diff --git a/node_modules/@owowagency/react-native-tuya/android/build/intermediates/navigation_json/debug/extractDeepLinksDebug/navigation.json b/node_modules/@owowagency/react-native-tuya/android/build/intermediates/navigation_json/debug/extractDeepLinksDebug/navigation.json
+new file mode 100644
+index 0000000..0637a08
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/build/intermediates/navigation_json/debug/extractDeepLinksDebug/navigation.json
+@@ -0,0 +1 @@
++[]
+\ No newline at end of file
+diff --git a/node_modules/@owowagency/react-native-tuya/android/build/intermediates/nested_resources_validation_report/debug/generateDebugResources/nestedResourcesValidationReport.txt b/node_modules/@owowagency/react-native-tuya/android/build/intermediates/nested_resources_validation_report/debug/generateDebugResources/nestedResourcesValidationReport.txt
+new file mode 100644
+index 0000000..08f4ebe
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/build/intermediates/nested_resources_validation_report/debug/generateDebugResources/nestedResourcesValidationReport.txt
+@@ -0,0 +1 @@
++0 Warning/Error
+\ No newline at end of file
+diff --git a/node_modules/@owowagency/react-native-tuya/android/build/intermediates/packaged_res/debug/packageDebugResources/values/values.xml b/node_modules/@owowagency/react-native-tuya/android/build/intermediates/packaged_res/debug/packageDebugResources/values/values.xml
+new file mode 100644
+index 0000000..b452ba0
+--- /dev/null
++++ b/node_modules/@owowagency/react-native-tuya/android/build/intermediates/packaged_res/debug/packageDebugResources/values/values.xml
+@@ -0,0 +1,4 @@
++<?xml version="1.0" encoding="utf-8"?>
++<resources>
++    <string name="app_name">tuyasmart-sdk-react-native</string>
++</resources>
+\ No newline at end of file
+diff --git a/node_modules/@owowagency/react-native-tuya/android/src/main/AndroidManifest.xml b/node_modules/@owowagency/react-native-tuya/android/src/main/AndroidManifest.xml
+index 9012a75..c4e6c98 100644
+--- a/node_modules/@owowagency/react-native-tuya/android/src/main/AndroidManifest.xml
++++ b/node_modules/@owowagency/react-native-tuya/android/src/main/AndroidManifest.xml
+@@ -1,2 +1 @@
+-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+-    package="com.tuya.smart.rnsdk" />
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"/>

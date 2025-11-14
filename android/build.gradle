@@ -1,6 +1,6 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-    ext.kotlinVersion = '1.9.25'
+    ext.kotlinVersion = '1.9.22'
     ext {
         androidXAnnotation = "1.1.0"
         androidXBrowser = "1.0.0"
@@ -10,16 +10,14 @@ buildscript {
         firebaseMessagingVersion = "+" // default: "21.1.0"
         googlePlayServicesAuthVersion = "19.2.0"
         googlePlayServicesVersion = "+"
-        kotlin_version = '1.9.25'
+        kotlin_version = '1.9.22'
         mediaCompatVersion = "1.0.1"
         minSdkVersion = 24
         targetSdkVersion = 35
         supportLibVersion = "28.0.0"
         supportV4Version = "1.0.0"
         frescoVersion = findProperty('expo.frescoVersion') ?: '2.5.0'
-        reactNativeVersion = "0.75.5"
         enableHermes = true
-
         // We use NDK 23 which has both M1 support and is the side-by-side NDK version from AGP.
         ndkVersion = "23.1.7779620"
     }
@@ -29,9 +27,9 @@ buildscript {
         jcenter()
     }
     dependencies {
-        // classpath 'com.android.tools.build:gradle:8.5.2'
-        classpath("com.android.tools.build:gradle:8.4.1")
-        classpath("com.facebook.react:react-native-gradle-plugin")
+        classpath 'com.android.tools.build:gradle:8.5.0'
+        // classpath("com.android.tools.build:gradle:8.4.1")
+        // classpath("com.facebook.react:react-native-gradle-plugin")
         classpath 'com.google.gms:google-services:4.4.0'
         // classpath('com.google.gms:google-services:4.3.15')
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
@@ -44,16 +42,28 @@ allprojects {
         google()
         mavenCentral()
         jcenter()
-        maven { url("$rootDir/../node_modules/react-native/android") }
+        maven { url "$rootDir/../node_modules/react-native/android" }
         maven { url("$rootDir/../node_modules/jsc-android/dist")}
         maven { url 'https://www.jitpack.io' }
         maven { url "https://maven.google.com" }
+        maven { url "https://maven.aliyun.com/repository/public/" }
         maven{url 'https://maven.aliyun.com/nexus/content/groups/public/'}
-        maven { url "https://maven-other.tuya.com/repository/maven-releases/"}
-        maven { url "https://maven-other.tuya.com/repository/maven-commercial-releases/" }
-        maven { url 'https://central.maven.org/maven2/' }
+        // maven { url "https://maven-other.tuya.com/repository/maven-releases/"}
+        // maven { url "https://maven-other.tuya.com/repository/maven-commercial-releases/" }
+        // maven { url 'https://central.maven.org/maven2/' }
+        maven { url 'https://repo1.maven.org/maven2/' }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
         maven { url 'https://developer.huawei.com/repo/' }
+
+
+        // ✅ Tuya repositories (reliable mirrors)
+        maven { url 'https://maven-other.tuya.com/repository/maven-public/' }
+        maven { url 'https://maven.tuya.com/repository/maven-commercial-releases/' }
+        maven { url 'https://maven.tuya.com/repository/maven-public-releases/' }
+        maven { url 'https://maven.tuyaeu.com/repository/maven-public-releases/' }
+
+        maven { url "https://maven-other.tuya.com/repository/maven-commercial-releases/" }
+        maven { url "https://maven-other.tuya.com/repository/maven-public-releases/" }
         
     }
 }
@@ -61,8 +71,8 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
 subprojects {
-    
     afterEvaluate { project ->
         project.plugins.withType(org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper) {
             tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
