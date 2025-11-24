@@ -1,18 +1,18 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState, useRef, useEffect} from 'react';
-import {Alert, Animated} from 'react-native';
-import {useIsFocused} from '@react-navigation/native';
+import React, { useState, useRef, useEffect } from 'react';
+import { Alert, Animated, Platform } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 import Sound from 'react-native-sound';
 import Torch from 'react-native-torch';
-import TrackPlayer, {RepeatMode} from 'react-native-track-player';
+import TrackPlayer, { RepeatMode } from 'react-native-track-player';
 import * as Brightness from 'expo-brightness';
-import {deactivateKeepAwake, activateKeepAwakeAsync} from 'expo-keep-awake';
+import { deactivateKeepAwake, activateKeepAwakeAsync } from 'expo-keep-awake';
 
-import {useTimeFormatContext} from '../../../contexts/time-format.context';
-import {useDeviceBrightnessContext} from '../../../contexts/device-brightness.context';
+import { useTimeFormatContext } from '../../../contexts/time-format.context';
+import { useDeviceBrightnessContext } from '../../../contexts/device-brightness.context';
 
 import useTime from '../../../hooks/useTime';
-import {useTuyaServices} from '../../../hooks/useTuyaServices';
+import { useTuyaServices } from '../../../hooks/useTuyaServices';
 
 import UpgradeAlarmScreen from './UpgradeAlarmScreen';
 
@@ -20,21 +20,20 @@ import {
   pulseSettings,
   colorSettings,
 } from '../../../constants/available-settings';
-
-
-export default function UpgradeAlarmContainer({route, navigation}) {
-  const {alarm} = route.params;
+let soundPlayer;
+export default function UpgradeAlarmContainer({ route, navigation }) {
+  const { alarm } = route.params;
   const [torchIsFlashing, setTorchIsFlashing] = useState(false);
   const [bulbIsFlashing, setBulbIsFlashing] = useState(false);
   const [isPlayerReady, setIsPlayerReady] = useState(false);
   const isFocused = useIsFocused();
   const screenOpacity = useRef(new Animated.Value(1)).current;
 
-  const {timeFormat} = useTimeFormatContext();
-  const {readyToChangeBrightness} = useDeviceBrightnessContext();
+  const { timeFormat } = useTimeFormatContext();
+  const { readyToChangeBrightness } = useDeviceBrightnessContext();
 
-  const {timeToDisplay, period} = useTime(timeFormat);
-  const {turnBulbOn, turnBulbOff} = useTuyaServices();
+  const { timeToDisplay, period } = useTime(timeFormat);
+  const { turnBulbOn, turnBulbOff } = useTuyaServices();
 
   const chosenColors = colorSettings.find(
     (setting) => setting.backgroundColor === alarm?.alarm?.screen_color,
@@ -50,25 +49,40 @@ export default function UpgradeAlarmContainer({route, navigation}) {
 
     if (readyToChangeBrightness && isFocused) {
       activateKeepAwakeAsync();
-      setMaximumBrightness();
+      // setMaximumBrightness();
     }
   }, [readyToChangeBrightness, isFocused]);
 
   useEffect(() => {
+    if(Platform.OS=='ios'){
+      const soundPlayer = new Sound("")
+      soundPlayer.setVolume(1);
+    }
+   
+  }, [])
+
+  useEffect(() => {
+    console.log(alarm?.alarm?.alarm_sound,'as');
     try {
       if (alarm?.alarm?.alarm_sound) {
-        const soundPlayer = new Sound(
+         soundPlayer = new Sound(
           alarm.alarm.alarm_sound,
           Sound.MAIN_BUNDLE,
           (error) => {
+
             if (error) {
               console.log(error);
             }
-
             soundPlayer.setNumberOfLoops(-1);
 
             if (alarm?.alarm?.alarm_sound_enabled) {
-              soundPlayer.play();
+              if (!isPlayerReady &&!soundPlayer.isPlaying()) {
+                console.warn('Start play');
+                
+                soundPlayer.play();
+             
+              }
+         
             }
           },
         );
@@ -76,7 +90,12 @@ export default function UpgradeAlarmContainer({route, navigation}) {
         soundPlayer.setVolume(1);
 
         return () => {
-          soundPlayer.stop();
+          soundPlayer.pause()
+          soundPlayer.stop(() => {
+            soundPlayer.release()
+           
+          });     
+      
         };
       } else {
         if (alarm?.alarm?.alarm_sound_enabled) {
@@ -177,22 +196,28 @@ export default function UpgradeAlarmContainer({route, navigation}) {
 
   async function playTrack() {
     try {
+      console.log('play track');
       await TrackPlayer.setRepeatMode(RepeatMode.Track);
       await TrackPlayer.play();
+      
     } catch (error) {
       console.log(error);
     }
   }
 
   const handleTurnOffPress = async () => {
-    TrackPlayer.pause();
+    soundPlayer.stop()
+    soundPlayer.release()
+    await TrackPlayer.pause();
     await TrackPlayer.reset();
-    turnBulbOn();
+
+    turnBulbOff();
     deactivateKeepAwake();
     navigation.replace('FreeInformation');
   };
 
   const handleSnoozeButton = async () => {
+    turnBulbOff();
     const snoozeTimeInMiliseconds = 300000;
     const sleepSoundHourLimit = [
       {
@@ -201,17 +226,21 @@ export default function UpgradeAlarmContainer({route, navigation}) {
       },
     ];
 
-    turnBulbOff();
 
-    TrackPlayer.getQueue().then((queue) => {
+    await TrackPlayer.getQueue().then(async (queue) => {
       if (queue.length > 1) {
-        TrackPlayer.skipToPrevious();
+        // TrackPlayer.reset()
+        console.warn('TRACK QUE')
+        await TrackPlayer.skipToPrevious()
+
+        TrackPlayer.pause();
+
       } else {
         TrackPlayer.pause();
       }
     });
 
-    TrackPlayer.pause();
+    await TrackPlayer.pause();
 
     navigation.replace('UpgradeSleep', {
       adjustedAlarmDateInMiliseconds:

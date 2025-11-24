@@ -227,6 +227,14 @@ export const StackContainer = styled.ScrollView`
   z-index: 1;
 `;
 
+export const AlarmStackContainer = styled.ScrollView`
+  width: 100%;
+  height: 100%;
+  padding: 0 ${scaleWidth(16)}px;
+  margin-bottom: ${scaleHeight(120)}px;
+  z-index: 1;
+`;
+
 export const StackChildWrapper = styled.View`
   width: 100%;
   margin-bottom: ${scaleHeight(10)}px;

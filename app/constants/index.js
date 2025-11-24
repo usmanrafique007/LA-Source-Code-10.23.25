@@ -1,7 +1,7 @@
 export const WEB_CLIENT_ID =
-  '1054757627660-6rldktuaftbs92clbuhg56v1i8vqrde9.apps.googleusercontent.com';
+  '468523640148-1avu7l9obk8asc7bl2ps3tfc3dnn4pmu.apps.googleusercontent.com';
 export const ANDROID_CLIENT_ID =
-  '1054757627660-882mmmpemoakvsv4u8a834pdkn21figr.apps.googleusercontent.com';
+  '468523640148-38n9c5oen5j0prmlbp2t2840p0jgb6ga.apps.googleusercontent.com';
 
 export const musicAlarmSoundIdentifiers = [
   '11_halcyon_2',

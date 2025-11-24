@@ -8,8 +8,9 @@ podfile_properties = JSON.parse(File.read(File.join(__dir__, 'Podfile.properties
 
 ENV['RCT_NEW_ARCH_ENABLED'] = podfile_properties['newArchEnabled'] == 'true' ? '1' : '0'
 ENV['EX_DEV_CLIENT_NETWORK_INSPECTOR'] = '1' if podfile_properties['EX_DEV_CLIENT_NETWORK_INSPECTOR'] == 'true'
-
-platform :ios, podfile_properties['ios.deploymentTarget'] || '13.0'
+source 'https://cdn.cocoapods.org/'
+source 'https://github.com/tuya/tuya-pod-specs.git'
+platform :ios, podfile_properties['ios.deploymentTarget'] || '14.0'
 
 install! 'cocoapods',
   :deterministic_uuids => false
@@ -41,7 +42,9 @@ prepare_react_native_project!
 # end
 
 target 'lightawake' do
-  pod "TuyaSmartHomeKit" 
+  pod "ThingSmartCryption", :path =>'./'
+  pod 'ThingSmartHomeKit','~> 5.8.0'
+  pod "ThingSmartBusinessExtensionKit"
   pod 'RNCPushNotificationIOS', :path => '../node_modules/@react-native-community/push-notification-ios'
   use_expo_modules!
   use_modular_headers!
@@ -65,7 +68,39 @@ target 'lightawake' do
     # :flipper_configuration => flipper_config
   )
 
+  # post_install do |installer|
+  #   react_native_post_install(
+  #     installer,
+  #     config[:reactNativePath],
+  #     # Set `mac_catalyst_enabled` to `true` in order to apply patches
+  #     # necessary for Mac Catalyst builds
+  #     :mac_catalyst_enabled => false
+  #   )
+  #   __apply_Xcode_12_5_M1_post_install_workaround(installer)
+  #   installer.pods_project.targets.each do |target|
+  #     target.build_configurations.each do |config|
+  #       config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "13.0"
+  #       config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+  #       config.build_settings['ENABLE_BITCODE'] = 'NO'
+  #       # 请替换为您的 TeamID
+  #       # replace to your teamid
+  #       config.build_settings["DEVELOPMENT_TEAM"] = "GW3M2Q3PDS"
+  #     end
+  #   end
+  #   # This is necessary for Xcode 14, because it signs resource bundles by default
+  #   # when building for devices.
+  #   installer.target_installation_results.pod_target_installation_results
+  #     .each do |pod_name, target_installation_result|
+  #     target_installation_result.resource_bundle_targets.each do |resource_bundle_target|
+  #       resource_bundle_target.build_configurations.each do |config|
+  #         config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+  #       end
+  #     end
+  #   end
+  # end
+
   post_install do |installer|
+
     react_native_post_install(
       installer,
       config[:reactNativePath],
@@ -74,7 +109,16 @@ target 'lightawake' do
       :mac_catalyst_enabled => false
     )
     __apply_Xcode_12_5_M1_post_install_workaround(installer)
-
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "13.0"
+        config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+        config.build_settings['ENABLE_BITCODE'] = 'NO'
+        # 请替换为您的 TeamID
+        # replace to your teamid
+        config.build_settings["DEVELOPMENT_TEAM"] = "GW3M2Q3PDS"
+      end
+    end
     # This is necessary for Xcode 14, because it signs resource bundles by default
     # when building for devices.
     installer.target_installation_results.pod_target_installation_results
@@ -85,6 +129,26 @@ target 'lightawake' do
         end
       end
     end
+
+    bitcode_strip_path = `xcrun --find bitcode_strip`.chop!
+      def strip_bitcode_from_framework(bitcode_strip_path, framework_relative_path)
+        framework_path = File.join(Dir.pwd, framework_relative_path)
+        command = "#{bitcode_strip_path} #{framework_path} -r -o #{framework_path}"
+        puts "Stripping bitcode: #{command}"
+        system(command)
+      end
+  
+      framework_paths = [
+        "Pods/LogRocket/LogRocket.xcframework/ios-arm64/LogRocket.framework/LogRocket",
+        "Pods/hermes-engine/destroot/Library/Frameworks/macosx/hermes.framework/hermes",
+        "Pods/hermes-engine/destroot/Library/Frameworks/macosx/hermes.framework/Versions/Current/hermes",
+        "Pods/hermes-engine/destroot/Library/Frameworks/universal/hermes.xcframework/ios-arm64/hermes.framework/hermes",
+        "Pods/hermes-engine/destroot/Library/Frameworks/universal/hermes.xcframework/ios-arm64_x86_64-maccatalyst/hermes.framework/hermes"
+      ]
+  
+      framework_paths.each do |framework_relative_path|
+        strip_bitcode_from_framework(bitcode_strip_path, framework_relative_path)
+      end
   end
 
   post_integrate do |installer|

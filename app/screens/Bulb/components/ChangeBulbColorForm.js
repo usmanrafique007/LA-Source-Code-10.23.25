@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from 'react';
-import {Modal} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Modal } from 'react-native';
 
 import ColorPicker from 'react-native-wheel-color-picker';
-import {send} from '@volst/react-native-tuya';
-import {responsiveHeight} from 'react-native-responsive-dimensions';
+import {send} from '@owowagency/react-native-tuya';
+import { responsiveHeight } from 'react-native-responsive-dimensions';
 
 import {
   ModalBody,
@@ -16,8 +16,8 @@ import {
   Spacer,
 } from '../../../styles/commonStyledComponents';
 import styled from 'styled-components/native';
-import {scaleHeight, scaleWidth} from '../../../styles/scales';
-import {theme} from '../../../styles/theme';
+import { scaleHeight, scaleWidth } from '../../../styles/scales';
+import { theme } from '../../../styles/theme';
 
 import {
   storeAsyncStorageData,
@@ -34,7 +34,7 @@ const PALETTE = [
   '#ffde17',
 ];
 
-const ChangeBulbColorForm = ({colorWheelShow, setColorWheelShow, device}) => {
+const ChangeBulbColorForm = ({ colorWheelShow, setColorWheelShow, device }) => {
   const [wheelColor, setWheelColor] = useState('');
   const [pickedColor, setPickedColor] = useState('');
   const [loading, setLoading] = useState(true);
@@ -44,6 +44,8 @@ const ChangeBulbColorForm = ({colorWheelShow, setColorWheelShow, device}) => {
       const deviceColor = await getAsyncStorageData(
         StorageProperty.ACTIVE_DEVICE_COLOR,
       );
+
+      console.log("ACTIVE_DEVICE_COLOR", deviceColor);
 
       setWheelColor(deviceColor ?? 'ffffff');
       setLoading(false);
@@ -102,7 +104,7 @@ const ChangeBulbColorForm = ({colorWheelShow, setColorWheelShow, device}) => {
       <Backdrop>
         <ModalBody
           colors={[theme.colors.bluePurple, theme.colors.lightIndigo]}
-          start={{x: 0.7, y: 0}}>
+          start={{ x: 0.7, y: 0 }}>
           <CloseButtonContainer onPress={() => setColorWheelShow(false)}>
             <ExitModalButton>
               <ModalXIcon
@@ -112,7 +114,7 @@ const ChangeBulbColorForm = ({colorWheelShow, setColorWheelShow, device}) => {
           </CloseButtonContainer>
           <BulbColorPickerContainer>
             <ColorWheelContainer>
-              <ScreenTitle style={{paddingBottom: responsiveHeight(3)}}>
+              <ScreenTitle style={{ paddingBottom: responsiveHeight(3) }}>
                 Set Color and Brightness
               </ScreenTitle>
               {!loading && (

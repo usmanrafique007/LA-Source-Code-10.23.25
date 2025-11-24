@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState} from 'react';
-import {Platform, TouchableWithoutFeedback, View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Platform, TouchableWithoutFeedback, View } from 'react-native';
 
 import LottieView from 'lottie-react-native';
 import CheckBox from '@react-native-community/checkbox';
-import {requestPurchase} from 'react-native-iap';
+import { requestPurchase } from 'react-native-iap';
 import {
   responsiveScreenHeight,
   responsiveScreenWidth,
@@ -20,17 +20,17 @@ import {
   SettingHead,
   Row,
 } from '../../../styles/commonStyledComponents';
-import {scaleWidth} from '../../../styles/scales';
-import {useAlarms} from '../hooks/useAlarms';
-import Loader from './Loader';
-import {usePurchaseHandling} from '../../../components/Globals/PurchaseContext';
+import { scaleWidth } from '../../../styles/scales';
+import { useAlarms } from '../hooks/useAlarms';
+import { usePurchaseHandling } from '../../../components/Globals/PurchaseContext';
+import ShimmerCard from './ShimmerCard';
 
 export default function InAppAlarm() {
   const [hasAlarmPurchased, setHasAlarmPurchased] = useState(false);
-  const {alarm, loader, setLoader} = useAlarms(hasAlarmPurchased);
+  const { alarm, loader, setLoader } = useAlarms(hasAlarmPurchased);
   const [animationLoader, setAnimationLoader] = useState(false);
   const [isPurchasePending, setIsPurchasePending] = useState(false);
-  const {alarmPurchaseComplete} = usePurchaseHandling();
+  const { alarmPurchaseComplete } = usePurchaseHandling();
 
   useEffect(() => {
     if (alarmPurchaseComplete) {
@@ -46,23 +46,33 @@ export default function InAppAlarm() {
     }
     setAnimationLoader(true);
     setIsPurchasePending(true);
-    console.log('Purchase request initiated');
+    console.log('Purchase request initiated', item);
     try {
       if (Platform.OS === 'ios') {
         console.log('Requesting purchase (iOS)');
-        await requestPurchase({sku: item});
+        await requestPurchase({ sku: item });
       } else {
         console.log('Requesting purchase (Android)');
-        await requestPurchase({skus: [item]});
+        await requestPurchase({ skus: [item] });
+        console.log("🚀 ~ handleRequestPurchase ~ await requestPurchase({skus: [item]}):")
+
       }
       setIsPurchasePending(false);
+      setAnimationLoader(false);
+
     } catch (error) {
+      setAnimationLoader(false);
+      if (error == 'Error: You already own this item.') {
+        setHasAlarmPurchased(!hasAlarmPurchased);
+      }
       console.error('Purchase Pending', error);
       setIsPurchasePending(false);
     }
   };
 
-  const renderedAlarm = ({item, index}) => {
+  const renderedAlarm = ({ item, index }) => {
+    console.log(item);
+
     return (
       <TouchableWithoutFeedback>
         <SettingContainer
@@ -75,9 +85,9 @@ export default function InAppAlarm() {
               height: responsiveScreenHeight(45),
               flexDirection: 'column',
             }}>
-            <Spacer style={{paddingBottom: responsiveScreenHeight(2)}} />
+            <Spacer style={{ paddingBottom: responsiveScreenHeight(2) }} />
             <Cover source={require('../../../../assets/clock.png')} />
-            <Spacer style={{paddingBottom: responsiveScreenHeight(3)}} />
+            <Spacer style={{ paddingBottom: responsiveScreenHeight(3) }} />
             <View
               style={{
                 marginRight: 'auto',
@@ -85,7 +95,7 @@ export default function InAppAlarm() {
               <BundleNameTitle>{item?.title}</BundleNameTitle>
               <Spacer />
               <BundleQuote>{item?.description}</BundleQuote>
-              <Spacer style={{paddingBottom: responsiveScreenHeight(2.5)}} />
+              <Spacer style={{ paddingBottom: responsiveScreenHeight(2.5) }} />
               <Row
                 style={{
                   alignItems: 'flex-end',
@@ -113,7 +123,7 @@ export default function InAppAlarm() {
                         onFillColor={'#f3d449'}
                         onTintColor={'#f3d449'}
                         onCheckColor={'#1d0f57'}
-                        tintColors={{true: '#f3d449'}}
+                        tintColors={{ true: '#f3d449' }}
                         disabled={true}
                       />
                     ) : (
@@ -139,9 +149,9 @@ export default function InAppAlarm() {
       <SectionNameContainer>
         <SectionName>Alarm</SectionName>
       </SectionNameContainer>
-      <Spacer style={{paddingBottom: responsiveScreenHeight(1)}} />
+      <Spacer style={{ paddingBottom: responsiveScreenHeight(1) }} />
       {loader ? (
-        <Loader />
+        <ShimmerCard />
       ) : (
         <Carousel
           data={[alarm]}
@@ -152,7 +162,7 @@ export default function InAppAlarm() {
           layoutCardOffset={18}
         />
       )}
-      <Spacer style={{paddingBottom: responsiveScreenHeight(5)}} />
+      <Spacer style={{ paddingBottom: responsiveScreenHeight(5) }} />
     </>
   );
 }

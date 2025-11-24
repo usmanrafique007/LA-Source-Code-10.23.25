@@ -13,5 +13,16 @@ export default function useNotify() {
     });
   }
 
-  return {notify};
+  function reminderAlert() {
+    PushNotification.localNotification({
+      /* Android Only Properties */
+      channelId: 'lightawake-channel',
+      /* iOS and Android properties */
+      title: 'Light-Awake',
+      message: 'Wake-Up Reminder!',
+      soundName: Platform.OS === 'ios' ? 'default' : 'ping.mp3',
+    });
+  }
+
+  return {notify, reminderAlert};
 }

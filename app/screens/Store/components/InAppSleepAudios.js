@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState, useRef, useEffect} from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Platform,
   TouchableWithoutFeedback,
@@ -12,7 +12,7 @@ import {
 import LottieView from 'lottie-react-native';
 import CheckBox from '@react-native-community/checkbox';
 
-import {requestPurchase} from 'react-native-iap';
+import { requestPurchase } from 'react-native-iap';
 import {
   responsiveScreenHeight,
   responsiveScreenWidth,
@@ -21,7 +21,7 @@ import {
 import Carousel from 'react-native-snap-carousel';
 import Sound from 'react-native-sound';
 
-import {trackSettings} from '../../../constants/available-settings';
+import { trackSettings } from '../../../constants/available-settings';
 
 import styled from 'styled-components/native';
 import {
@@ -30,30 +30,30 @@ import {
   SettingHead,
   Row,
 } from '../../../styles/commonStyledComponents';
-import {scaleWidth} from '../../../styles/scales';
-import {theme} from '../../../styles/theme';
-import Loader from './Loader';
-import {useSleepAudios} from '../hooks/useSleepAudios';
-import {usePurchaseHandling} from '../../../components/Globals/PurchaseContext';
+import { scaleWidth } from '../../../styles/scales';
+import { theme } from '../../../styles/theme';
+import { useSleepAudios } from '../hooks/useSleepAudios';
+import { usePurchaseHandling } from '../../../components/Globals/PurchaseContext';
+import ShimmerCard from './ShimmerCard';
 
 Sound.setCategory('Playback');
 let soundPlayer = new Sound(
   trackSettings[0]?.product_identifier?.slice(3, trackSettings[0]?.length + 3) +
-    '.mp3',
+  '.mp3',
 );
 
-export default function InAppSleepAudios({}) {
+export default function InAppSleepAudios({ }) {
   const [hasSleepAudiosPurchased, setHasSleepAudiosPurchased] = useState(false);
   const [soundPlaying, setSoundPlaying] = useState(false);
   const [category, setCategory] = useState('All');
   const alarmPreviewTimeout = useRef();
-  const {sleepAudios, loader, setLoader} = useSleepAudios(
+  const { sleepAudios, loader, setLoader } = useSleepAudios(
     hasSleepAudiosPurchased,
   );
   const [toDisplayAudios, setToDisplayAudios] = useState([]);
   const [animationLoader, setAnimationLoader] = useState(false);
   const [isPurchasePending, setIsPurchasePending] = useState(false);
-  const {audioPurchaseComplete} = usePurchaseHandling();
+  const { audioPurchaseComplete } = usePurchaseHandling();
 
   useEffect(() => {
     setLoader(true);
@@ -77,7 +77,7 @@ export default function InAppSleepAudios({}) {
     ];
 
     return (
-      <View style={{marginLeft: 10}}>
+      <View style={{ marginLeft: 10 }}>
         <SectionButton
           style={{
             backgroundColor:
@@ -171,14 +171,22 @@ export default function InAppSleepAudios({}) {
     }
     setIsPurchasePending(true);
     console.log('Purchase request initiated');
-    if (Platform.OS === 'ios') {
-      console.log('Requesting purchase (iOS)');
-      requestPurchase({sku: item});
-    } else {
-      console.log('Requesting purchase (Android)');
-      requestPurchase({skus: [item]});
+    try {
+
+      if (Platform.OS === 'ios') {
+        console.log('Requesting purchase (iOS)');
+        requestPurchase({ sku: item });
+      } else {
+        console.log('Requesting purchase (Android)');
+        requestPurchase({ skus: [item] });
+      }
+      setAnimationLoader(false);
+      setIsPurchasePending(false);
     }
-    setIsPurchasePending(false);
+    catch (e) {
+      setIsPurchasePending(false);
+      setAnimationLoader(false);
+    }
   };
 
   const stopPlayer = () => {
@@ -226,7 +234,7 @@ export default function InAppSleepAudios({}) {
     }
   };
 
-  const renderedAudios = ({item, index}) => {
+  const renderedAudios = ({ item, index }) => {
     return (
       <TouchableWithoutFeedback>
         <SettingContainer
@@ -239,13 +247,13 @@ export default function InAppSleepAudios({}) {
               height: responsiveScreenHeight(45),
               flexDirection: 'column',
             }}>
-            <Spacer style={{paddingBottom: responsiveScreenHeight(2)}} />
+            <Spacer style={{ paddingBottom: responsiveScreenHeight(2) }} />
             <BundleImage
               source={require('../../../../assets/musical-note.png')}
             />
-            <Spacer style={{paddingBottom: responsiveScreenHeight(3)}} />
-            <Row style={{width: '100%'}}>
-              <BundleNameTitle style={{width: '78%'}}>
+            <Spacer style={{ paddingBottom: responsiveScreenHeight(3) }} />
+            <Row style={{ width: '100%' }}>
+              <BundleNameTitle style={{ width: '78%' }}>
                 {item.title}
               </BundleNameTitle>
               <StyledTouchableOpacity
@@ -269,7 +277,7 @@ export default function InAppSleepAudios({}) {
               }}>
               {item.description}
             </BundleQuote>
-            <Spacer style={{paddingBottom: responsiveScreenHeight(2.5)}} />
+            <Spacer style={{ paddingBottom: responsiveScreenHeight(2.5) }} />
             <Row
               style={{
                 alignItems: 'flex-end',
@@ -293,12 +301,12 @@ export default function InAppSleepAudios({}) {
                 <>
                   {item.is_purchased ? (
                     <CheckBox
-                      style={{height: responsiveScreenHeight(4)}}
+                      style={{ height: responsiveScreenHeight(4) }}
                       value={true}
                       onFillColor={'#f3d449'}
                       onTintColor={'#f3d449'}
                       onCheckColor={'#1d0f57'}
-                      tintColors={{true: '#f3d449'}}
+                      tintColors={{ true: '#f3d449' }}
                       disabled={true}
                     />
                   ) : (
@@ -323,20 +331,20 @@ export default function InAppSleepAudios({}) {
       <SectionNameContainer>
         <SectionName>Sleep Sounds</SectionName>
       </SectionNameContainer>
-      <Spacer style={{paddingBottom: responsiveScreenHeight(1)}} />
+      <Spacer style={{ paddingBottom: responsiveScreenHeight(1) }} />
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={{marginLeft: 8}}>
+        style={{ marginLeft: 8 }}>
         {renderCategory(0)}
         {renderCategory(1)}
         {renderCategory(2)}
         {renderCategory(3)}
         {renderCategory(4)}
       </ScrollView>
-      <Spacer style={{paddingBottom: responsiveScreenHeight(1)}} />
+      <Spacer style={{ paddingBottom: responsiveScreenHeight(1) }} />
       {loader ? (
-        <Loader />
+        <ShimmerCard />
       ) : (
         <Carousel
           data={toDisplayAudios}
@@ -347,7 +355,7 @@ export default function InAppSleepAudios({}) {
           layoutCardOffset={18}
         />
       )}
-      <Spacer style={{paddingBottom: responsiveScreenHeight(5)}} />
+      <Spacer style={{ paddingBottom: responsiveScreenHeight(5) }} />
     </>
   );
 }

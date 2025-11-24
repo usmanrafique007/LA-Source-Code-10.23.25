@@ -2,7 +2,11 @@ import {getAsyncStorageData} from '../constants/utils';
 import axios from 'axios';
 import StorageProperty from '../constants/storage-property';
 
-export const LIGHTAWAKE_BASE_URL = 'http://159.89.94.80';
+// export const LIGHTAWAKE_BASE_URL = 'http://167.99.148.252';
+// export const LIGHTAWAKE_BASE_URL = 'http://159.89.94.80';
+export const LIGHTAWAKE_BASE_URL = 'https://api.lightawake.biz';
+
+// export const LIGHTAWAKE_BASE_URL = 'http://localhost:3000/';
 // export const LIGHTAWAKE_BASE_URL = 'http://192.168.0.180:3001';
 
 export const connectionPath = {

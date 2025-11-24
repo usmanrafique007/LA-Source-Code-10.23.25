@@ -1,0 +1,136 @@
+import React from 'react';
+import { Modal } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import {
+  responsiveScreenHeight,
+  responsiveScreenWidth,
+  responsiveScreenFontSize,
+} from 'react-native-responsive-dimensions';
+import styled from 'styled-components/native';
+import { scaleHeight, scaleWidth } from '../../styles/scales';
+import { theme } from '../../styles/theme';
+
+const PrivacyModal = ({
+  greetings,
+  message,
+  showPopUp,
+  setShowPopUp,
+}) => {
+
+  const handleAllow = () => {
+    setShowPopUp('close');
+  };
+
+  return (
+
+    <Modal visible={showPopUp} transparent={true} animationType="fade">
+      <Backdrop>
+        <ModalBody
+          colors={[theme.colors.white, theme.colors.white]}
+          start={{ x: 0.7, y: 0 }}>
+          <BulbColorPickerContainer>
+            <IconHolder>
+              <ScreenTitle
+                style={{
+                  textAlign: 'center',
+                  fontSize: responsiveScreenFontSize(2.2),
+                  fontFamily: theme.fonts.bold,
+                }}>
+                {greetings}
+              </ScreenTitle>
+            </IconHolder>
+            <ScreenTitle style={{ textAlign: 'center', marginTop: scaleHeight(20) }}>
+              {message}
+            </ScreenTitle>
+            <ButtonContainer>
+              <SetChangeButton onPress={handleAllow}>
+                <ButtonText>Ok</ButtonText>
+              </SetChangeButton>
+            </ButtonContainer>
+          </BulbColorPickerContainer>
+        </ModalBody>
+      </Backdrop>
+    </Modal>
+
+  );
+};
+export default PrivacyModal;
+const ButtonContainer = styled.View`
+  width: 100%;
+  border-radius: 5px;
+  padding-top: ${responsiveScreenHeight(2.5)};
+`;
+const BulbColorPickerContainer = styled.View`
+  width: 100%;
+  padding: 4.5% 4.9%;
+  // height: ${responsiveScreenHeight(65)};
+  align-items: center;
+`;
+const ButtonText = styled.Text`
+  color: ${(props) => props.theme.colors.darkIndigoTwo};
+  font-size: ${scaleWidth(18)}px;
+  font-family: ${(props) => props.theme.fonts.bold};
+  margin: auto;
+`;
+const Backdrop = styled.View`
+  width: 100%;
+  height: 100%;
+  background-color: #00000080;
+`;
+const CancelContainer = styled.TouchableOpacity`
+  flex-direction: row;
+  margin-left: auto;
+`;
+const ExitModalButton = styled.View`
+  height: 32px;
+  width: 32px;
+  border-radius: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  shadow-color: #000;
+  shadow-opacity: 0.34;
+  shadow-radius: 6.27px;
+  elevation: 10;
+  background-color: ${(props) => props.theme.colors.white};
+`;
+const IconHolder = styled.View`
+  border-radius: ${responsiveScreenWidth(10)};
+  padding-bottom: ${responsiveScreenHeight(0)}
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+const ModalBody = styled(LinearGradient)`
+  elevation: 7;
+  shadow-opacity: 0.9;
+  shadow-radius: 20px;
+  shadow-offset: 0px 2px;
+  shadow-color: #000;
+  display: flex;
+  align-items: center;
+  margin: auto;
+  padding: 20px;
+  border-radius: 20px;
+  z-index: 100;
+  max-width: 90%;
+  // height: ${responsiveScreenHeight(65)};
+  width: 85%;
+`;
+const ModalXIcon = styled.Image`
+  width: 12px;
+  height: 12px;
+  align-items: flex-end;
+`;
+const ScreenTitle = styled.Text`
+  font-family: ${(props) => props.theme.fonts.default};
+  color: ${(props) => props.theme.colors.black};
+  font-size: ${responsiveScreenFontSize(1.5)};
+`;
+const SetChangeButton = styled.TouchableOpacity`
+  width: ${scaleWidth(183)}px;
+  height: ${scaleHeight(48)}px;
+  background-color: ${(props) => props.theme.colors.yellow};
+  border-radius: ${scaleWidth(24)}px;
+  margin: auto;
+`;

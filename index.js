@@ -15,24 +15,24 @@ AppRegistry.registerComponent('main', () => App);
 
 PushNotification.configure({
   onRegister: function (token) {
-    console.log('====================================');
-    console.log('TOKEN:', token);
-    console.log('====================================');
+    // console.log('====================================');
+    // console.log('TOKEN:', token);
+    // console.log('====================================');
   },
   onNotification: function (notification) {
-    console.log('====================================');
-    console.log('NOTIFICATION:', notification);
-    console.log('====================================');
+    // console.log('====================================');
+    // console.log('NOTIFICATION:', notification);
+    // console.log('====================================');
 
     notification.finish(PushNotificationIOS.FetchResult.NoData);
   },
-  popInitialNotification: true,
-  requestPermissions: true,
-  permissions: {
-    alert: true,
-    badge: true,
-    sound: true,
-  },
+  // popInitialNotification: true,
+  // requestPermissions: true,
+  // permissions: {
+  //   alert: true,
+  //   badge: true,
+  //   sound: true,
+  // },
 });
 
 registerRootComponent(App);

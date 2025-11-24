@@ -1,18 +1,18 @@
-import React, {useEffect, useState} from 'react';
-import {View, ScrollView, TouchableWithoutFeedback} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import {
   responsiveScreenHeight,
   responsiveScreenWidth,
 } from 'react-native-responsive-dimensions';
-import {showMessage, hideMessage} from 'react-native-flash-message';
+import { showMessage, hideMessage } from 'react-native-flash-message';
 
-import {Toast} from '../../../components/Globals/Toast';
-import {AppleSignIn} from './social_logins/apple_sign_in';
-import {GoogleSignIn} from './social_logins/google_sign_in';
+import { Toast } from '../../../components/Globals/Toast';
+import { AppleSignIn } from './social_logins/apple_sign_in';
+import { GoogleSignIn } from './social_logins/google_sign_in';
 
 import styled from 'styled-components/native';
-import {scaleHeight, scaleWidth} from '../../../styles/scales';
+import { scaleHeight, scaleWidth } from '../../../styles/scales';
 import {
   ScreenContainer as DefaultScreenContainer,
   Spacer,
@@ -21,12 +21,13 @@ import AxiosRequestHandler, {
   connectionPath,
   method,
 } from '../../../network/AxiosRequestHandler';
-import {storeAsyncStorageData} from '../../../constants/utils';
+import { storeAsyncStorageData } from '../../../constants/utils';
 import StorageProperty from '../../../constants/storage-property';
 
-import {useHomeId} from '../../../hooks/useHomeId';
+import { useHomeId } from '../../../hooks/useHomeId';
+import AxiosMailerLiteRequestHandler, { mailerliteEndpoint } from '../../../network/AxiosMailerLiteHandler';
 
-export default function RegistrationForm({navigation, isLogin, setIsLogin}) {
+export default function RegistrationForm({ navigation, isLogin, setIsLogin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -34,7 +35,7 @@ export default function RegistrationForm({navigation, isLogin, setIsLogin}) {
   const [showPasswordInfo, setShowPasswordInfo] = useState(false);
   const [isPasswordSecure, setIsPasswordSecure] = useState(true);
   const [isConfirmPasswordSecure, setIsConfirmPasswordSecure] = useState(true);
-  const {homeId, getHomeId} = useHomeId();
+  const { homeId, getHomeId } = useHomeId();
 
   useEffect(() => {
     async function fetch() {
@@ -45,6 +46,7 @@ export default function RegistrationForm({navigation, isLogin, setIsLogin}) {
   }, []);
 
   const handleRegisterClicked = async () => {
+    Keyboard.dismiss();
     const userExists = await verifyUser();
 
     if (validateFullName(fullName)) {
@@ -126,12 +128,24 @@ export default function RegistrationForm({navigation, isLogin, setIsLogin}) {
 
       const response = await AxiosRequestHandler(requestConfig, true, true);
 
+
       const authToken = {
         client: response?.headers['client'],
         uid: response?.headers['uid'],
         'access-token': response?.headers['access-token'],
       };
+      const sendData = {
+        email: response?.headers['uid'],
+      }
+      const mailerliteConfig = {
+        data: sendData,
+        method: method.post,
+        url: mailerliteEndpoint.auth.appUserSubscriber,
+      };
 
+      const res = await AxiosMailerLiteRequestHandler(mailerliteConfig);
+      console.warn(res);
+      
       storeAsyncStorageData(
         StorageProperty.USER_TOKEN,
         JSON.stringify(authToken),
@@ -147,6 +161,8 @@ export default function RegistrationForm({navigation, isLogin, setIsLogin}) {
         navigation.navigate('Store');
       }, 2000);
     } catch (error) {
+      console.log(error);
+      
       console.log(error.response.data);
       if (error.response.data.message) {
         return Toast(
@@ -159,7 +175,7 @@ export default function RegistrationForm({navigation, isLogin, setIsLogin}) {
 
       Toast(
         'Error',
-        error.response.data.errors.full_messages.toString(),
+        error.response.data.errors?.full_messages.toString(),
         'danger',
         'danger',
       );
@@ -196,7 +212,7 @@ export default function RegistrationForm({navigation, isLogin, setIsLogin}) {
 
   return (
     <StackContainer>
-      <ScrollView>
+      <ScrollView keyboardShouldPersistTaps='handled'>
         <View>
           <StackChildWrapper>
             <InputTextContainer>
@@ -206,7 +222,7 @@ export default function RegistrationForm({navigation, isLogin, setIsLogin}) {
                 placeholder="Enter email"
                 placeholderTextColor="#A9A9A9"
                 autoCapitalize="none"
-                style={{width: '91%'}}
+                style={{ width: '91%' }}
               />
             </InputTextContainer>
           </StackChildWrapper>
@@ -217,7 +233,7 @@ export default function RegistrationForm({navigation, isLogin, setIsLogin}) {
                 onChangeText={(fullName) => setFullName(fullName)}
                 placeholder="Full name"
                 placeholderTextColor="#A9A9A9"
-                style={{width: '91%'}}
+                style={{ width: '91%' }}
               />
             </InputTextContainer>
           </StackChildWrapper>
@@ -281,19 +297,20 @@ export default function RegistrationForm({navigation, isLogin, setIsLogin}) {
             </SetPairButton>
           </StackChildWrapper>
           <Spacer />
-          <StackChildWrapper>
+          {/* {Platform.OS === 'ios' ?  <StackChildWrapper>
             <SocialLoginTextSpacer>
               ─── Or continue by ───
             </SocialLoginTextSpacer>
-          </StackChildWrapper>
-          <StackChildWrapper>
+          </StackChildWrapper> : <></>} */}
+          {/* <StackChildWrapper>
             {Platform.OS === 'ios' ? (
               <AppleSignIn isLogin={isLogin} navigation={navigation} />
             ) : (
-              <GoogleSignIn navigation={navigation} />
+              <></>
+              // <GoogleSignIn navigation={navigation} />
             )}
             <Spacer />
-          </StackChildWrapper>
+          </StackChildWrapper> */}
           <StackChildWrapper>
             <Footer>
               <AuthButton onPress={() => setIsLogin(true)}>
@@ -345,14 +362,14 @@ const InfoIcon = styled.Image`
 
 const InputText = styled.TextInput`
   margin: auto;
-  font-size: 16px;
+  font-size: ${scaleWidth(14)}px;
   background-color: white;
   border-color: white;
   border-radius: ${scaleWidth(5)}px;
   border-width: 1px;
   height: ${scaleHeight(50)}px;
   width: 80%
-  padding: 10px;
+  padding:0px;
   
 `;
 

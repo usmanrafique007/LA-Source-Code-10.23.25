@@ -1,47 +1,60 @@
-import React, {useState, useEffect} from 'react';
-import {TouchableWithoutFeedback} from 'react-native';
-import {useIsFocused} from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import {
+  Linking,
+  TouchableWithoutFeedback,
+  DeviceEventEmitter,
+  BackHandler,
+} from 'react-native';
+import { CommonActions, useIsFocused } from '@react-navigation/native';
+import Sound from 'react-native-sound';
 
 import * as Brightness from 'expo-brightness';
-import {useKeepAwake, deactivateKeepAwake} from 'expo-keep-awake';
+import { useKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
+import BackgroundService from 'react-native-background-actions';
 
 import useTime from '../../../hooks/useTime';
 import useAppState from '../hooks/useAppState';
 import useNotify from '../hooks/useNotify';
-import {useTuyaServices} from '../../../hooks/useTuyaServices';
-import {formatTo24hFormat, formatTo12hFormat} from '../../../constants/utils';
+import { useTuyaServices } from '../../../hooks/useTuyaServices';
+import { formatTo24hFormat, formatTo12hFormat } from '../../../constants/utils';
 
-import {useTimeFormatContext} from '../../../contexts/time-format.context';
-import {useDeviceBrightnessContext} from '../../../contexts/device-brightness.context';
+import { useTimeFormatContext } from '../../../contexts/time-format.context';
+import { useDeviceBrightnessContext } from '../../../contexts/device-brightness.context';
 
 import styled from 'styled-components/native';
-import {scaleWidth} from '../../../styles/scales';
+import { scaleWidth } from '../../../styles/scales';
 import {
   IllustratedBackgroundImage,
   ClockBar,
 } from '../../../styles/commonStyledComponents';
-import RNUxcam from 'react-native-ux-cam';
+import { useAlarmSoundContext } from '../../../contexts/alarm-sound.context';
+import { pulseSettings } from '../../../constants/available-settings';
+import { useWakeUpContext } from '../../../contexts/wake-up.context';
 
-const FreeSleep = ({route, navigation}) => {
-  RNUxcam.tagScreenName('Sleep Screen');
+const FreeSleep = ({ route, navigation }) => {
   useKeepAwake();
-  const {timeFormat} = useTimeFormatContext();
-  const {timeToDisplay, period, nowDateInMiliseconds} = useTime(timeFormat);
-  const {readyToChangeBrightness, restoreDeviceBrightnessWhenAppIsReady} =
+  const { timeFormat } = useTimeFormatContext();
+  const { timeToDisplay, period, nowDateInMiliseconds } = useTime(timeFormat);
+  const { alarmSound, alarmSoundEnabled, startSound } = useAlarmSoundContext();
+  const { readyToChangeBrightness, restoreDeviceBrightnessWhenAppIsReady } =
     useDeviceBrightnessContext();
-  const {appStateVisible} = useAppState();
-  const {notify} = useNotify();
-  const {turnBulbOff} = useTuyaServices();
+  const { appStateVisible } = useAppState();
+  const { notify, reminderAlert } = useNotify();
+  const { turnBulbOff } = useTuyaServices();
   const [isScrensaverActive, setIsScreensaverActive] = useState(false);
   const [displayTurnOffMessage, setDisplayTurnOffMessage] = useState(false);
   const isFocused = useIsFocused();
 
-  const {adjustedAlarmDateInMiliseconds} = route.params;
+  // Torch Light States
+  const [torchIsFlashing, setTorchIsFlashing] = useState(false);
+  const { flashlightPulseRate, flashlightPulseRateEnabled } = useWakeUpContext();
+
+  const { adjustedAlarmDateInMiliseconds } = route.params;
   const alarmDate = new Date(adjustedAlarmDateInMiliseconds);
   alarmDate.setSeconds(0);
   const alarmHours = alarmDate.getHours();
   const alarmMinutes = alarmDate.getMinutes();
-  const {timeToDisplay: alarmTimeToDisplay, period: alarmPeriod} =
+  const { timeToDisplay: alarmTimeToDisplay, period: alarmPeriod } =
     timeFormat === '24'
       ? formatTo24hFormat(alarmHours, alarmMinutes)
       : formatTo12hFormat(alarmHours, alarmMinutes);
@@ -50,25 +63,122 @@ const FreeSleep = ({route, navigation}) => {
     turnBulbOff();
   }, []);
 
+  const options = {
+    taskName: 'Ligth Awake',
+    taskTitle: 'Ligth Awake',
+    taskDesc: 'Alarm set in background mode',
+    taskIcon: {
+      name: 'ic_launcher',
+      type: 'mipmap',
+    },
+    color: '#ff00ff',
+    linkingURI: 'scheme://host',
+    parameters: {
+      delay: 1000,
+    },
+  };
+
+  const sleep = (time) =>
+    new Promise((resolve) =>
+      setTimeout(() => {
+        resolve();
+      }, time),
+    );
+
+  const veryIntensiveTask = async (taskDataArguments) => {
+    const { delay } = taskDataArguments;
+    const soundPlayer = new Sound(alarmSound, Sound.MAIN_BUNDLE, (error) => {
+      soundPlayer.setCategory('Playback')
+      if (error) console.log(error);
+      soundPlayer.setNumberOfLoops(-1);
+    });
+    let timeOut;
+    let isHandler = true;
+    let alarmDuration = alarmDate.getTime() - new Date().getTime();
+
+    const startPlaying = async (time) => {
+      soundPlayer.play();
+      soundPlayer.setVolume(0);
+      if (isHandler && !timeOut) {
+        console.log('start playing...');
+        timeOut = setTimeout(() => {
+          // soundPlayer.play();
+          // soundPlayer.setVolume(1);
+          isHandler = false;
+          reminderAlert();
+        }, time);
+      }
+    };
+
+    const stopPlaying = () => {
+      if (soundPlayer.isPlaying) {
+        console.log('stop playing...');
+        soundPlayer.stop(() => {
+          soundPlayer.release(() => {
+            isHandler = true;
+            clearTimeout(timeOut);
+          });
+        });
+      }
+    };
+
+    await new Promise(async (resolve) => {
+      while (true) {
+        if (BackgroundService.isRunning()) startPlaying(alarmDuration);
+        else stopPlaying();
+        await sleep(delay);
+      }
+    });
+  };
+
   useEffect(() => {
     restoreDeviceBrightnessWhenAppIsReady();
     if (appStateVisible == 'background') {
+      onBackgroundServices();
       notify();
+    } else {
+      BackgroundService.stop();
     }
   }, [appStateVisible]);
 
-  useEffect(() => {
-    const setMinimumBrightness = async () => {
-      // setting brightness after moving app to background on android
-      // doesn't work if we didn't get brightness earlier
-      await Brightness.getBrightnessAsync();
-      await Brightness.setBrightnessAsync(0);
-    };
-
-    if (readyToChangeBrightness && isFocused) {
-      setMinimumBrightness();
+  const onBackgroundServices = async () => {
+    if (BackgroundService.isRunning()) {
+      await BackgroundService.stop();
+      await BackgroundService.start(veryIntensiveTask, options);
+    } else {
+      await BackgroundService.start(veryIntensiveTask, options);
     }
-  }, [readyToChangeBrightness, isFocused]);
+  };
+
+  const handleBackAction = () => {
+    setDisplayTurnOffMessage(true);
+    return true;
+  };
+
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      handleBackAction,
+    );
+
+    return () => backHandler.remove();
+  }, []);
+
+  // useEffect(() => {
+  //   const setMinimumBrightness = async (value) => {
+  //     // setting brightness after moving app to background on android
+  //     // doesn't work if we didn't get brightness earlier
+  //     await Brightness.getSystemBrightnessAsync();
+  //     await Brightness.setSystemBrightnessAsync(value);
+  //   };
+
+  //   if (readyToChangeBrightness && isFocused) {
+  //     setMinimumBrightness(0);
+  //     return () => {
+  //       setMinimumBrightness(0.7);
+  //     };
+  //   }
+  // }, [readyToChangeBrightness, isFocused]);
 
   useEffect(() => {
     if (!isScrensaverActive) {
@@ -78,45 +188,6 @@ const FreeSleep = ({route, navigation}) => {
       return () => clearTimeout(screensaverDelay);
     }
   }, [isScrensaverActive]);
-
-  // useEffect(() => {
-  //   const soundPlayer = new Sound(sleepSound, Sound.MAIN_BUNDLE, (error) => {
-  //     if (error) {
-  //       console.log('failed to load the sound', error);
-  //       return;
-  //     }
-  //     soundPlayer.setNumberOfLoops(-1);
-
-  //     soundPlayer.setVolume(mapVolumeSettingToDecimal(sleepSoundVolume));
-
-  //     if (sleepSoundEnabled) {
-  //       soundPlayer.play();
-  //     }
-  //   });
-
-  //   setTimeout(() => {
-  //     let index = +sleepSoundVolume;
-
-  //     var interval = setInterval(() => {
-  //       if (index > 0) {
-  //         index--;
-  //         const element = volumeSettings[index];
-
-  //         soundPlayer.setVolume(element.volume);
-  //       } else {
-  //         soundPlayer.stop();
-  //       }
-  //     }, 500);
-
-  //     setTimeout(() => {
-  //       clearInterval(interval);
-  //     }, +sleepSoundVolume * 10000);
-  //   }, mapSleepSoundSettingToTimeInMilliseconds(sleepSoundTimer));
-
-  //   return () => {
-  //     soundPlayer.stop();
-  //   };
-  // }, [sleepSound, sleepSoundEnabled]);
 
   useEffect(() => {
     if (alarmDate.getTime() <= nowDateInMiliseconds) {
@@ -134,8 +205,9 @@ const FreeSleep = ({route, navigation}) => {
     setDisplayTurnOffMessage(true);
   };
 
-  const handleTurnOffPress = () => {
+  const handleTurnOffPress = async () => {
     deactivateKeepAwake();
+    await BackgroundService.stop();
     navigation.goBack();
   };
 

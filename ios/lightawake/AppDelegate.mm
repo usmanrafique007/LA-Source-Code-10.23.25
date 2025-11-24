@@ -8,10 +8,9 @@
 #import <FBSDKCoreKit/FBSDKCoreKit-swift.h>
 #import <RNCPushNotificationIOS.h>
 #import <RNSplashScreen.h>
-#import <TuyaSmartHomeKit/TuyaSmartKit.h>
 #import <UserNotifications/UserNotifications.h>
 #import <React/RCTLinkingManager.h>
-
+#import <ThingSmartHomeKit/ThingSmartKit.h>
 // #ifdef FB_SONARKIT_ENABLED
 // #import <FlipperKit/FlipperClient.h>
 // #import <FlipperKitLayoutPlugin/FlipperKitLayoutPlugin.h>
@@ -48,15 +47,21 @@
     [FIRApp configure];
   }
 
+  #ifdef DEBUG
+    [[ThingSmartSDK sharedInstance] setDebugMode:YES];
+  #endif
+  [ThingSmartSDK sharedInstance].appGroupId=@"group.com.lightawake.live";
+  [[ThingSmartSDK sharedInstance] startWithAppKey:@"cdkgtja8xqe3en8m9udu" secretKey:@"xp4rthxec9jsvxnmc8gv95qpug387mw3"];
+
   // #ifdef FB_SONARKIT_ENABLED
   //   InitializeFlipper(application);
   // #endif
 
-  #ifdef DEBUG
-    [[TuyaSmartSDK sharedInstance] setDebugMode:YES];
-  #endif
-
-  [[TuyaSmartSDK sharedInstance] startWithAppKey:@"8dtgsm7qhk8dhxvwwtgj" secretKey:@"7ktdrydnrjjfsvtu4nkwqdm44xcstjx4"];
+//  #ifdef DEBUG
+  //  [[TuyaSmartSDK sharedInstance] setDebugMode:YES];
+//  #endif
+// 
+//  [[TuyaSmartSDK sharedInstance] startWithAppKey:@"8dtgsm7qhk8dhxvwwtgj" secretKey:@"7ktdrydnrjjfsvtu4nkwqdm44xcstjx4"];
 
   // self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   // UIViewController *rootViewController = [UIViewController new];

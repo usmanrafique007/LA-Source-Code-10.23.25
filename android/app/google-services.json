@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "468523640148",
     "project_id": "lightawake-7f932",
-    "storage_bucket": "lightawake-7f932.appspot.com"
+    "storage_bucket": "lightawake-7f932.firebasestorage.app"
   },
   "client": [
     {
@@ -14,23 +14,31 @@
       },
       "oauth_client": [
         {
-          "client_id": "468523640148-bg9de7h9ea52tsk9re77sgh891gcg4t3.apps.googleusercontent.com",
+          "client_id": "468523640148-4ureu6fr1uh3vcabhh50p9doa1q9l09u.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.lightawakereimagined",
-            "certificate_hash": "d4ade082a94248d759d9b6f5f509a9006247bab7"
+            "certificate_hash": "a7e82fedaa3ba937559fd1ae6c5d390697a5cf63"
           }
         },
         {
-          "client_id": "468523640148-rknb2ha1qabpm06ah2eevkdb05etfs4d.apps.googleusercontent.com",
+          "client_id": "468523640148-9j4er25l7vbbph89v9ha6jotpq2g3uue.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.lightawakereimagined",
-            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+            "certificate_hash": "87069e891fb0a0918bec68343c7776bfac2e7f08"
           }
         },
         {
-          "client_id": "468523640148-tfa82k0trnc4hs7r8200670jdtf5972u.apps.googleusercontent.com",
+          "client_id": "468523640148-rhijnmp9m04sa45nfbdu4erd36grlvkl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lightawakereimagined",
+            "certificate_hash": "e27ef0881f5cf56bbc0d6b9d0971b2cc3f834266"
+          }
+        },
+        {
+          "client_id": "468523640148-1avu7l9obk8asc7bl2ps3tfc3dnn4pmu.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -43,7 +51,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "468523640148-tfa82k0trnc4hs7r8200670jdtf5972u.apps.googleusercontent.com",
+              "client_id": "468523640148-1avu7l9obk8asc7bl2ps3tfc3dnn4pmu.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

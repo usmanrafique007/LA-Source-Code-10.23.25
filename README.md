@@ -27,3 +27,25 @@ To run eslint use `yarn lint`
 [Jira](https://blazity.atlassian.net/secure/RapidBoard.jspa?rapidView=21&projectKey=LAW&view=planning&selectedIssue=LAW-6&issueLimit=100)
 
 [React-Native setting up dev env](https://reactnative.dev/docs/environment-setup)
+
+
+
+Steps for Run Build
+1- Delete Node Modules
+2- npm i
+3- npm i --legacy-peer-deps
+4- npm run android
+
+
+Node Version v20.9.0
+Java version 11.0.20
+node -v
+java -version
+
+
+adb reverse tcp:3000 tcp:3000
+
+To release: 
+`cd android
+./gradlew clean
+./gradlew assembleRelease`

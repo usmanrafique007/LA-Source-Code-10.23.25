@@ -7,6 +7,7 @@ const StorageProperty = {
   BULB_PULSE_RATE: 'flashlightPulseRate',
   BULB_PULSE_RATE_ENABLED: 'flashlightPulseRateEnabled',
   ALARM_SOUND: 'alarmSound',
+  SOUND_PLAYER: 'soundPlayer',
   SLEEP_SOUND: 'sleepSound',
   SLEEP_SOUND_VOLUME: 'sleepSoundVolume',
   SLEEP_SOUND_TIMER: 'sleepSoundTimer',
@@ -27,7 +28,9 @@ const StorageProperty = {
   USER_TOKEN: 'userTokenStored',
   PROMPTSTARTTIME: 'prompStartTime',
   SURVEYANSWERED: 'surveyAnswered',
-  WIFI_NAME: 'wifiName'
+  WIFI_NAME: 'wifiName',
+  IS_DISABLE_ALARM:'isDisableAlarm',
+  PRIVACY_MODAL:'privacyModal'
 };
 
 export default StorageProperty;

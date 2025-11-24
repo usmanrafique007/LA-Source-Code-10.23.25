@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {send} from '@volst/react-native-tuya';
+import React, { useState } from 'react';
+import {send} from '@owowagency/react-native-tuya';
 import Switch from '../../../components/Globals/Switch';
 import {
   SettingContainer,
@@ -8,9 +8,9 @@ import {
   SettingTitle,
   Row,
 } from '../../../styles/commonStyledComponents';
-import {Toast} from '../../../components/Globals/Toast';
+import { Toast } from '../../../components/Globals/Toast';
 
-const ChangeBulbLightOnOff = ({device}) => {
+const ChangeBulbLightOnOff = ({ device }) => {
   const [light, setLight] = useState(device?.dps[20]);
 
   const handleSwitch = () => {

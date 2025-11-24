@@ -7,6 +7,7 @@ import useTime from '../../../hooks/useTime';
 import {useDeviceBrightnessContext} from '../../../contexts/device-brightness.context';
 import {useTimeFormatContext} from '../../../contexts/time-format.context';
 import FreeWakeUpInformationScreen from './FreeWakeUpInformationScreen';
+import { Platform } from 'react-native';
 
 const DATA = [
   {
@@ -95,6 +96,13 @@ export default function FreeWakeUpInformationContainer({navigation}) {
   const {restoreDeviceBrightnessWhenAppIsReady} = useDeviceBrightnessContext();
   const isFocused = useIsFocused();
 
+  // useEffect(() => {
+  //   // if(Platform.OS=='ios'){
+  //     const soundPlayer = new Sound("")
+  //     soundPlayer.setVolume(0);
+  //   // }
+   
+  // }, [])
   useEffect(() => {
     if (isFocused) {
       restoreDeviceBrightnessWhenAppIsReady();

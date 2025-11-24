@@ -12,7 +12,7 @@ import {
 export function Header({navigation}) {
   return (
     <BulbScreenHead>
-      <BackButton onPress={() => navigation.navigate('Home')} />
+      <BackButton onPress={() => navigation.goBack()} />
       <ScreenTitle>BULBS</ScreenTitle>
     </BulbScreenHead>
   );

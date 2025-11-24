@@ -10,7 +10,6 @@ import {
   ScreenContainer,
 } from '../../../styles/commonStyledComponents';
 import {scaleHeight, scaleWidth} from '../../../styles/scales';
-import RNUxcam from 'react-native-ux-cam';
 
 export default function FreeWakeUpInformationScreen({
   timeToDisplay,
@@ -18,7 +17,6 @@ export default function FreeWakeUpInformationScreen({
   wakeUpData,
   navigation,
 }) {
-  RNUxcam.tagScreenName('Wake-up Screen');
   return (
     <BackgroundImage source={wakeUpData.image} resizeMode="cover">
       <Container>

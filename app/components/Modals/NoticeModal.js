@@ -58,6 +58,33 @@ const NoticeModal = ({noticeModalOpen, setNoticeModalOpen}) => {
       closeButton: <Spacer style={{marginBottom: responsiveHeight(2)}} />,
       animatedIcon: (
         <LottieView
+          source={require('../../../assets/loader.json')}
+          style={{
+            width: responsiveWidth(30),
+            height: responsiveHeight(30),
+            marginLeft: 'auto',
+            marginRight: 'auto',
+          }}
+          autoPlay
+          loop
+        />
+      ),
+      message: (
+        <ModalText
+          style={{
+            fontSize: responsiveFontSize(2.2),
+            marginLeft: 5,
+            textAlign: 'center',
+          }}>
+          Please confirm that the Location is enable from your device settings.
+          {'\n'}
+        </ModalText>
+      ),
+    },
+    {
+      closeButton: <Spacer style={{marginBottom: responsiveHeight(2)}} />,
+      animatedIcon: (
+        <LottieView
           source={require('../../../assets/password.json')}
           style={{
             width: responsiveWidth(30),
@@ -146,7 +173,7 @@ const NoticeModal = ({noticeModalOpen, setNoticeModalOpen}) => {
       <Backdrop>
         <ModalBody
           colors={[theme.colors.bluePurple, theme.colors.lightIndigo]}
-          start={{x: 0.7, y: 0}}>
+          start={{x: 0.9, y: 0}}>
           <ExitButtonContainer
             style={{alignItems: 'flex-end'}}
             onPress={() => handleCloseModal()}>
@@ -163,7 +190,8 @@ const NoticeModal = ({noticeModalOpen, setNoticeModalOpen}) => {
             itemWidth={scaleWidth(350)}
             layout={'default'}
             onSnapToItem={(index) => setActiveSlide(index)}
-          />
+            decelerationRate={0.25}          
+            />
           <Pagination
             dotsLength={notices.length}
             activeDotIndex={activeSlide}

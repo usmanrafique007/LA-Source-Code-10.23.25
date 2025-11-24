@@ -105,14 +105,14 @@ export default function UpgradeSleepSoundPicker({
         setSoundSleep(product_identifier + '.mp3');
       } catch (error) {
         // workaround to set the first purchased sleep sound be highlighted first
-        setSoundSleep(tracks[0]?.audio.product_identifier + '.mp3');
+        // setSoundSleep(tracks[0]?.audio.product_identifier + '.mp3');
 
-        addTrackToQueue(tracks[0], 'sleep', 'unshift');
+        // addTrackToQueue(tracks[0], 'sleep', 'unshift');
 
-        storeAsyncStorageData(
-          StorageProperty.SLEEP_TRACK,
-          `${JSON.stringify(tracks[0])}`,
-        );
+        // storeAsyncStorageData(
+        //   StorageProperty.SLEEP_TRACK,
+        //   `${JSON.stringify(tracks[0])}`,
+        // );
       }
     }
 
@@ -150,16 +150,16 @@ export default function UpgradeSleepSoundPicker({
 
   function sortAudios(audios) {
     const pinkNoise = audios.filter(
-      (element) => element.audio.audio_type_color === 'pink_noise',
+      (element) => element?.audio?.audio_type_color === 'pink_noise',
     );
     const brownNoise = audios.filter(
-      (element) => element.audio.audio_type_color === 'brown_noise',
+      (element) => element?.audio?.audio_type_color === 'brown_noise',
     );
     const whiteNoise = audios.filter(
-      (element) => element.audio.audio_type_color === 'white_noise',
+      (element) => element?.audio?.audio_type_color === 'white_noise',
     );
     const shortStory = audios.filter(
-      (element) => element.audio.audio_type_color === 'short_story',
+      (element) => element?.audio?.audio_type_color === 'short_story',
     );
 
     setPinkNoiseAudios(pinkNoise);
@@ -226,30 +226,38 @@ export default function UpgradeSleepSoundPicker({
     let newArray = [...loaderArray];
     newArray[categoryIndex][trackIndex] = true;
     setLoaderArray(newArray);
+    try{
+      await redownloadPurchasedTrack(track.audio,track);
 
-    await redownloadPurchasedTrack(track.audio);
-
-    newArray[categoryIndex][trackIndex] = false;
-    setLoaderArray(newArray);
-
-    setLastDownloadedIndex({categoryIndex, trackIndex});
-
-    setTimeout(async () => {
-      const {exist} = await checkAudioExistence(track.track_url);
-      const newTracks = [...tracks];
-
-      // Initialize newTracks[categoryIndex] if it's undefined
-      if (!newTracks[categoryIndex]) {
-        newTracks[categoryIndex] = [];
-      }
-
-      const updatedTrack = {...newTracks[categoryIndex][trackIndex]};
-      updatedTrack.track_exist = exist;
-      newTracks[categoryIndex][trackIndex] = updatedTrack;
-      setTracks(newTracks);
+      newArray[categoryIndex][trackIndex] = false;
+      setLoaderArray(newArray);
+  
+      setLastDownloadedIndex({categoryIndex, trackIndex});
+  
+      setTimeout(async () => {
+        const {exist} = await checkAudioExistence(track.track_url);
+        const newTracks = [...tracks];
+  
+        // Initialize newTracks[categoryIndex] if it's undefined
+        if (!newTracks[categoryIndex]) {
+          newTracks[categoryIndex] = [];
+        }
+  
+        const updatedTrack = {...newTracks[categoryIndex][trackIndex]};
+        updatedTrack.track_exist = exist;
+        newTracks[categoryIndex][trackIndex] = updatedTrack;
+        setTracks(newTracks);
+        setHasUpdated(!hasUpdated);
+        setIsDownloading(false);
+      }, 500);
+    }
+    catch(e){
       setHasUpdated(!hasUpdated);
+
       setIsDownloading(false);
-    }, 500);
+
+    }
+
   }
 
   async function handleSetAlarm(track) {
@@ -288,6 +296,7 @@ export default function UpgradeSleepSoundPicker({
           />
           <AudioSectionTitle>{title}</AudioSectionTitle>
         </Row>
+        
         {audios.length != 0 ? (
           audios.map((track, index) => (
             <SoundRow key={track.audio.id}>
@@ -305,6 +314,7 @@ export default function UpgradeSleepSoundPicker({
                     }
                   />
                 </StyledTouchableOpacity>
+             
                 {track.track_exist ? (
                   <StyledTouchableOpacity onPress={() => handleSetAlarm(track)}>
                     <Image
@@ -313,6 +323,7 @@ export default function UpgradeSleepSoundPicker({
                           ? require('../../../../../../assets/selected-icon.png')
                           : require('../../../../../../assets/not-selected-icon.png')
                       }
+                      style={{marginRight:responsiveScreenWidth(0.4)}}
                     />
                   </StyledTouchableOpacity>
                 ) : loaderArray[categoryIndex][index] ? (
@@ -322,6 +333,7 @@ export default function UpgradeSleepSoundPicker({
                       style={{
                         marginLeft: responsiveScreenWidth(1),
                         height: responsiveScreenHeight(4),
+                        width:responsiveScreenWidth(6)
                       }}
                       autoPlay
                       loop
