@@ -1,0 +1,24 @@
+diff --git a/node_modules/expo-modules-core/android/CMakeLists.txt b/node_modules/expo-modules-core/android/CMakeLists.txt
+index aa5252c..c2e0e9f 100644
+--- a/node_modules/expo-modules-core/android/CMakeLists.txt
++++ b/node_modules/expo-modules-core/android/CMakeLists.txt
+@@ -89,6 +89,10 @@ endif()
+ # find libraries
+ 
+ find_library(LOG_LIB log)
++find_library(CPP_SHARED_LIB c++_shared)
++if (NOT CPP_SHARED_LIB)
++  message(FATAL_ERROR "Unable to locate libc++_shared; ensure the NDK is installed correctly.")
++endif()
+ 
+ find_package(ReactAndroid REQUIRED CONFIG)
+ 
+@@ -124,6 +128,7 @@ target_link_libraries(
+         ${PACKAGE_NAME}
+         CommonSettings
+         ${LOG_LIB}
++        ${CPP_SHARED_LIB}
+         fbjni::fbjni
+         ReactAndroid::jsi
+         ReactAndroid::reactnativejni
+

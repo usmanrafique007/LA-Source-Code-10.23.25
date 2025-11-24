@@ -118,8 +118,8 @@ android {
         applicationId 'com.lightawakereimagined'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 165
-        versionName "3.4.0"
+        versionCode 169
+        versionName "3.4.2"
         missingDimensionStrategy 'store', 'play'
         multiDexEnabled true
     ndk {
